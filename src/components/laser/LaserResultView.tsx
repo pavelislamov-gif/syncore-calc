@@ -2,6 +2,7 @@ import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { StatusBanner } from '@/components/ui/StatusBanner'
+import { LaserLayerSettings } from '@/components/laser/LaserLayerSettings'
 import type { LaserResult } from '@/types/laser'
 import type { Material } from '@/types/material'
 import { formatNumber, formatRpm } from '@/utils/format'
@@ -48,6 +49,8 @@ export function LaserResultView({ result, material, onSaveHistory, onSaveFavorit
           <p className="mt-2 text-sm text-ink-soft">{check.detail}</p>
         </Card>
       ))}
+
+      <LaserLayerSettings result={result} />
 
       <Card>
         <p className="text-sm font-semibold">Почему?</p>

@@ -40,7 +40,7 @@ export function HomePage() {
         <ModuleCard
           icon={<ScanLine className="h-5 w-5" />}
           title="Лазерная резка"
-          description="Скорость, газ, фокус и пробивка по материалу и толщине."
+          description="Скорость, газ, фокус, пробивка и настройки слоя для контроллера."
           to="/laser"
           action="Открыть калькулятор"
         />
