@@ -64,5 +64,7 @@ export function getLaserSource(id: string): LaserSourcePreset | undefined {
 }
 
 export function defaultLaserSource(): LaserSourcePreset {
-  return laserSourcePresets.find((item) => item.id === 'fiber-1500') ?? laserSourcePresets[0]
+  const preset = laserSourcePresets.find((item) => item.id === 'fiber-1500') ?? laserSourcePresets[0]
+  if (!preset) throw new Error('Laser source presets are empty')
+  return preset
 }

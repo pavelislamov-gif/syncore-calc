@@ -117,4 +117,21 @@ describe('fiber mild steel 1.5 kW', () => {
       }),
     ).toThrow(/0\.2 до 40/)
   })
+
+  it('rejects zero manual speed', () => {
+    expect(() =>
+      calculateLaser({
+        materialId: 'st3',
+        thicknessMm: 3,
+        cutLengthMm: 1000,
+        sourceKind: 'fiber',
+        powerW: 1500,
+        operation: 'cut',
+        quality: 'standard',
+        gasMode: 'auto',
+        paramMode: 'manual',
+        overrides: { speedMmMin: 0 },
+      }),
+    ).toThrow(/больше нуля/)
+  })
 })

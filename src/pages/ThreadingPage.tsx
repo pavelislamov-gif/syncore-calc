@@ -2,7 +2,7 @@ import { ThreadingForm } from '@/components/threading/ThreadingForm'
 import { ThreadingResultView } from '@/components/threading/ThreadingResultView'
 import { useThreadingForm } from '@/hooks/useThreadingForm'
 import { saveFavorite, saveHistoryItem } from '@/services/storage'
-import { formatRpm, newId } from '@/utils/format'
+import { formatNumber, formatRpm, newId } from '@/utils/format'
 import { scrollToResult } from '@/utils/scroll'
 
 export function ThreadingPage() {
@@ -16,7 +16,7 @@ export function ThreadingPage() {
       kind: 'threading',
       title: `${form.result.designation} × ${form.result.pitchMm} · ${material.shortName}`,
       createdAt: new Date().toISOString(),
-      summary: `${formatRpm(form.result.rpm)} об/мин · отверстие ${formatRpm(form.result.tapDrillMm)} мм`,
+      summary: `${formatRpm(form.result.rpm)} об/мин · отверстие ${formatNumber(form.result.tapDrillMm, 2)} мм`,
       payload: { state: form.state, result: form.result },
     })
   }

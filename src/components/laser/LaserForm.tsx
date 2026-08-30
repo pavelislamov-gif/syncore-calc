@@ -8,7 +8,7 @@ import { Select } from '@/components/ui/Select'
 import { SegmentedControl } from '@/components/ui/SegmentedControl'
 import type { LaserFormState } from '@/hooks/useLaserForm'
 import type { Material } from '@/types/material'
-import type { AssistGas } from '@/types/laser'
+import type { AssistGas, LaserResult } from '@/types/laser'
 import { cn } from '@/utils/cn'
 
 const hints = {
@@ -26,6 +26,7 @@ interface Props {
   applySource: (id: string) => void
   onCalculate: () => void
   error: string | null
+  preview?: LaserResult | null
 }
 
 export function LaserForm({
@@ -37,6 +38,7 @@ export function LaserForm({
   applySource,
   onCalculate,
   error,
+  preview,
 }: Props) {
   function patch(partial: Partial<LaserFormState>) {
     setState((current) => ({ ...current, ...partial }))
@@ -142,37 +144,41 @@ export function LaserForm({
             onChange={(powerW) => patch({ powerW })}
           />
         </div>
-        <p className="mt-4 text-sm font-medium text-ink-soft">Качество кромки</p>
-        <div className="mt-3 flex flex-wrap gap-2">
-          {(
-            [
-              { id: 'fine', label: 'Чистая' },
-              { id: 'standard', label: 'Обычная' },
-              { id: 'coarse', label: 'Быстрая' },
-            ] as const
-          ).map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              className={cn(
-                'min-h-11 rounded-xl px-3 text-sm font-semibold ring-1 transition-colors',
-                state.quality === item.id
-                  ? 'bg-graphite text-white ring-graphite'
-                  : 'bg-card text-ink-soft ring-line hover:text-ink',
-              )}
-              onClick={() => patch({ quality: item.id })}
-            >
-              {item.label}
-            </button>
-          ))}
-        </div>
+        {state.operation === 'cut' ? (
+          <>
+            <p className="mt-4 text-sm font-medium text-ink-soft">Качество кромки</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {(
+                [
+                  { id: 'fine', label: 'Чистая' },
+                  { id: 'standard', label: 'Обычная' },
+                  { id: 'coarse', label: 'Быстрая' },
+                ] as const
+              ).map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  className={cn(
+                    'min-h-11 rounded-xl px-3 text-sm font-semibold ring-1 transition-colors',
+                    state.quality === item.id
+                      ? 'bg-graphite text-white ring-graphite'
+                      : 'bg-card text-ink-soft ring-line hover:text-ink',
+                  )}
+                  onClick={() => patch({ quality: item.id })}
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
+          </>
+        ) : null}
         <div className="mt-4 overflow-hidden rounded-2xl">
           <LaserCutDiagram
-            thicknessMm={Number.isFinite(thicknessNum) ? thicknessNum : 3}
-            focusMm={state.sourceKind === 'fiber' ? -0.8 : 0}
-            nozzleMm={thicknessNum > 4 ? 2 : 1.5}
+            thicknessMm={Number.isFinite(thicknessNum) && thicknessNum > 0 ? thicknessNum : 3}
+            focusMm={preview?.focusMm ?? (state.sourceKind === 'fiber' ? -0.8 : 0)}
+            nozzleMm={preview?.nozzleMm ?? (thicknessNum > 4 ? 2 : 1.5)}
             sourceKind={state.sourceKind}
-            gas={state.gasMode === 'auto' ? 'auto' : state.gas}
+            gas={preview?.gas ?? (state.gasMode === 'manual' ? state.gas : 'O2')}
           />
         </div>
       </Card>

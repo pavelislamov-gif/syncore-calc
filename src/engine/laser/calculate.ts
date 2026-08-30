@@ -41,7 +41,10 @@ export function calculateLaser(input: LaserInput): LaserResult {
     rangeMax = speedMmMin * 1.4
   }
 
-  if (input.paramMode === 'manual' && input.overrides.speedMmMin) {
+  if (input.paramMode === 'manual' && input.overrides.speedMmMin != null) {
+    if (!Number.isFinite(input.overrides.speedMmMin) || input.overrides.speedMmMin <= 0) {
+      throw new CalculationError('speed', 'Скорость должна быть больше нуля.')
+    }
     speedMmMin = input.overrides.speedMmMin
   }
 
@@ -65,13 +68,12 @@ export function calculateLaser(input: LaserInput): LaserResult {
   const piercePowerPct = input.operation === 'engrave' ? 0 : Math.min(100, powerPct + 8)
   const kerfMm = Math.max(0.08, table.kerfFactor * Math.sqrt(input.thicknessMm) * (input.sourceKind === 'fiber' ? 1 : 1.3))
   const speedMmS = speedMmMin / 60
-  const timeMin = input.cutLengthMm / speedMmMin + pierceTimeMs / 60000
+  const timeMin = speedMmMin > 0 ? input.cutLengthMm / speedMmMin + pierceTimeMs / 60000 : 0
 
   const checks = evaluateChecks({
     input,
     family,
     metal,
-    tablePreferred: table.preferredSource,
     minPowerW: point.minPowerW,
     speedMmMin,
     rangeMin,
@@ -151,7 +153,6 @@ function evaluateChecks(args: {
   input: LaserInput
   family: LaserResult['family']
   metal: boolean
-  tablePreferred: 'fiber' | 'co2'
   minPowerW: number
   speedMmMin: number
   rangeMin: number

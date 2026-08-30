@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { getMaterial, listMaterials } from '@/data/materials'
 import { defaultLaserSource, getLaserSource } from '@/data/laser/sources'
 import { calculateLaser } from '@/engine/laser'
@@ -65,7 +65,13 @@ export function runLaser(state: LaserFormState): LaserResult {
 
 export function useLaserForm() {
   const [state, setStateInner] = useState<LaserFormState>(initialLaserState)
-  const [result, setResult] = useState<LaserResult | null>(null)
+  const [result, setResult] = useState<LaserResult | null>(() => {
+    try {
+      return runLaser(initialLaserState)
+    } catch {
+      return null
+    }
+  })
   const [error, setError] = useState<string | null>(null)
   const [advanced, setAdvanced] = useState(false)
   const material = useMemo(() => getMaterial(state.materialId), [state.materialId])
@@ -83,10 +89,6 @@ export function useLaserForm() {
       return false
     }
   }
-
-  useEffect(() => {
-    applyCalc(initialLaserState)
-  }, [])
 
   function setState(updater: (current: LaserFormState) => LaserFormState) {
     setStateInner((current) => {

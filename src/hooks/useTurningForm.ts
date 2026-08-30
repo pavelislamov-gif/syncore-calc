@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { defaultLathe, getLathePreset } from '@/data/machines/lathes'
 import { getMaterial, listMaterials } from '@/data/materials'
 import { getCutterKind } from '@/data/tools/cutters'
@@ -90,7 +90,13 @@ export function runTurning(state: TurningFormState): TurningResult {
 
 export function useTurningForm() {
   const [state, setStateInner] = useState<TurningFormState>(initialTurningState)
-  const [result, setResult] = useState<TurningResult | null>(null)
+  const [result, setResult] = useState<TurningResult | null>(() => {
+    try {
+      return runTurning(initialTurningState)
+    } catch {
+      return null
+    }
+  })
   const [error, setError] = useState<string | null>(null)
   const [advanced, setAdvanced] = useState(false)
   const material = useMemo(() => getMaterial(state.materialId), [state.materialId])
@@ -108,10 +114,6 @@ export function useTurningForm() {
       return false
     }
   }
-
-  useEffect(() => {
-    applyCalc(initialTurningState)
-  }, [])
 
   function setState(updater: (current: TurningFormState) => TurningFormState) {
     setStateInner((current) => {

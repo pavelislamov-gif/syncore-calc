@@ -52,6 +52,7 @@ export function LaserPage() {
               if (form.calculate()) scrollToResult('laser-result')
             }}
             error={form.error}
+            preview={form.result}
           />
         </div>
       </div>

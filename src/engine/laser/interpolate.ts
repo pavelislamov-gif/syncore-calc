@@ -1,6 +1,9 @@
 import type { LaserThicknessPoint } from '@/data/laser/regimes'
 
 export function interpolatePoints(thicknessMm: number, points: LaserThicknessPoint[]): LaserThicknessPoint {
+  if (points.length === 0) {
+    throw new Error('Laser regime table is empty')
+  }
   const sorted = [...points].sort((a, b) => a.thicknessMm - b.thicknessMm)
   const first = sorted[0]
   const last = sorted[sorted.length - 1]

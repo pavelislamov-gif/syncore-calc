@@ -11,7 +11,7 @@ export function LaserCutDiagram({ thicknessMm, focusMm, nozzleMm, sourceKind, ga
   const sheetH = Math.min(48, 10 + thicknessMm * 2.2)
   const sheetY = 86
   const sheetTop = sheetY - sheetH
-  const focusY = sheetTop - focusMm * 4
+  const focusY = Math.min(100, Math.max(22, sheetTop + focusMm * 4))
   const nozzleW = 10 + nozzleMm * 3
 
   return (

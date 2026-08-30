@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { defaultMachineForClass, machinePresets } from '@/data/machines'
 import { getMaterial, listMaterials } from '@/data/materials'
 import { geometryToFormFields } from '@/data/tools/geometry'
@@ -105,8 +105,15 @@ export function runMilling(state: MillingFormState): MillingResult {
 }
 
 export function useMillingForm(seed?: Partial<MillingFormState>) {
-  const [state, setStateInner] = useState<MillingFormState>({ ...initialMillingState, ...seed })
-  const [result, setResult] = useState<MillingResult | null>(null)
+  const start = { ...initialMillingState, ...seed }
+  const [state, setStateInner] = useState<MillingFormState>(start)
+  const [result, setResult] = useState<MillingResult | null>(() => {
+    try {
+      return runMilling(start)
+    } catch {
+      return null
+    }
+  })
   const [error, setError] = useState<string | null>(null)
   const [advanced, setAdvanced] = useState(false)
 
@@ -125,12 +132,6 @@ export function useMillingForm(seed?: Partial<MillingFormState>) {
       return false
     }
   }
-
-  useEffect(() => {
-    applyCalc({ ...initialMillingState, ...seed })
-    // начальный итог: материал + инструмент по умолчанию
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
 
   function setState(updater: (current: MillingFormState) => MillingFormState) {
     setStateInner((current) => {
