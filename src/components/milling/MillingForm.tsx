@@ -51,6 +51,7 @@ export function MillingForm({
   return (
     <form
       className="space-y-4"
+      noValidate
       onSubmit={(event) => {
         event.preventDefault()
         onCalculate()
@@ -142,6 +143,7 @@ export function MillingForm({
             value={state.diameter}
             min={0.1}
             max={100}
+            error={error && /диаметр/i.test(error) ? error : undefined}
             onChange={(diameter) => patch({ diameter })}
           />
           <NumberField
@@ -151,6 +153,7 @@ export function MillingForm({
             min={1}
             max={12}
             step="1"
+            error={error && /зуб/i.test(error) ? error : undefined}
             onChange={(flutes) => patch({ flutes })}
           />
         </div>
