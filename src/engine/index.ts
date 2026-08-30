@@ -1,5 +1,6 @@
 export * from './milling'
 export * from './turning'
 export * from './threading'
+export * from './laser'
 export { CalculationError } from './errors'
 export * from './units'

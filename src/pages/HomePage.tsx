@@ -11,13 +11,13 @@ export function HomePage() {
       <section className="max-w-3xl">
         <p className="text-sm font-semibold uppercase tracking-[0.16em] text-accent-2">TechCalc</p>
         <h1 className="mt-3 text-4xl font-extrabold tracking-tight md:text-5xl">Инженерные расчёты для производства</h1>
-        <p className="mt-4 text-lg text-ink-soft">Материал и инструмент — режимы резания для фрезера и токарки.</p>
+        <p className="mt-4 text-lg text-ink-soft">Материал и инструмент — режимы для фрезера, токарки и лазера.</p>
         <div className="mt-6 flex flex-col gap-3 sm:flex-row">
           <Link to="/milling">
             <Button variant="graphite">Открыть фрезерование</Button>
           </Link>
-          <Link to="/turning">
-            <Button variant="outline">Открыть токарку</Button>
+          <Link to="/laser">
+            <Button variant="outline">Открыть лазер</Button>
           </Link>
         </div>
       </section>
@@ -42,20 +42,18 @@ export function HomePage() {
           title="Лазерная резка"
           description="Расчёт параметров лазерной резки металла и параметры для CypCut."
           to="/laser"
-          action="Следующий этап"
+          action="Открыть калькулятор"
         />
       </section>
 
       <section>
         <p className="text-sm font-medium text-muted">В будущем</p>
         <div className="mt-3 flex flex-wrap gap-2">
-          {['Раскрой материала', 'Сверление (отдельный модуль)', 'Конвертер единиц', 'Дюймовая резьба'].map(
-            (item) => (
-              <span key={item} className="rounded-full bg-white px-3 py-2 text-sm text-ink-soft ring-1 ring-line">
-                {item}
-              </span>
-            ),
-          )}
+          {['Раскрой листа', 'Сверление (отдельный модуль)', 'Конвертер единиц', 'Дюймовая резьба'].map((item) => (
+            <span key={item} className="rounded-full bg-white px-3 py-2 text-sm text-ink-soft ring-1 ring-line">
+              {item}
+            </span>
+          ))}
         </div>
       </section>
 
