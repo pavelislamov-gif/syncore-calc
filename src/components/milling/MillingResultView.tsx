@@ -21,15 +21,24 @@ export function MillingResultView({ result, material, onSaveHistory, onSaveFavor
 
   return (
     <div id="milling-result" className="scroll-mt-24 space-y-4">
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
         <ResultHero code="S" value={formatRpm(result.rpm)} unit="об/мин" />
-        <ResultHero code="F" value={formatRpm(result.feedMmMin)} unit="мм/мин" />
+        <ResultHero code="F" value={formatRpm(result.feedMmMin)} unit="мм/мин XY" />
+        <ResultHero code="Fz" value={formatRpm(result.plungeMmMin)} unit="мм/мин по Z" />
       </div>
+      <p className="text-sm leading-6 text-ink-soft">
+        Fz — прямолинейное врезание по оси Z (консервативно, k_z {formatNumber(result.plungeRatio, 2)}).
+        Винтовое врезание (ramping / helical):{' '}
+        <strong className="text-ink">{formatRpm(result.helicalPlungeMmMin)} мм/мин</strong> ≈ 55% подачи XY. Концевой
+        фрезой не стоит «сверлить» на полной F.
+      </p>
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-        <Metric label="Подача на зуб" value={`${formatNumber(result.fz, 3)} мм/зуб`} />
+        <Metric label="Подача на зуб XY" value={`${formatNumber(result.fz, 3)} мм/зуб`} />
+        <Metric label="Подача на зуб по Z" value={`${formatNumber(result.fzPlunge, 3)} мм/зуб`} />
         <Metric label="Скорость резания" value={`${formatNumber(result.vc, 0)} м/мин`} />
         <Metric label="Глубина резания" value={`${formatNumber(result.ap, 2)} мм`} />
         <Metric label="Ширина резания" value={`${formatNumber(result.ae, 2)} мм`} />
+        <Metric label="Винтовое врезание" value={`${formatRpm(result.helicalPlungeMmMin)} мм/мин`} />
       </div>
       <Metric label="Ориентировочная мощность" value={`${formatNumber(result.powerKw, 2)} кВт`} />
 

@@ -44,6 +44,10 @@ export interface MillingResult {
   ap: number
   ae: number
   powerKw: number
+  plungeMmMin: number
+  fzPlunge: number
+  helicalPlungeMmMin: number
+  plungeRatio: number
   status: CheckSeverity
   statusTitle: string
   checks: CheckResult[]

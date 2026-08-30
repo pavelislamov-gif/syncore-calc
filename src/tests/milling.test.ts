@@ -3,9 +3,12 @@ import {
   calculateCuttingSpeed,
   calculateFeedPerTooth,
   calculateFeedRate,
+  calculateHelicalPlungeFeed,
   calculateMilling,
+  calculatePlungeFeed,
   calculatePower,
   calculateSpindleSpeed,
+  plungeRatio,
 } from '@/engine'
 import { CalculationError } from '@/engine/errors'
 import { inchToMm, mmToInch, roundTo, wToKw } from '@/engine/units'
@@ -34,6 +37,16 @@ describe('feed', () => {
 
   it('computes fz from feed', () => {
     expect(calculateFeedPerTooth(1440, 18000, 2)).toBe(0.04)
+  })
+
+  it('computes Z plunge as a fraction of XY feed', () => {
+    const k = plungeRatio(0.85, 'endmill')
+    expect(k).toBeGreaterThanOrEqual(0.12)
+    expect(k).toBeLessThanOrEqual(0.5)
+    expect(calculatePlungeFeed(1440, k)).toBeLessThan(1440)
+    expect(roundTo(calculateHelicalPlungeFeed(1440), 0)).toBe(792)
+    expect(plungeRatio(0.85, 'drill')).toBeGreaterThan(plungeRatio(0.85, 'endmill'))
+    expect(plungeRatio(0.85, 'ball')).toBeLessThan(plungeRatio(0.85, 'endmill'))
   })
 })
 
@@ -106,6 +119,21 @@ describe('milling engine AMg6 Ø6 2Z', () => {
     expect(roundTo(result.ap, 1)).toBe(1.5)
     expect(roundTo(result.ae, 1)).toBe(3)
     expect(result.clamped.rpm).toBe(true)
+    expect(result.plungeMmMin).toBeLessThan(result.feedMmMin)
+    expect(roundTo(result.plungeRatio, 3)).toBe(roundTo(plungeRatio(0.85, 'endmill'), 3))
+    expect(roundTo(result.plungeMmMin, 1)).toBe(roundTo(1440 * result.plungeRatio, 1))
+    expect(roundTo(result.helicalPlungeMmMin, 0)).toBe(792)
+    expect(result.steps.some((step) => step.id === 'plunge')).toBe(true)
+  })
+
+  it('uses a higher Z plunge ratio for drills than for end mills', () => {
+    const mill = calculateMilling(base)
+    const drill = calculateMilling({
+      ...base,
+      tool: { ...base.tool, type: 'drill' },
+    })
+    expect(drill.plungeRatio).toBeGreaterThan(mill.plungeRatio)
+    expect(drill.plungeMmMin).toBeGreaterThan(mill.plungeMmMin)
   })
 
   it('warns when theoretical RPM exceeds the machine', () => {

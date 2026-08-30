@@ -16,7 +16,7 @@ export function MillingPage() {
       kind: 'milling',
       title: `${material.shortName} / Ø${form.state.diameter} / ${form.state.flutes}Z`,
       createdAt: new Date().toISOString(),
-      summary: `${formatRpm(form.result.rpm)} об/мин · ${formatRpm(form.result.feedMmMin)} мм/мин`,
+      summary: `${formatRpm(form.result.rpm)} об/мин · F ${formatRpm(form.result.feedMmMin)} · Fz ${formatRpm(form.result.plungeMmMin)} мм/мин`,
       payload: { state: form.state, result: form.result },
     })
   }
@@ -64,7 +64,7 @@ export function MillingPage() {
           />
         ) : (
           <div className="rounded-2xl border border-dashed border-line p-8 text-muted">
-            Нажмите «Рассчитать», чтобы получить обороты, подачу, Vc, fz, ap и ae.
+            Нажмите «Рассчитать», чтобы получить S, F (XY), Fz (врезание по Z), Vc, fz, ap и ae.
           </div>
         )}
       </div>

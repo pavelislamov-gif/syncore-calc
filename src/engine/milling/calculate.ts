@@ -10,7 +10,7 @@ import {
   validateOverride,
 } from '../validation'
 import { applyMachineClamps, evaluateMillingChecks } from './checks'
-import { calculateFeedPerTooth, calculateFeedRate } from './feed'
+import { calculateFeedPerTooth, calculateFeedRate, calculateHelicalPlungeFeed, calculatePlungeFeed, plungeRatio } from './feed'
 import { calculatePower, recommendDepth, recommendWidth } from './power'
 import { conservativeVc, recommendFz, recommendVc } from './recommend'
 import { calculateCuttingSpeed, calculateSpindleSpeed } from './spindle'
@@ -57,6 +57,13 @@ export function calculateMilling(input: MillingInput): MillingResult {
   const vcActual = calculateCuttingSpeed(rpm, input.tool.diameterMm)
   const feedMmMin = clamped.feedMmMin
   const fzActual = calculateFeedPerTooth(feedMmMin, rpm, input.tool.flutes)
+  const plungeK = plungeRatio(material.machinability, input.tool.type)
+  let plungeMmMin = calculatePlungeFeed(feedMmMin, plungeK)
+  if (plungeMmMin > input.machine.maxFeedMmMin) {
+    plungeMmMin = input.machine.maxFeedMmMin
+  }
+  const helicalPlungeMmMin = Math.min(calculateHelicalPlungeFeed(feedMmMin), input.machine.maxFeedMmMin)
+  const fzPlunge = calculateFeedPerTooth(plungeMmMin, rpm, input.tool.flutes)
   const ap = clamped.ap
   const ae = clamped.ae
   const powerKw = calculatePower({
@@ -146,6 +153,20 @@ export function calculateMilling(input: MillingInput): MillingResult {
       result: `${roundTo(theoreticalFeed, 1)} мм/мин`,
     },
     {
+      id: 'plunge',
+      label: millingFormulas.plunge.label,
+      formula: millingFormulas.plunge.formula,
+      substitution: `Vf_z = ${roundTo(feedMmMin, 1)} × ${roundTo(plungeK, 3)}`,
+      result: `${roundTo(plungeMmMin, 1)} мм/мин`,
+    },
+    {
+      id: 'helical',
+      label: millingFormulas.helicalPlunge.label,
+      formula: millingFormulas.helicalPlunge.formula,
+      substitution: `Vf_helical = ${roundTo(feedMmMin, 1)} × 0.55`,
+      result: `${roundTo(helicalPlungeMmMin, 1)} мм/мин`,
+    },
+    {
       id: 'p',
       label: millingFormulas.power.label,
       formula: millingFormulas.power.formula,
@@ -162,6 +183,10 @@ export function calculateMilling(input: MillingInput): MillingResult {
     ap,
     ae,
     powerKw,
+    plungeMmMin,
+    fzPlunge,
+    helicalPlungeMmMin,
+    plungeRatio: plungeK,
     status: finalStatus,
     statusTitle: finalTitle,
     checks,

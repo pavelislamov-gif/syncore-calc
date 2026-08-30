@@ -16,7 +16,7 @@ export function QuickCalc() {
       kind: 'milling',
       title: `${material.shortName} / Ø${form.state.diameter} / ${form.state.flutes}Z`,
       createdAt: new Date().toISOString(),
-      summary: `${formatRpm(form.result.rpm)} об/мин · ${formatRpm(form.result.feedMmMin)} мм/мин`,
+      summary: `${formatRpm(form.result.rpm)} об/мин · F ${formatRpm(form.result.feedMmMin)} · Fz ${formatRpm(form.result.plungeMmMin)} мм/мин`,
       payload: { state: form.state, result: form.result },
     })
   }

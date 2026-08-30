@@ -22,3 +22,32 @@ export function calculateFeedPerTooth(feedMmMin: number, rpm: number, flutes: nu
   }
   return feedMmMin / (rpm * flutes)
 }
+
+/**
+ * Straight Z plunge is much slower than XY feed: poor chip evacuation, few teeth cutting axially.
+ * Vf_z = Vf × k, fz_z = fz × k. k is a handbook-range factor, not a catalog guarantee.
+ */
+export function plungeRatio(machinability: number, millType: string): number {
+  const byType: Record<string, number> = {
+    endmill: 1,
+    slot: 0.9,
+    corner_radius: 0.9,
+    ball: 0.65,
+    chamfer: 0.45,
+    drill: 1.15,
+    special: 0.8,
+  }
+  const typeK = byType[millType] ?? 1
+  return Math.min(0.5, Math.max(0.12, (0.16 + 0.24 * machinability) * typeK))
+}
+
+export function calculatePlungeFeed(feedMmMin: number, ratio: number): number {
+  if (feedMmMin <= 0) {
+    throw new CalculationError('plunge', 'Подача должна быть больше нуля.')
+  }
+  return feedMmMin * ratio
+}
+
+export function calculateHelicalPlungeFeed(feedMmMin: number): number {
+  return feedMmMin * 0.55
+}
