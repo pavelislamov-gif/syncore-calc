@@ -9,8 +9,8 @@
   "lang": "ru",
   "icons": [
     {
-      "src": "/logo.png",
-      "sizes": "334x64",
+      "src": "/mark.png",
+      "sizes": "120x120",
       "type": "image/png",
       "purpose": "any"
     },

@@ -7,8 +7,8 @@ export function HomePage() {
   return (
     <div className="space-y-10">
       <section className="max-w-3xl">
-        <div className="inline-flex items-center rounded-xl bg-black px-3 py-2">
-          <img src="/logo.png" alt="SYNCORE" className="h-8 w-auto" />
+        <div className="inline-flex items-center rounded-2xl bg-black px-4 py-3">
+          <img src="/logo.png" alt="SYNCORE" className="h-14 w-auto sm:h-16" />
         </div>
         <p className="mt-4 text-sm font-semibold uppercase tracking-[0.16em] text-accent">SYNCORE calc</p>
         <h1 className="mt-3 text-3xl font-extrabold tracking-tight md:text-5xl">Инженерные расчёты для производства</h1>

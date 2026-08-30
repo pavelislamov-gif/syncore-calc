@@ -2,7 +2,7 @@ import { cn } from '@/utils/cn'
 
 export function BrandMark({ className }: { className?: string }) {
   return (
-    <img src="/logo.png" alt="SYNCORE" className={cn('h-8 w-auto max-w-[12.5rem] object-contain object-left', className)} />
+    <img src="/logo.png" alt="SYNCORE" className={cn('h-10 w-auto max-w-[min(16rem,70vw)] object-contain object-left', className)} />
   )
 }
 
