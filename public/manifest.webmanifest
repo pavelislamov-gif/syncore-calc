@@ -1,6 +1,6 @@
 {
-  "name": "TechCalc",
-  "short_name": "TechCalc",
+  "name": "SYNCORE calc",
+  "short_name": "SYNCORE calc",
   "description": "Инженерные расчёты режимов резания для ЧПУ",
   "start_url": "/",
   "display": "standalone",

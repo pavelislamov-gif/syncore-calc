@@ -1,12 +1,14 @@
 import type { FavoriteCombination, SavedCalculation } from '@/types/history'
 
-const HISTORY_KEY = 'techcalc.history'
-const FAVORITES_KEY = 'techcalc.favorites'
+const HISTORY_KEY = 'syncore.calc.history'
+const FAVORITES_KEY = 'syncore.calc.favorites'
+const LEGACY_HISTORY_KEY = 'techcalc.history'
+const LEGACY_FAVORITES_KEY = 'techcalc.favorites'
 
-function readJson<T>(key: string, fallback: T): T {
+function readJson<T>(key: string, fallback: T, legacyKey?: string): T {
   if (typeof localStorage === 'undefined') return fallback
   try {
-    const raw = localStorage.getItem(key)
+    const raw = localStorage.getItem(key) ?? (legacyKey ? localStorage.getItem(legacyKey) : null)
     if (!raw) return fallback
     return JSON.parse(raw) as T
   } catch {
@@ -19,7 +21,7 @@ function writeJson(key: string, value: unknown) {
 }
 
 export function listHistory(): SavedCalculation[] {
-  return readJson<SavedCalculation[]>(HISTORY_KEY, [])
+  return readJson<SavedCalculation[]>(HISTORY_KEY, [], LEGACY_HISTORY_KEY)
 }
 
 export function saveHistoryItem(item: SavedCalculation) {
@@ -35,7 +37,7 @@ export function removeHistoryItem(id: string) {
 }
 
 export function listFavorites(): FavoriteCombination[] {
-  return readJson<FavoriteCombination[]>(FAVORITES_KEY, [])
+  return readJson<FavoriteCombination[]>(FAVORITES_KEY, [], LEGACY_FAVORITES_KEY)
 }
 
 export function saveFavorite(item: FavoriteCombination) {

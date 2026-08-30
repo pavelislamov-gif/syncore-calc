@@ -1,4 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" fill="none">
   <rect width="180" height="180" rx="40" fill="#171B1F"/>
-  <circle cx="90" cy="90" r="36" stroke="#0E8F7B" stroke-width="10"/>
+  <path
+    d="M90 28 148 61.5v57L90 152 32 118.5v-57L90 28Z"
+    stroke="#0E8F7B"
+    stroke-width="8"
+    stroke-linejoin="round"
+  />
+  <path
+    d="M90 58 122 86.5v27L90 122 58 113.5v-27L90 58Z"
+    fill="#0E8F7B"
+  />
 </svg>

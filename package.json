@@ -1,5 +1,5 @@
 {
-  "name": "techcalc",
+  "name": "syncore-calc",
   "private": true,
   "version": "0.1.0",
   "type": "module",
@@ -33,5 +33,5 @@
     "vite": "^8.2.2",
     "vitest": "^4.1.11"
   },
-  "description": "Engineering calculators for CNC milling"
+  "description": "SYNCORE calc — engineering calculators for CNC milling, turning, and laser"
 }

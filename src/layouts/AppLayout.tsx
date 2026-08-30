@@ -32,7 +32,7 @@ export function AppLayout() {
         <Outlet />
       </main>
       <footer className="mx-auto hidden max-w-6xl px-6 py-8 text-sm text-muted lg:block">
-        TechCalc · справочные режимы резания. Фактический режим зависит от станка, инструмента и заготовки.{' '}
+        SYNCORE calc · справочные режимы резания. Фактический режим зависит от станка, инструмента и заготовки.{' '}
         <NavLink to="/pro" className="text-ink underline-offset-2 hover:underline">
           PRO
         </NavLink>

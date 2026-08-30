@@ -1,7 +1,8 @@
 import { Link, NavLink, useLocation } from 'react-router-dom'
-import { Gauge, Menu } from 'lucide-react'
+import { Menu } from 'lucide-react'
 import { cn } from '@/utils/cn'
 import { headerLinks, isTurningSection } from '@/components/layout/nav'
+import { BrandWordmark } from '@/components/layout/BrandLogo'
 
 interface Props {
   onOpenMenu: () => void
@@ -12,11 +13,8 @@ export function Header({ onOpenMenu }: Props) {
   return (
     <header className="sticky top-0 z-30 h-[var(--app-header-height)] border-b border-line/80 bg-paper/90 backdrop-blur">
       <div className="mx-auto flex h-full max-w-6xl items-center justify-between gap-4 px-4 md:px-6">
-        <Link to="/" className="flex items-center gap-2 font-extrabold tracking-tight">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-graphite text-white">
-            <Gauge className="h-5 w-5" />
-          </span>
-          TechCalc
+        <Link to="/" className="min-w-0" aria-label="SYNCORE calc">
+          <BrandWordmark />
         </Link>
         <nav className="hidden items-center gap-1 overflow-x-auto lg:flex">
           {headerLinks.map((link) => (
