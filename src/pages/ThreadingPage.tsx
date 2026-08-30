@@ -1,5 +1,6 @@
 import { ThreadingForm } from '@/components/threading/ThreadingForm'
 import { ThreadingResultView } from '@/components/threading/ThreadingResultView'
+import { ResultFooterBlock } from '@/components/results/ResultFooterBlock'
 import { MobileResultBar } from '@/components/layout/MobileResultBar'
 import { useThreadingForm } from '@/hooks/useThreadingForm'
 import { saveFavorite, saveHistoryItem } from '@/services/storage'
@@ -69,16 +70,22 @@ export function ThreadingPage() {
             }}
             error={form.error}
           />
+          {form.result && material ? (
+            <div className="mt-4">
+              <ResultFooterBlock
+                why={form.result.why}
+                disclaimer={`Справочно для ${material.name}. Дюймовая резьба — на следующем шаге.`}
+                steps={form.result.steps}
+                onSaveHistory={persistHistory}
+                onSaveFavorite={persistFavorite}
+              />
+            </div>
+          ) : null}
         </div>
       </div>
       <div className="order-1 lg:order-2">
         {form.result && material ? (
-          <ThreadingResultView
-            result={form.result}
-            material={material}
-            onSaveHistory={persistHistory}
-            onSaveFavorite={persistFavorite}
-          />
+          <ThreadingResultView result={form.result} />
         ) : (
           <div className="rounded-2xl border border-dashed border-line p-8 text-muted">
             Выберите размер резьбы и нажмите «К итогам».

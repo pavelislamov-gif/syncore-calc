@@ -1,20 +1,15 @@
 import { LaserLayerSettings } from '@/components/laser/LaserLayerSettings'
-import { ResultFooterBlock } from '@/components/results/ResultFooterBlock'
 import { Badge } from '@/components/ui/Badge'
 import { Card } from '@/components/ui/Card'
 import { StatusBanner } from '@/components/ui/StatusBanner'
 import type { LaserResult } from '@/types/laser'
-import type { Material } from '@/types/material'
 import { formatNumber, formatRpm } from '@/utils/format'
 
 interface Props {
   result: LaserResult
-  material: Material
-  onSaveHistory: () => void
-  onSaveFavorite: () => void
 }
 
-export function LaserResultView({ result, material, onSaveHistory, onSaveFavorite }: Props) {
+export function LaserResultView({ result }: Props) {
   const tone = result.status === 'ok' ? 'ok' : result.status === 'warning' ? 'warning' : 'error'
 
   return (
@@ -50,14 +45,6 @@ export function LaserResultView({ result, material, onSaveHistory, onSaveFavorit
       <LaserLayerSettings result={result} />
 
       <Badge tone={tone}>Единицы: мм · мм/мин · мм/с · % · бар · Вт</Badge>
-
-      <ResultFooterBlock
-        why={result.why}
-        disclaimer={`Справочное значение для ${material.name}. Фактический режим зависит от головы, сопла, чистоты оптики и газа.`}
-        steps={result.steps}
-        onSaveHistory={onSaveHistory}
-        onSaveFavorite={onSaveFavorite}
-      />
     </div>
   )
 }

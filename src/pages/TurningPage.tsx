@@ -1,5 +1,6 @@
 import { TurningForm } from '@/components/turning/TurningForm'
 import { TurningResultView } from '@/components/turning/TurningResultView'
+import { ResultFooterBlock } from '@/components/results/ResultFooterBlock'
 import { useTurningForm } from '@/hooks/useTurningForm'
 import { saveFavorite, saveHistoryItem } from '@/services/storage'
 import { MobileResultBar } from '@/components/layout/MobileResultBar'
@@ -65,16 +66,22 @@ export function TurningPage() {
             }}
             error={form.error}
           />
+          {form.result && material ? (
+            <div className="mt-4">
+              <ResultFooterBlock
+                why={form.result.why}
+                disclaimer={`Справочное значение для ${material.name}. Фактический режим зависит от сплава пластины, СОЖ и жёсткости.`}
+                steps={form.result.steps}
+                onSaveHistory={persistHistory}
+                onSaveFavorite={persistFavorite}
+              />
+            </div>
+          ) : null}
         </div>
       </div>
       <div className="order-1 lg:order-2">
         {form.result && material ? (
-          <TurningResultView
-            result={form.result}
-            material={material}
-            onSaveHistory={persistHistory}
-            onSaveFavorite={persistFavorite}
-          />
+          <TurningResultView result={form.result} />
         ) : (
           <div className="rounded-2xl border border-dashed border-line p-8 text-muted">
             Выберите материал и инструмент — режимы появятся здесь.

@@ -1,19 +1,14 @@
-import { ResultFooterBlock } from '@/components/results/ResultFooterBlock'
 import { Badge } from '@/components/ui/Badge'
 import { Card } from '@/components/ui/Card'
 import { StatusBanner } from '@/components/ui/StatusBanner'
 import type { TurningResult } from '@/types/turning'
-import type { Material } from '@/types/material'
 import { formatNumber, formatRpm } from '@/utils/format'
 
 interface Props {
   result: TurningResult
-  material: Material
-  onSaveHistory: () => void
-  onSaveFavorite: () => void
 }
 
-export function TurningResultView({ result, material, onSaveHistory, onSaveFavorite }: Props) {
+export function TurningResultView({ result }: Props) {
   const tone = result.status === 'ok' ? 'ok' : result.status === 'warning' ? 'warning' : 'error'
 
   return (
@@ -45,14 +40,6 @@ export function TurningResultView({ result, material, onSaveHistory, onSaveFavor
       ))}
 
       <Badge tone={tone}>Единицы: мм · мм/об · мм/мин · м/мин · об/мин · кВт</Badge>
-
-      <ResultFooterBlock
-        why={result.why}
-        disclaimer={`Справочное значение для ${material.name}. Фактический режим зависит от сплава пластины, СОЖ и жёсткости.`}
-        steps={result.steps}
-        onSaveHistory={onSaveHistory}
-        onSaveFavorite={onSaveFavorite}
-      />
     </div>
   )
 }

@@ -1,19 +1,14 @@
-import { ResultFooterBlock } from '@/components/results/ResultFooterBlock'
 import { Badge } from '@/components/ui/Badge'
 import { Card } from '@/components/ui/Card'
 import { StatusBanner } from '@/components/ui/StatusBanner'
 import type { MillingResult } from '@/types/milling'
-import type { Material } from '@/types/material'
 import { formatNumber, formatRpm } from '@/utils/format'
 
 interface Props {
   result: MillingResult
-  material: Material
-  onSaveHistory: () => void
-  onSaveFavorite: () => void
 }
 
-export function MillingResultView({ result, material, onSaveHistory, onSaveFavorite }: Props) {
+export function MillingResultView({ result }: Props) {
   const tone = result.status === 'ok' ? 'ok' : result.status === 'warning' ? 'warning' : 'error'
 
   return (
@@ -66,14 +61,6 @@ export function MillingResultView({ result, material, onSaveHistory, onSaveFavor
       ) : null}
 
       <Badge tone={tone}>Единицы: мм · мм/мин · м/мин · об/мин · кВт</Badge>
-
-      <ResultFooterBlock
-        why={result.why}
-        disclaimer={`Справочное значение / рекомендуемый диапазон для ${material.name}. Это не гарантированный паспортный режим.`}
-        steps={result.steps}
-        onSaveHistory={onSaveHistory}
-        onSaveFavorite={onSaveFavorite}
-      />
     </div>
   )
 }

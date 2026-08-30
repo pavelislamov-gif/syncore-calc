@@ -1,5 +1,6 @@
 import { MillingForm } from '@/components/milling/MillingForm'
 import { MillingResultView } from '@/components/milling/MillingResultView'
+import { ResultFooterBlock } from '@/components/results/ResultFooterBlock'
 import { useMillingForm } from '@/hooks/useMillingForm'
 import { saveFavorite, saveHistoryItem } from '@/services/storage'
 import { MobileResultBar } from '@/components/layout/MobileResultBar'
@@ -61,16 +62,22 @@ export function MillingPage() {
             }}
             error={form.error}
           />
+          {form.result && material ? (
+            <div className="mt-4">
+              <ResultFooterBlock
+                why={form.result.why}
+                disclaimer={`Справочное значение / рекомендуемый диапазон для ${material.name}. Это не гарантированный паспортный режим.`}
+                steps={form.result.steps}
+                onSaveHistory={persistHistory}
+                onSaveFavorite={persistFavorite}
+              />
+            </div>
+          ) : null}
         </div>
       </div>
       <div className="order-1 lg:order-2">
         {form.result && material ? (
-          <MillingResultView
-            result={form.result}
-            material={material}
-            onSaveHistory={persistHistory}
-            onSaveFavorite={persistFavorite}
-          />
+          <MillingResultView result={form.result} />
         ) : (
           <div className="rounded-2xl border border-dashed border-line p-8 text-muted">
             Выберите материал и фрезу — режимы появятся здесь.

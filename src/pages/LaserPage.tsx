@@ -1,5 +1,6 @@
 import { LaserForm } from '@/components/laser/LaserForm'
 import { LaserResultView } from '@/components/laser/LaserResultView'
+import { ResultFooterBlock } from '@/components/results/ResultFooterBlock'
 import { useLaserForm } from '@/hooks/useLaserForm'
 import { saveFavorite, saveHistoryItem } from '@/services/storage'
 import { MobileResultBar } from '@/components/layout/MobileResultBar'
@@ -65,16 +66,22 @@ export function LaserPage() {
             error={form.error}
             preview={form.result}
           />
+          {form.result && material ? (
+            <div className="mt-4">
+              <ResultFooterBlock
+                why={form.result.why}
+                disclaimer={`Справочное значение для ${material.name}. Фактический режим зависит от головы, сопла, чистоты оптики и газа.`}
+                steps={form.result.steps}
+                onSaveHistory={persistHistory}
+                onSaveFavorite={persistFavorite}
+              />
+            </div>
+          ) : null}
         </div>
       </div>
       <div className="order-1 lg:order-2">
         {form.result && material ? (
-          <LaserResultView
-            result={form.result}
-            material={material}
-            onSaveHistory={persistHistory}
-            onSaveFavorite={persistFavorite}
-          />
+          <LaserResultView result={form.result} />
         ) : (
           <div className="rounded-2xl border border-dashed border-line p-8 text-muted">
             Выберите материал и источник — режимы появятся здесь.

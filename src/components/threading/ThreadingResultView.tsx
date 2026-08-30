@@ -1,19 +1,14 @@
-import { ResultFooterBlock } from '@/components/results/ResultFooterBlock'
 import { Badge } from '@/components/ui/Badge'
 import { Card } from '@/components/ui/Card'
 import { StatusBanner } from '@/components/ui/StatusBanner'
 import type { ThreadingResult } from '@/types/threading'
-import type { Material } from '@/types/material'
 import { formatNumber, formatRpm } from '@/utils/format'
 
 interface Props {
   result: ThreadingResult
-  material: Material
-  onSaveHistory: () => void
-  onSaveFavorite: () => void
 }
 
-export function ThreadingResultView({ result, material, onSaveHistory, onSaveFavorite }: Props) {
+export function ThreadingResultView({ result }: Props) {
   return (
     <div id="threading-result" className="scroll-mt-24 space-y-4">
       <div className="grid grid-cols-2 gap-3">
@@ -49,13 +44,6 @@ export function ThreadingResultView({ result, material, onSaveHistory, onSaveFav
           <p className="mt-2 text-sm text-ink-soft">{check.detail}</p>
         </Card>
       ))}
-      <ResultFooterBlock
-        why={result.why}
-        disclaimer={`Справочно для ${material.name}. Дюймовая резьба — на следующем шаге.`}
-        steps={result.steps}
-        onSaveHistory={onSaveHistory}
-        onSaveFavorite={onSaveFavorite}
-      />
     </div>
   )
 }
