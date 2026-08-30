@@ -9,7 +9,7 @@ export function HomePage() {
     <div className="space-y-10">
       <section className="max-w-3xl">
         <div className="inline-flex items-center rounded-2xl bg-black px-4 py-3">
-          <BrandWordmark markClassName="h-14 max-w-[min(18rem,70vw)] sm:h-16" captionClassName="text-2xl sm:text-3xl" />
+          <BrandWordmark size="lg" />
         </div>
         <h1 className="mt-3 text-3xl font-extrabold tracking-tight md:text-5xl">Инженерные расчёты для производства</h1>
         <p className="mt-4 text-base text-ink-soft sm:text-lg">

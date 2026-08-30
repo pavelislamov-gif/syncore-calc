@@ -1,32 +1,24 @@
 import { cn } from '@/utils/cn'
 
-export function BrandMark({ className }: { className?: string }) {
+export function BrandWordmark({ size = 'md' }: { size?: 'md' | 'lg' }) {
   return (
-    <img
-      src="/logo.png"
-      alt="SYNCORE"
-      className={cn('h-10 w-auto max-w-[min(14rem,58vw)] object-contain object-left', className)}
-    />
-  )
-}
-
-export function BrandWordmark({
-  markClassName,
-  captionClassName,
-}: {
-  markClassName?: string
-  captionClassName?: string
-}) {
-  return (
-    <span className="flex min-w-0 items-center gap-2.5">
-      <BrandMark className={markClassName} />
+    <span className="flex min-w-0 items-center gap-2">
+      <img
+        src="/mark.png"
+        alt=""
+        className={cn('shrink-0 object-contain', size === 'lg' ? 'h-14 sm:h-16' : 'h-10')}
+      />
       <span
         className={cn(
-          'shrink-0 font-extrabold leading-none tracking-tight text-white',
-          captionClassName ?? 'text-[1.35rem]',
+          'flex items-baseline gap-1.5 font-extrabold leading-none tracking-tight',
+          size === 'lg' ? 'text-[1.7rem] sm:text-[1.95rem]' : 'text-[1.2rem]',
         )}
       >
-        Calc
+        <span className="whitespace-nowrap">
+          <span className="text-white">SYN</span>
+          <span className="text-accent">CORE</span>
+        </span>
+        <span className="whitespace-nowrap text-white">Calc</span>
       </span>
     </span>
   )
