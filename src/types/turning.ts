@@ -33,6 +33,7 @@ export interface TurningInput {
   lengthMm: number
   stockMm: number
   insertId: string | null
+  cutterId?: string
   paramMode: ParamMode
   machine: MachineLimits
   overrides: TurningOverrides

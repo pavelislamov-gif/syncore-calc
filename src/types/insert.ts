@@ -1,11 +1,9 @@
-export type InsertShape = 'CNMG' | 'DNMG' | 'VNMG' | 'WNMG' | 'TNMG' | 'CCMT' | 'DCMT' | 'VBMT'
-
-export type InsertDuty = 'roughing' | 'finishing' | 'general'
+export type InsertDuty = 'roughing' | 'finishing' | 'general' | 'grooving' | 'threading'
 
 export interface InsertDefinition {
   id: string
   iso: string
-  shape: InsertShape
+  shape: string
   sizeCode: string
   inscribedCircleMm: number
   thicknessMm: number
@@ -14,4 +12,5 @@ export interface InsertDefinition {
   grade: string
   coating: string
   notes: string
+  groups: string[]
 }

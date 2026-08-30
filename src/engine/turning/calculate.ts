@@ -2,6 +2,7 @@ import { getMaterial } from '@/data/materials'
 import { getTurningParams } from '@/data/materials/turning'
 import { getInsert } from '@/data/inserts'
 import { getTurningOperation } from '@/data/formulas/operations'
+import { getCutterKind } from '@/data/tools/cutters'
 import { turningFormulas } from '@/data/formulas/turning'
 import type { CheckResult } from '@/types/milling'
 import type { TurningInput, TurningResult } from '@/types/turning'
@@ -48,14 +49,16 @@ export function calculateTurning(input: TurningInput): TurningResult {
   }
 
   const operation = getTurningOperation(input.operation)
+  const cutter = input.cutterId ? getCutterKind(input.cutterId) : undefined
   const insert = input.insertId ? getInsert(input.insertId) : null
-  if (operation.needsInsert && !insert) {
-    throw new CalculationError('insert', 'Выберите пластину. Для сверления пластина не нужна.')
+  const needsInsert = cutter ? cutter.needsInsert : operation.needsInsert
+  if (needsInsert && !insert) {
+    throw new CalculationError('insert', 'Выберите пластину. Для сверления и резца HSS пластина не нужна.')
   }
 
-  const vcRange = vcRangeForOperation(params, input.operation)
-  const autoVc = recommendTurningVc(params, input.operation)
-  const autoF = recommendTurningFeed(params, input.operation, insert ?? null)
+  const vcRange = vcRangeForOperation(params, input.operation, cutter)
+  const autoVc = recommendTurningVc(params, input.operation, cutter)
+  const autoF = recommendTurningFeed(params, input.operation, insert ?? null, cutter)
   const autoAp = recommendTurningAp(params, input.operation, input.stockMm)
 
   const vcTarget = input.paramMode === 'manual' && input.overrides.vc != null ? input.overrides.vc : autoVc
@@ -134,7 +137,7 @@ export function calculateTurning(input: TurningInput): TurningResult {
       detail: `Оценка ${roundTo(powerKw, 2)} кВт при ${input.machine.spindlePowerKw} кВт.`,
     })
   }
-  if (insert && feedMmRev > insert.noseRadiusMm * 0.85) {
+  if (insert && insert.duty !== 'threading' && insert.duty !== 'grooving' && feedMmRev > insert.noseRadiusMm * 0.85) {
     checks.push({
       id: 'radius',
       severity: 'warning',
@@ -177,7 +180,7 @@ export function calculateTurning(input: TurningInput): TurningResult {
         : status === 'warning'
           ? 'Режим рассчитан, но проверьте ограничения станка и нагрузку.'
           : 'Режим требует корректировки.',
-    why: `Для ${material.name}, операции «${operation.label}» и диаметра Ø${roundTo(input.diameterMm, 1)} мм выбран справочный диапазон Vc ${roundTo(vcRange.min, 0)}–${roundTo(vcRange.max, 0)} м/мин${insert ? ` и пластина ${insert.iso}` : ''}. Это справочные значения, не паспортный режим конкретной марки пластины.`,
+    why: `Для ${material.name}, резца «${cutter?.name ?? 'не задан'}», операции «${operation.label}» и Ø${roundTo(input.diameterMm, 1)} мм выбран справочный диапазон Vc ${roundTo(vcRange.min, 0)}–${roundTo(vcRange.max, 0)} м/мин${insert ? `, пластина ${insert.iso}` : ''}. Это справочные значения, не паспортный режим конкретной марки.`,
     steps: [
       {
         id: 'n',

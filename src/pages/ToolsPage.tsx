@@ -1,4 +1,5 @@
 import { coatings, cutterMaterials, endMillTypes } from '@/data/tools'
+import { cutterKinds } from '@/data/tools/cutters'
 import { inserts } from '@/data/inserts'
 import { Card } from '@/components/ui/Card'
 
@@ -34,6 +35,16 @@ export function ToolsPage() {
                   {item.name} · ×{item.vcMultiplier}
                 </p>
                 <p className="text-sm text-ink-soft">{item.notes}</p>
+              </li>
+            ))}
+          </ul>
+        </Card>
+        <Card>
+          <h2 className="font-bold">Виды токарных резцов</h2>
+          <ul className="mt-3 grid gap-2 sm:grid-cols-2">
+            {cutterKinds.map((item) => (
+              <li key={item.id} className="text-sm text-ink-soft">
+                <span className="font-medium text-ink">{item.name}</span>
               </li>
             ))}
           </ul>

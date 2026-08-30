@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { turningOperations } from '@/data/formulas/operations'
-import { inserts } from '@/data/inserts'
+import { cutterKinds, getCutterKind } from '@/data/tools/cutters'
+import { insertsForGroups } from '@/data/inserts'
 import { lathePresets } from '@/data/machines/lathes'
 import { materialCategories } from '@/data/materials'
 import { Button } from '@/components/ui/Button'
@@ -122,7 +123,35 @@ export function TurningForm({
         </div>
       </Card>
 
-      {state.operation === 'drill' ? null : (
+      <Card>
+        <p className="text-sm font-medium text-muted">Резец</p>
+        <label className="mt-3 block">
+          <span className="mb-1.5 block text-sm font-medium text-ink-soft">Вид резца</span>
+          <Select
+            value={state.cutterId}
+            onChange={(event) => {
+              const cutter = getCutterKind(event.target.value)
+              const nextInserts = insertsForGroups(cutter?.insertGroups ?? [])
+              const keep = nextInserts.some((item) => item.id === state.insertId)
+              patch({
+                cutterId: event.target.value,
+                insertId: keep ? state.insertId : (nextInserts[0]?.id ?? state.insertId),
+              })
+            }}
+          >
+            {cutterKinds.map((item) => (
+              <option key={item.id} value={item.id}>
+                {item.name}
+              </option>
+            ))}
+          </Select>
+        </label>
+        {getCutterKind(state.cutterId) ? (
+          <p className="mt-2 text-sm text-ink-soft">{getCutterKind(state.cutterId)?.hint}</p>
+        ) : null}
+      </Card>
+
+      {state.operation === 'drill' || getCutterKind(state.cutterId)?.needsInsert === false ? null : (
         <Card>
           <p className="mb-3 text-sm font-medium text-muted">Пластина</p>
           <label className="block">
@@ -130,13 +159,13 @@ export function TurningForm({
               ISO-обозначение
               <Hint
                 title="Пластина"
-                text="Тип, размер и радиус при вершине. Подача ограничивается радиусом вершины. Это справочные типоразмеры, не конкретная марка сплава."
+                text="Список сужается по виду резца. Подача ограничивается радиусом вершины. Типоразмеры справочные, не марка сплава."
               />
             </span>
             <Select value={state.insertId} onChange={(event) => patch({ insertId: event.target.value })}>
-              {inserts.map((item) => (
+              {insertsForGroups(getCutterKind(state.cutterId)?.insertGroups ?? []).map((item) => (
                 <option key={item.id} value={item.id}>
-                  {item.iso} · re {item.noseRadiusMm} мм · {item.duty === 'roughing' ? 'черновая' : item.duty === 'finishing' ? 'чистовая' : 'универсальная'}
+                  {item.iso} · re {item.noseRadiusMm} мм · {item.shape}
                 </option>
               ))}
             </Select>

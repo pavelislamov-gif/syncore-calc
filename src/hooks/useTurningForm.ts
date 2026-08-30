@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { defaultLathe, getLathePreset } from '@/data/machines/lathes'
 import { getMaterial, listMaterials } from '@/data/materials'
+import { getCutterKind } from '@/data/tools/cutters'
 import { calculateTurning } from '@/engine/turning'
 import { CalculationError } from '@/engine/errors'
 import type { TurningOperation, TurningResult } from '@/types/turning'
@@ -14,6 +15,7 @@ export interface TurningFormState {
   length: string
   stock: string
   insertId: string
+  cutterId: string
   presetId: string
   paramMode: ParamMode
   expert: boolean
@@ -36,6 +38,7 @@ export const initialTurningState: TurningFormState = {
   length: '80',
   stock: '3',
   insertId: 'CNMG120408',
+  cutterId: 'od_straight',
   presetId: lathe.id,
   paramMode: 'auto',
   expert: false,
@@ -73,7 +76,8 @@ export function runTurning(state: TurningFormState): TurningResult {
     diameterMm: num(state.diameter),
     lengthMm: num(state.length),
     stockMm: num(state.stock),
-    insertId: state.operation === 'drill' ? null : state.insertId,
+    insertId: state.operation === 'drill' || getCutterKind(state.cutterId)?.needsInsert === false ? null : state.insertId,
+    cutterId: state.cutterId,
     paramMode: state.paramMode,
     machine: machineFromTurningForm(state),
     overrides: {

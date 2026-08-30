@@ -22,11 +22,11 @@ export function TurningResultView({ result, material, onSaveHistory, onSaveFavor
   return (
     <div id="turning-result" className="scroll-mt-24 space-y-4">
       <div className="grid grid-cols-2 gap-3">
-        <Hero value={formatRpm(result.rpm)} unit="об/мин" />
-        <Hero value={formatNumber(result.feedMmMin, 0)} unit="мм/мин" />
+        <Hero code="S" value={formatRpm(result.rpm)} unit="об/мин" />
+        <Hero code="F" value={formatNumber(result.feedMmMin, 0)} unit="мм/мин" />
       </div>
       <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
-        <Metric label="Подача" value={`${formatNumber(result.feedMmRev, 3)} мм/об`} />
+        <Metric label="f · подача" value={`${formatNumber(result.feedMmRev, 3)} мм/об`} />
         <Metric label="Скорость резания" value={`${formatNumber(result.vc, 0)} м/мин`} />
         <Metric label="Глубина резания" value={`${formatNumber(result.ap, 2)} мм`} />
         <Metric label="Проходы" value={`${result.passes}`} />
@@ -84,10 +84,11 @@ export function TurningResultView({ result, material, onSaveHistory, onSaveFavor
   )
 }
 
-function Hero({ value, unit }: { value: string; unit: string }) {
+function Hero({ code, value, unit }: { code: string; value: string; unit: string }) {
   return (
     <Card className="bg-graphite text-white">
-      <p className="font-mono text-3xl font-semibold tracking-tight md:text-4xl">{value}</p>
+      <p className="text-xs font-bold tracking-[0.2em] text-accent">{code}</p>
+      <p className="mt-1 font-mono text-3xl font-semibold tracking-tight md:text-4xl">{value}</p>
       <p className="mt-1 text-sm text-white/70">{unit}</p>
     </Card>
   )

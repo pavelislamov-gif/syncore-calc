@@ -22,8 +22,8 @@ export function MillingResultView({ result, material, onSaveHistory, onSaveFavor
   return (
     <div id="milling-result" className="scroll-mt-24 space-y-4">
       <div className="grid grid-cols-2 gap-3">
-        <ResultHero value={formatRpm(result.rpm)} unit="об/мин" />
-        <ResultHero value={formatRpm(result.feedMmMin)} unit="мм/мин" />
+        <ResultHero code="S" value={formatRpm(result.rpm)} unit="об/мин" />
+        <ResultHero code="F" value={formatRpm(result.feedMmMin)} unit="мм/мин" />
       </div>
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         <Metric label="Подача на зуб" value={`${formatNumber(result.fz, 3)} мм/зуб`} />
@@ -91,10 +91,11 @@ export function MillingResultView({ result, material, onSaveHistory, onSaveFavor
   )
 }
 
-function ResultHero({ value, unit }: { value: string; unit: string }) {
+function ResultHero({ code, value, unit }: { code: string; value: string; unit: string }) {
   return (
     <Card className="bg-graphite text-white">
-      <p className="font-mono text-3xl font-semibold tracking-tight md:text-4xl">{value}</p>
+      <p className="text-xs font-bold tracking-[0.2em] text-accent">{code}</p>
+      <p className="mt-1 font-mono text-3xl font-semibold tracking-tight md:text-4xl">{value}</p>
       <p className="mt-1 text-sm text-white/70">{unit}</p>
     </Card>
   )
