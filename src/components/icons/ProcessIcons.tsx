@@ -8,55 +8,60 @@ interface IconProps {
 
 function Svg({ className, title, children }: { className?: string; title: string; children: ReactNode }) {
   return (
-    <svg viewBox="0 0 24 24" fill="none" className={cn('shrink-0', className)} role="img" aria-label={title}>
+    <svg
+      viewBox="0 0 32 32"
+      fill="none"
+      className={cn('shrink-0', className)}
+      role="img"
+      aria-label={title}
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <title>{title}</title>
       {children}
     </svg>
   )
 }
 
-/** End mill cutting a slot. */
+/** Top view of an end mill plus a slot in the work. */
 export function MillingProcessIcon({ className, title = 'Фрезерование' }: IconProps) {
   return (
     <Svg className={className} title={title}>
-      <rect x="3.5" y="16.2" width="17" height="4.4" rx="0.6" stroke="currentColor" strokeWidth="1.5" />
-      <path d="M8 16.2V14.4h8v1.8" stroke="currentColor" strokeWidth="1.5" />
-      <rect x="10.15" y="3.2" width="3.7" height="12.2" rx="1.4" stroke="currentColor" strokeWidth="1.5" />
-      <path
-        d="M10.4 7.2c.9 1.1 2.3 1.1 3.2 0M10.4 10.4c.9 1.1 2.3 1.1 3.2 0M10.4 13.5c.9 1.1 2.3 1.1 3.2 0"
-        stroke="currentColor"
-        strokeWidth="1.2"
-      />
-      <path d="M16.2 5.2a2.6 2.6 0 0 0 2.2-2.4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
-      <path d="M17.8 3.4l1.1-.9M17.8 3.4l.2 1.4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+      <circle cx="16" cy="13" r="7.2" />
+      <circle cx="16" cy="13" r="1.6" fill="currentColor" stroke="none" />
+      <path d="M16 5.8v14.4M8.8 13h14.4" />
+      <path d="M11.2 7.4 20.8 18.6M20.8 7.4 11.2 18.6" strokeWidth="1.2" />
+      <path d="M6 24h20" />
+      <path d="M10 24v3.2h12V24" />
     </Svg>
   )
 }
 
-/** Lathe: rotating bar and turning tool. */
+/** Bar in a chuck and a turning insert. */
 export function TurningProcessIcon({ className, title = 'Токарная обработка' }: IconProps) {
   return (
     <Svg className={className} title={title}>
-      <ellipse cx="5.2" cy="11" rx="2.1" ry="3.4" stroke="currentColor" strokeWidth="1.5" />
-      <path d="M5.4 7.6h12.4a.8.8 0 0 1 .8.8v5.2a.8.8 0 0 1-.8.8H5.4" stroke="currentColor" strokeWidth="1.5" />
-      <path d="M18.6 8.2v6.6" stroke="currentColor" strokeWidth="1.5" />
-      <path d="M4.2 6.2A4 4 0 0 1 6.4 4.6" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
-      <path d="M5.6 5l1.3-.3M5.6 5l-.4-1.2" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-      <path d="M13.2 15.4 16 18.4h3.4" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
-      <path d="M13.2 15.4h2.4v2.1" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+      <ellipse cx="7" cy="14" rx="3.2" ry="5" />
+      <path d="M7 9h16.5c.8 0 1.5.7 1.5 1.5v7c0 .8-.7 1.5-1.5 1.5H7" />
+      <path d="M23.5 10.2v9.6" />
+      <path d="M15.5 20.5 19 26h6" />
+      <path d="M15.5 20.5h3.2v3.2" />
+      <path d="M4.8 7.2c1.4-1.6 3.3-2.4 5.2-2.4" />
     </Svg>
   )
 }
 
-/** Laser head, beam and sheet kerf. */
+/** Cutting head, beam and kerf in sheet. */
 export function LaserProcessIcon({ className, title = 'Лазерная резка' }: IconProps) {
   return (
     <Svg className={className} title={title}>
-      <rect x="3.5" y="15.4" width="17" height="4.6" rx="0.6" stroke="currentColor" strokeWidth="1.5" />
-      <path d="M12 15.4v4.6" stroke="currentColor" strokeWidth="1.5" />
-      <path d="M8.6 4.2h6.8l-2.1 5.4H10.7L8.6 4.2Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
-      <path d="M12 9.6v5.8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-      <path d="M12 12.2 9.6 14.6M12 12.2l2.4 2.4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+      <path d="M11 4h10l-3.4 7H14.4L11 4Z" />
+      <path d="M16 11v8" />
+      <path d="M16 16.5 13.2 20M16 16.5l2.8 3.5" />
+      <rect x="5" y="21" width="22" height="5.5" rx="0.8" />
+      <path d="M16 21v5.5" />
     </Svg>
   )
 }

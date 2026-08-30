@@ -31,7 +31,7 @@ export function BottomNav({ onOpenMore }: Props) {
                 )
               }
             >
-              <item.Icon className="h-6 w-6" />
+              <item.Icon className="h-7 w-7" />
               {item.label}
             </NavLink>
           </li>
