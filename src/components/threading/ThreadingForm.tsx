@@ -146,8 +146,8 @@ export function ThreadingForm({ state, setState, materials, spec, threads, onCal
       </Card>
 
       {error ? <p className="text-sm font-medium text-danger">{error}</p> : null}
-      <Button type="submit" variant="graphite" fullWidth>
-        Рассчитать
+      <Button type="submit" variant="primary" fullWidth>
+        К итогам
       </Button>
     </form>
   )

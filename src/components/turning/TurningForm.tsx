@@ -221,7 +221,7 @@ export function TurningForm({
       </Card>
 
       {error ? <p className="text-sm font-medium text-danger">{error}</p> : null}
-      <Button type="submit" variant="outline" fullWidth>
+      <Button type="submit" variant="primary" fullWidth>
         К итогам
       </Button>
     </form>

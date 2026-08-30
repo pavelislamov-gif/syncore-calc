@@ -228,8 +228,8 @@ export function LaserForm({
       </Card>
 
       {error ? <p className="text-sm text-danger">{error}</p> : null}
-      <Button type="submit" variant="graphite" fullWidth>
-        Пересчитать
+      <Button type="submit" variant="primary" fullWidth>
+        К итогам
       </Button>
     </form>
   )

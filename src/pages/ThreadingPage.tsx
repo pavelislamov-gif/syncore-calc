@@ -78,7 +78,7 @@ export function ThreadingPage() {
           />
         ) : (
           <div className="rounded-2xl border border-dashed border-line p-8 text-muted">
-            Выберите M20 × 2.5 и нажмите «Рассчитать».
+            Выберите размер резьбы и нажмите «К итогам».
           </div>
         )}
       </div>
