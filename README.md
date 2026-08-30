@@ -30,32 +30,47 @@ npm run test
 npm run build
 ```
 
-Готовая сборка лежит в `dist/`. Это статический SPA: нужен хостинг файлов и fallback всех путей на `index.html`.
+Готовая сборка лежит в `dist/`. Это статический SPA: любые пути вроде `/milling` должны отдавать `index.html`.
 
-## Домен syncore54.ru
+## Публикация: GitHub + Beget (как портфолио)
 
-В панели регистратора (или DNS-хостинга):
+[pavelislamov.ru](https://pavelislamov.ru/) уже работает так: **файлы — GitHub Pages**, **DNS — Beget** (`ns1.beget.ru` / `ns2.beget.ru`). Калькулятор на [syncore54.ru](https://syncore54.ru) лучше выложить так же.
 
-1. **A / AAAA** или **ALIAS / ANAME** для `@` (apex `syncore54.ru`) — на IP или alias вашего хостинга.
-2. **CNAME** `www` → `syncore54.ru` (или сразу на хостинг, если так требуют).
-3. Включите HTTPS (Let’s Encrypt у хостера или сертификат у Vercel / Cloudflare).
+### 1. GitHub
 
-Если деплой на **Vercel**: добавьте домен в Project → Domains. В репозитории уже есть `vercel.json` (SPA rewrite). Для **Netlify** — `public/_redirects`.
+1. Создайте репозиторий на том же аккаунте, что и портфолио, и запушьте этот проект.
+2. Settings → Pages: Source = **GitHub Actions**.
+3. Settings → Pages → Custom domain: `syncore54.ru`, включите **Enforce HTTPS** после проверки DNS.
+4. Workflow `.github/workflows/pages.yml` собирает `dist/` и выкладывает Pages. Для SPA копируется `404.html` (прямой заход на `/milling`).
 
-На обычном nginx:
+В `public/CNAME` уже указан `syncore54.ru`.
 
-```nginx
-server {
-  server_name syncore54.ru www.syncore54.ru;
-  root /var/www/syncore-calc/dist;
-  index index.html;
-  location / {
-    try_files $uri /index.html;
-  }
-}
-```
+### 2. DNS в панели Beget
 
-Счётчик на `/usage` работает только если рядом крутится `npm run preview` / `npm run dev` (есть `/api/telemetry`). На чистой статике задайте внешний коллектор через `VITE_TELEMETRY_URL`.
+Раздел **Домены** → DNS-записи для `syncore54.ru` (те же A, что у портфолио):
+
+| Имя | Тип | Значение |
+| --- | --- | --- |
+| `@` | A | `185.199.108.153` |
+| `@` | A | `185.199.109.153` |
+| `@` | A | `185.199.110.153` |
+| `@` | A | `185.199.111.153` |
+| `www` | CNAME | `ВАШ-ЛОГИН.github.io.` |
+
+Логин GitHub тот же, что у `www.pavelislamov.ru` (`….github.io`). Не прикрепляйте `syncore54.ru` к сайту в разделе «Сайты» Beget — иначе панель перезапишет A-записи на IP хостинга и Pages перестанет открываться.
+
+SSL выдаёт GitHub, не Let’s Encrypt в Beget.
+
+### Другой вариант: файлы на хостинге Beget
+
+Если хотите хранить калькулятор в `public_html` на Beget (не Pages):
+
+1. В [Сайты](https://beget.com/ru/kb/manual/sajty) создайте сайт, прикрепите `syncore54.ru`.
+2. Залейте содержимое `dist/` в `public_html` (файловый менеджер или FTP). Файл `.htaccess` уже в сборке — Apache отдаст SPA-маршруты.
+3. В настройках домена включите редирект на HTTPS.
+
+Счётчик `/usage` на чистой статике (и Pages, и `public_html`) не работает — нужен `VITE_TELEMETRY_URL` или Plausible / Umami.
+
 
 ## Что умеет сейчас
 
