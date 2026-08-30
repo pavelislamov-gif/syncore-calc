@@ -8,8 +8,11 @@ const LOGO_W = 365
 const LOGO_H = 160
 const LETTER_BOTTOM = 76
 const LETTER_H = 29
-const CAP_RATIO = 0.7
+/** Optical: system sans cap-height is a bit shorter than the SYNCORE gothic. */
+const CAP_RATIO = 0.65
 const CALC_SIZE = LETTER_H / CAP_RATIO
+const CALC_X = 352
+const CALC_BASELINE = LETTER_BOTTOM - 3
 const CALC_X = 352
 
 export function BrandWordmark({ size = 'md' }: { size?: 'md' | 'lg' }) {
@@ -37,7 +40,7 @@ export function BrandWordmark({ size = 'md' }: { size?: 'md' | 'lg' }) {
       >
         <text
           x={CALC_X}
-          y={LETTER_BOTTOM - 1}
+          y={CALC_BASELINE}
           fill="#ffffff"
           fontFamily="Segoe UI, Inter, ui-sans-serif, system-ui, sans-serif"
           fontSize={CALC_SIZE}
