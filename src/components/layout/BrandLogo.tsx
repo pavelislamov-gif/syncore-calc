@@ -2,15 +2,32 @@ import { cn } from '@/utils/cn'
 
 export function BrandMark({ className }: { className?: string }) {
   return (
-    <img src="/logo.png" alt="SYNCORE" className={cn('h-10 w-auto max-w-[min(16rem,70vw)] object-contain object-left', className)} />
+    <img
+      src="/logo.png"
+      alt="SYNCORE"
+      className={cn('h-10 w-auto max-w-[min(14rem,58vw)] object-contain object-left', className)}
+    />
   )
 }
 
-export function BrandWordmark() {
+export function BrandWordmark({
+  markClassName,
+  captionClassName,
+}: {
+  markClassName?: string
+  captionClassName?: string
+}) {
   return (
     <span className="flex min-w-0 items-center gap-2.5">
-      <BrandMark />
-      <span className="hidden text-[13px] font-semibold uppercase tracking-[0.14em] text-white/70 sm:inline">calc</span>
+      <BrandMark className={markClassName} />
+      <span
+        className={cn(
+          'shrink-0 font-extrabold leading-none tracking-tight text-white',
+          captionClassName ?? 'text-[1.35rem]',
+        )}
+      >
+        Calc
+      </span>
     </span>
   )
 }

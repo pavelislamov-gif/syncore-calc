@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { ArrowRight } from 'lucide-react'
+import { BrandWordmark } from '@/components/layout/BrandLogo'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 
@@ -8,9 +9,8 @@ export function HomePage() {
     <div className="space-y-10">
       <section className="max-w-3xl">
         <div className="inline-flex items-center rounded-2xl bg-black px-4 py-3">
-          <img src="/logo.png" alt="SYNCORE" className="h-14 w-auto sm:h-16" />
+          <BrandWordmark markClassName="h-14 max-w-[min(18rem,70vw)] sm:h-16" captionClassName="text-2xl sm:text-3xl" />
         </div>
-        <p className="mt-4 text-sm font-semibold uppercase tracking-[0.16em] text-accent">SYNCORE calc</p>
         <h1 className="mt-3 text-3xl font-extrabold tracking-tight md:text-5xl">Инженерные расчёты для производства</h1>
         <p className="mt-4 text-base text-ink-soft sm:text-lg">
           Три направления: фрезерование, токарка и лазерная резка. Резьба — внутри токарки.
