@@ -9,13 +9,13 @@ interface IconProps {
 function Svg({ className, title, children }: { className?: string; title: string; children: ReactNode }) {
   return (
     <svg
-      viewBox="0 0 32 32"
+      viewBox="0 0 48 48"
       fill="none"
       className={cn('shrink-0', className)}
       role="img"
       aria-label={title}
       stroke="currentColor"
-      strokeWidth="1.7"
+      strokeWidth="1.8"
       strokeLinecap="round"
       strokeLinejoin="round"
     >
@@ -25,43 +25,50 @@ function Svg({ className, title, children }: { className?: string; title: string
   )
 }
 
-/** Top view of an end mill plus a slot in the work. */
+/** Vertical milling machine: column, spindle, table, handwheel. */
 export function MillingProcessIcon({ className, title = 'Фрезерование' }: IconProps) {
   return (
     <Svg className={className} title={title}>
-      <circle cx="16" cy="13" r="7.2" />
-      <circle cx="16" cy="13" r="1.6" fill="currentColor" stroke="none" />
-      <path d="M16 5.8v14.4M8.8 13h14.4" />
-      <path d="M11.2 7.4 20.8 18.6M20.8 7.4 11.2 18.6" strokeWidth="1.2" />
-      <path d="M6 24h20" />
-      <path d="M10 24v3.2h12V24" />
+      <path d="M10 42h28" />
+      <path d="M12 42V18h8v24" />
+      <path d="M16 18V8h16v7H24" />
+      <path d="M24 15v9" />
+      <path d="M22.2 24h3.6" />
+      <path d="M11 28h26" />
+      <path d="M14 28v3h20v-3" />
+      <circle cx="34" cy="36.5" r="4" />
+      <path d="M34 33.2v6.6M31.2 36.5h5.6" />
     </Svg>
   )
 }
 
-/** Bar in a chuck and a turning insert. */
+/** Lathe: bench, headstock, chuck, tailstock. */
 export function TurningProcessIcon({ className, title = 'Токарная обработка' }: IconProps) {
   return (
     <Svg className={className} title={title}>
-      <ellipse cx="7" cy="14" rx="3.2" ry="5" />
-      <path d="M7 9h16.5c.8 0 1.5.7 1.5 1.5v7c0 .8-.7 1.5-1.5 1.5H7" />
-      <path d="M23.5 10.2v9.6" />
-      <path d="M15.5 20.5 19 26h6" />
-      <path d="M15.5 20.5h3.2v3.2" />
-      <path d="M4.8 7.2c1.4-1.6 3.3-2.4 5.2-2.4" />
+      <path d="M6 40h36" />
+      <path d="M8 40V28h32v12" />
+      <path d="M14 28v12M20 28v12M32 28v12" />
+      <path d="M10 28V16h8v12" />
+      <circle cx="18" cy="22" r="3.4" />
+      <path d="M21.4 22h12.2" />
+      <path d="M33.6 16.5h6v11h-6" />
+      <path d="M33.6 22h-3" />
     </Svg>
   )
 }
 
-/** Cutting head, beam and kerf in sheet. */
+/** Laser cutter: gantry head, beam, sparks, sheet. */
 export function LaserProcessIcon({ className, title = 'Лазерная резка' }: IconProps) {
   return (
     <Svg className={className} title={title}>
-      <path d="M11 4h10l-3.4 7H14.4L11 4Z" />
-      <path d="M16 11v8" />
-      <path d="M16 16.5 13.2 20M16 16.5l2.8 3.5" />
-      <rect x="5" y="21" width="22" height="5.5" rx="0.8" />
-      <path d="M16 21v5.5" />
+      <path d="M16 6h16v4H16z" />
+      <path d="M18 10h12v4H18z" />
+      <path d="M21 14h6v5h-6z" />
+      <path d="M24 19v12" />
+      <path d="M24 27l-3.2 4M24 27l3.2 4M21.2 29.5h5.6" />
+      <path d="M10 36h28v6H10z" />
+      <path d="M24 36v6" />
     </Svg>
   )
 }
