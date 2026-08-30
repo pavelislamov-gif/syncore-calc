@@ -2,7 +2,6 @@ import { Link } from 'react-router-dom'
 import { ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
-import { QuickCalc } from '@/components/home/QuickCalc'
 
 export function HomePage() {
   return (
@@ -61,14 +60,6 @@ export function HomePage() {
               {item}
             </span>
           ))}
-        </div>
-      </section>
-
-      <section id="quick" className="scroll-mt-24">
-        <h2 className="text-2xl font-extrabold tracking-tight">Быстрый расчёт</h2>
-        <p className="mt-2 text-ink-soft">Материал, затем фреза — справа сразу режимы.</p>
-        <div className="mt-5">
-          <QuickCalc />
         </div>
       </section>
     </div>
