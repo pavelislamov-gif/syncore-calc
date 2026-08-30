@@ -34,7 +34,7 @@ export function QuickCalc() {
 
   return (
     <div className="grid gap-6 lg:grid-cols-2">
-      <div className={form.result ? 'order-2 lg:order-1' : undefined}>
+      <div>
         <MillingForm
           compact
           state={form.state}
@@ -49,7 +49,7 @@ export function QuickCalc() {
         />
       </div>
       {form.result && material ? (
-        <div className="order-1 lg:order-2">
+        <div>
           <MillingResultView
             result={form.result}
             material={material}
@@ -59,7 +59,7 @@ export function QuickCalc() {
         </div>
       ) : (
         <div className="rounded-2xl border border-dashed border-line p-6 text-sm text-muted">
-          Результат появится здесь сразу после расчёта.
+          Результат появится здесь: материал и фреза.
         </div>
       )}
     </div>

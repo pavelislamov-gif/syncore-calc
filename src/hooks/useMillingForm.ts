@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { defaultMachineForClass, machinePresets } from '@/data/machines'
 import { getMaterial, listMaterials } from '@/data/materials'
 import { geometryToFormFields } from '@/data/tools/geometry'
@@ -109,27 +109,33 @@ export function useMillingForm(seed?: Partial<MillingFormState>) {
   const [result, setResult] = useState<MillingResult | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [advanced, setAdvanced] = useState(false)
-  const live = useRef(false)
 
   const material = useMemo(() => getMaterial(state.materialId), [state.materialId])
   const materials = listMaterials({ plan: 'pro' })
 
-  function syncManual(next: MillingFormState) {
-    if (!live.current || next.paramMode !== 'manual') return
+  function applyCalc(next: MillingFormState) {
     try {
       setResult(runMilling(next))
       setError(null)
+      return true
     } catch (caught) {
       const message = caught instanceof CalculationError ? caught.userMessage : 'Проверьте введённые параметры.'
       setError(message)
       setResult(null)
+      return false
     }
   }
+
+  useEffect(() => {
+    applyCalc({ ...initialMillingState, ...seed })
+    // начальный итог: материал + инструмент по умолчанию
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   function setState(updater: (current: MillingFormState) => MillingFormState) {
     setStateInner((current) => {
       const next = updater(current)
-      queueMicrotask(() => syncManual(next))
+      queueMicrotask(() => applyCalc(next))
       return next
     })
   }
@@ -149,27 +155,7 @@ export function useMillingForm(seed?: Partial<MillingFormState>) {
   }
 
   function calculate() {
-    live.current = true
-    try {
-      const next = runMilling(state)
-      setResult(next)
-      setError(null)
-      if (state.paramMode === 'auto') {
-        setState((current) => ({
-          ...current,
-          vc: String(Math.round(next.usedRecommendedRanges.vc.recommended)),
-          fz: String(next.usedRecommendedRanges.fz.recommended),
-          ap: String(next.ap),
-          ae: String(next.ae),
-        }))
-      }
-      return next
-    } catch (caught) {
-      const message = caught instanceof CalculationError ? caught.userMessage : 'Проверьте введённые параметры.'
-      setError(message)
-      setResult(null)
-      return null
-    }
+    return applyCalc(state)
   }
 
   return {

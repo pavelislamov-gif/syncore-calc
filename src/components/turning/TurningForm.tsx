@@ -59,7 +59,47 @@ export function TurningForm({
       }}
     >
       <Card>
-        <p className="text-sm font-medium text-muted">Операция</p>
+        <p className="text-sm font-medium text-muted">1. Материал</p>
+        <label className="mt-3 block">
+          <span className="mb-1.5 block text-sm font-medium text-ink-soft">Что обрабатываем</span>
+          <Select value={state.materialId} onChange={(event) => patch({ materialId: event.target.value })}>
+            {materialCategories.map((category) => (
+              <optgroup key={category.id} label={category.label}>
+                {materials
+                  .filter((item) => item.category === category.id)
+                  .map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {item.name}
+                    </option>
+                  ))}
+              </optgroup>
+            ))}
+          </Select>
+        </label>
+        <div className="mt-3 grid gap-3 sm:grid-cols-2">
+          <NumberField
+            id="tdia"
+            label={state.operation === 'bore' ? 'Диаметр отверстия' : 'Диаметр детали'}
+            unit="мм"
+            value={state.diameter}
+            error={error && /диаметр/i.test(error) ? error : undefined}
+            onChange={(diameter) => patch({ diameter })}
+          />
+          <NumberField id="tlen" label="Длина прохода" unit="мм" value={state.length} onChange={(length) => patch({ length })} />
+          <NumberField
+            id="tstock"
+            label={operation?.stockLabel ?? 'Припуск'}
+            unit="мм"
+            hint={hints.stock}
+            value={state.stock}
+            onChange={(stock) => patch({ stock })}
+          />
+        </div>
+      </Card>
+
+      <Card>
+        <p className="text-sm font-medium text-muted">2. Инструмент</p>
+        <p className="mt-3 text-sm font-medium text-ink-soft">Операция</p>
         <div className="mt-3 flex flex-wrap gap-2">
           {turningOperations.map((item) => (
             <button
@@ -84,50 +124,7 @@ export function TurningForm({
           </Link>
         </div>
         {operation ? <p className="mt-3 text-sm text-ink-soft">{operation.hint}</p> : null}
-      </Card>
-
-      <Card>
-        <p className="text-sm font-medium text-muted">Материал и заготовка</p>
-        <label className="mt-3 block">
-          <span className="mb-1.5 block text-sm font-medium text-ink-soft">Материал</span>
-          <Select value={state.materialId} onChange={(event) => patch({ materialId: event.target.value })}>
-            {materialCategories.map((category) => (
-              <optgroup key={category.id} label={category.label}>
-                {materials
-                  .filter((item) => item.category === category.id)
-                  .map((item) => (
-                    <option key={item.id} value={item.id}>
-                      {item.name}
-                    </option>
-                  ))}
-              </optgroup>
-            ))}
-          </Select>
-        </label>
-        <div className="mt-3 grid gap-3 sm:grid-cols-2">
-          <NumberField
-            id="tdia"
-            label={state.operation === 'bore' ? 'Диаметр отверстия' : 'Диаметр'}
-            unit="мм"
-            value={state.diameter}
-            error={error && /диаметр/i.test(error) ? error : undefined}
-            onChange={(diameter) => patch({ diameter })}
-          />
-          <NumberField id="tlen" label="Длина прохода" unit="мм" value={state.length} onChange={(length) => patch({ length })} />
-          <NumberField
-            id="tstock"
-            label={operation?.stockLabel ?? 'Припуск'}
-            unit="мм"
-            hint={hints.stock}
-            value={state.stock}
-            onChange={(stock) => patch({ stock })}
-          />
-        </div>
-      </Card>
-
-      <Card>
-        <p className="text-sm font-medium text-muted">Резец</p>
-        <label className="mt-3 block">
+        <label className="mt-4 block">
           <span className="mb-1.5 block text-sm font-medium text-ink-soft">Вид резца</span>
           <Select
             value={state.cutterId}
@@ -151,14 +148,10 @@ export function TurningForm({
         {getCutterKind(state.cutterId) ? (
           <p className="mt-2 text-sm text-ink-soft">{getCutterKind(state.cutterId)?.hint}</p>
         ) : null}
-      </Card>
-
-      {state.operation === 'drill' || getCutterKind(state.cutterId)?.needsInsert === false ? null : (
-        <Card>
-          <p className="mb-3 text-sm font-medium text-muted">Пластина</p>
-          <label className="block">
+        {state.operation === 'drill' || getCutterKind(state.cutterId)?.needsInsert === false ? null : (
+          <label className="mt-4 block">
             <span className="mb-1.5 flex items-center gap-1 text-sm font-medium text-ink-soft">
-              ISO-обозначение
+              Пластина ISO
               <Hint
                 title="Пластина"
                 text="Список сужается по виду резца. Подача ограничивается радиусом вершины. Типоразмеры справочные, не марка сплава."
@@ -176,62 +169,60 @@ export function TurningForm({
               ))}
             </Select>
           </label>
-          {selectedInsert ? <InsertDiagram insert={selectedInsert} /> : null}
-        </Card>
-      )}
+        )}
+        {state.operation === 'drill' || getCutterKind(state.cutterId)?.needsInsert === false ? null : selectedInsert ? (
+          <InsertDiagram insert={selectedInsert} />
+        ) : null}
+      </Card>
 
       <Card>
-        <p className="text-sm font-medium text-muted">Станок</p>
-        <label className="mt-3 block">
-          <span className="mb-1.5 block text-sm font-medium text-ink-soft">Профиль</span>
-          <Select
-            value={state.presetId}
-            onChange={(event) => applyLathe(event.target.value)}
-          >
-            {lathePresets.map((item) => (
-              <option key={item.id} value={item.id}>
-                {item.name}
-              </option>
-            ))}
-          </Select>
-        </label>
-        <div className="mt-4">
-          <SegmentedControl
-            ariaLabel="Режим параметров"
-            value={state.paramMode}
-            options={[
-              { value: 'auto', label: 'Автоматически' },
-              { value: 'manual', label: 'Вручную' },
-            ]}
-            onChange={(paramMode) => patch({ paramMode })}
-          />
-        </div>
-        {state.paramMode === 'manual' || state.expert ? (
-          <div className="mt-4 grid gap-3 sm:grid-cols-3">
-            <NumberField id="tvc" label="Vc" unit="м/мин" hint={hints.vc} value={state.vc} onChange={(vc) => patch({ vc })} />
-            <NumberField id="tf" label="f" unit="мм/об" hint={hints.f} value={state.feed} onChange={(feed) => patch({ feed })} />
-            <NumberField id="tap" label="ap" unit="мм" hint={hints.ap} value={state.ap} onChange={(ap) => patch({ ap })} />
-          </div>
-        ) : (
-          <p className="mt-3 text-sm text-muted">Vc, подача и глубина подберутся по материалу, операции и пластине.</p>
-        )}
-        <button type="button" className="mt-4 text-sm font-semibold text-accent-2" onClick={() => setAdvanced(!advanced)}>
-          {advanced ? 'Скрыть расширенные параметры' : 'Расширенные параметры'}
+        <button type="button" className="text-sm font-semibold text-accent-2" onClick={() => setAdvanced(!advanced)}>
+          {advanced ? 'Скрыть станок и ручной ввод' : 'Станок и ручной ввод'}
         </button>
         {advanced ? (
-          <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            <NumberField id="trpm" label="Макс. обороты" unit="об/мин" value={state.maxRpm} onChange={(maxRpm) => patch({ maxRpm })} />
-            <NumberField id="tfeedmax" label="Макс. подача" unit="мм/мин" value={state.maxFeed} onChange={(maxFeed) => patch({ maxFeed })} />
-            <NumberField id="tpwr" label="Мощность" unit="кВт" value={state.powerKw} onChange={(powerKw) => patch({ powerKw })} />
-            <NumberField id="tdepth" label="Макс. ap" unit="мм" value={state.maxDepth} onChange={(maxDepth) => patch({ maxDepth })} />
-            <NumberField id="tmaxd" label="Макс. диаметр" unit="мм" value={state.maxDia} onChange={(maxDia) => patch({ maxDia })} />
+          <div className="mt-4 space-y-4">
+            <label className="block">
+              <span className="mb-1.5 block text-sm font-medium text-ink-soft">Профиль станка</span>
+              <Select value={state.presetId} onChange={(event) => applyLathe(event.target.value)}>
+                {lathePresets.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.name}
+                  </option>
+                ))}
+              </Select>
+            </label>
+            <SegmentedControl
+              ariaLabel="Режим параметров"
+              value={state.paramMode}
+              options={[
+                { value: 'auto', label: 'Автоматически' },
+                { value: 'manual', label: 'Вручную' },
+              ]}
+              onChange={(paramMode) => patch({ paramMode })}
+            />
+            {state.paramMode === 'manual' || state.expert ? (
+              <div className="grid gap-3 sm:grid-cols-3">
+                <NumberField id="tvc" label="Vc" unit="м/мин" hint={hints.vc} value={state.vc} onChange={(vc) => patch({ vc })} />
+                <NumberField id="tf" label="f" unit="мм/об" hint={hints.f} value={state.feed} onChange={(feed) => patch({ feed })} />
+                <NumberField id="tap" label="ap" unit="мм" hint={hints.ap} value={state.ap} onChange={(ap) => patch({ ap })} />
+              </div>
+            ) : (
+              <p className="text-sm text-muted">Vc, подача и глубина подберутся по материалу и пластине.</p>
+            )}
+            <div className="grid gap-3 sm:grid-cols-2">
+              <NumberField id="trpm" label="Макс. обороты" unit="об/мин" value={state.maxRpm} onChange={(maxRpm) => patch({ maxRpm })} />
+              <NumberField id="tfeedmax" label="Макс. подача" unit="мм/мин" value={state.maxFeed} onChange={(maxFeed) => patch({ maxFeed })} />
+              <NumberField id="tpwr" label="Мощность" unit="кВт" value={state.powerKw} onChange={(powerKw) => patch({ powerKw })} />
+              <NumberField id="tdepth" label="Макс. ap" unit="мм" value={state.maxDepth} onChange={(maxDepth) => patch({ maxDepth })} />
+              <NumberField id="tmaxd" label="Макс. диаметр" unit="мм" value={state.maxDia} onChange={(maxDia) => patch({ maxDia })} />
+            </div>
           </div>
         ) : null}
       </Card>
 
       {error ? <p className="text-sm font-medium text-danger">{error}</p> : null}
-      <Button type="submit" variant="graphite" fullWidth>
-        Рассчитать
+      <Button type="submit" variant="outline" fullWidth>
+        К итогам
       </Button>
     </form>
   )

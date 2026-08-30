@@ -36,12 +36,10 @@ export function TurningPage() {
 
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,26rem)_minmax(0,1fr)] lg:items-start">
-      <div className={form.result ? 'order-2 lg:order-1' : undefined}>
+      <div>
         <p className="text-sm font-semibold uppercase tracking-[0.16em] text-muted">Токарная обработка</p>
         <h1 className="mt-2 text-3xl font-extrabold tracking-tight">Режимы точения</h1>
-        <p className="mt-2 text-ink-soft">
-          Сначала операция, затем материал, диаметр и пластина. Формулы применятся сами. Значения справочные.
-        </p>
+        <p className="mt-2 text-ink-soft">Материал, затем резец и пластина — справа сразу итог. Значения справочные.</p>
         <div className="mt-6">
           <TurningForm
             state={form.state}
@@ -57,7 +55,7 @@ export function TurningPage() {
           />
         </div>
       </div>
-      <div className={form.result ? 'order-1 lg:order-2' : undefined}>
+      <div>
         {form.result && material ? (
           <TurningResultView
             result={form.result}
@@ -67,7 +65,7 @@ export function TurningPage() {
           />
         ) : (
           <div className="rounded-2xl border border-dashed border-line p-8 text-muted">
-            Выберите операцию и нажмите «Рассчитать».
+            Выберите материал и инструмент — режимы появятся здесь.
           </div>
         )}
       </div>

@@ -34,12 +34,10 @@ export function MillingPage() {
 
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,26rem)_minmax(0,1fr)] lg:items-start">
-      <div className={form.result ? 'order-2 lg:order-1' : undefined}>
+      <div>
         <p className="text-sm font-semibold uppercase tracking-[0.16em] text-muted">Фрезерование</p>
         <h1 className="mt-2 text-3xl font-extrabold tracking-tight">Режимы резания</h1>
-        <p className="mt-2 text-ink-soft">
-          Выберите материал, фрезу и станок. Формулы применятся автоматически. Значения — справочные диапазоны.
-        </p>
+        <p className="mt-2 text-ink-soft">Материал, затем фреза — справа сразу итог. Станок по умолчанию хоббийный.</p>
         <div className="mt-6">
           <MillingForm
             state={form.state}
@@ -54,7 +52,7 @@ export function MillingPage() {
           />
         </div>
       </div>
-      <div className={form.result ? 'order-1 lg:order-2' : undefined}>
+      <div>
         {form.result && material ? (
           <MillingResultView
             result={form.result}
@@ -64,7 +62,7 @@ export function MillingPage() {
           />
         ) : (
           <div className="rounded-2xl border border-dashed border-line p-8 text-muted">
-            Нажмите «Рассчитать», чтобы получить S, F (XY), Fz (врезание по Z), Vc, fz, ap и ae.
+            Выберите материал и фрезу — режимы появятся здесь.
           </div>
         )}
       </div>

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { defaultLathe, getLathePreset } from '@/data/machines/lathes'
 import { getMaterial, listMaterials } from '@/data/materials'
 import { getCutterKind } from '@/data/tools/cutters'
@@ -89,12 +89,37 @@ export function runTurning(state: TurningFormState): TurningResult {
 }
 
 export function useTurningForm() {
-  const [state, setState] = useState<TurningFormState>(initialTurningState)
+  const [state, setStateInner] = useState<TurningFormState>(initialTurningState)
   const [result, setResult] = useState<TurningResult | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [advanced, setAdvanced] = useState(false)
   const material = useMemo(() => getMaterial(state.materialId), [state.materialId])
   const materials = listMaterials({ plan: 'pro' })
+
+  function applyCalc(next: TurningFormState) {
+    try {
+      setResult(runTurning(next))
+      setError(null)
+      return true
+    } catch (caught) {
+      const message = caught instanceof CalculationError ? caught.userMessage : 'Проверьте введённые параметры.'
+      setError(message)
+      setResult(null)
+      return false
+    }
+  }
+
+  useEffect(() => {
+    applyCalc(initialTurningState)
+  }, [])
+
+  function setState(updater: (current: TurningFormState) => TurningFormState) {
+    setStateInner((current) => {
+      const next = updater(current)
+      queueMicrotask(() => applyCalc(next))
+      return next
+    })
+  }
 
   function applyLathe(id: string) {
     const preset = getLathePreset(id) ?? defaultLathe()
@@ -110,17 +135,7 @@ export function useTurningForm() {
   }
 
   function calculate() {
-    try {
-      const next = runTurning(state)
-      setResult(next)
-      setError(null)
-      return next
-    } catch (caught) {
-      const message = caught instanceof CalculationError ? caught.userMessage : 'Проверьте введённые параметры.'
-      setError(message)
-      setResult(null)
-      return null
-    }
+    return applyCalc(state)
   }
 
   return {

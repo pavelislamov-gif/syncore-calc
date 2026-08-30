@@ -67,65 +67,9 @@ export function MillingForm({
       }}
     >
       <Card>
-        <p className="text-sm font-medium text-muted">Станок</p>
-        <div className="mt-3">
-          <SegmentedControl
-            ariaLabel="Класс станка"
-            value={state.machineClass}
-            options={[
-              { value: 'hobby', label: 'Хоббийный' },
-              { value: 'industrial', label: 'Промышленный' },
-            ]}
-            onChange={(machineClass: MachineClass) => {
-              const preset = machinePresets.find((item) => item.class === machineClass)
-              if (!preset) return
-              setState((current) => ({
-                ...current,
-                machineClass,
-                presetId: preset.id,
-                maxRpm: String(preset.maxRpm),
-                maxFeed: String(preset.maxFeedMmMin),
-                powerKw: String(preset.spindlePowerKw),
-                maxDepth: String(preset.maxDepthMm),
-                collet: String(preset.colletDiameterMm),
-              }))
-            }}
-          />
-        </div>
-        <label className="mt-4 block">
-          <span className="mb-1.5 block text-sm font-medium text-ink-soft">Профиль станка</span>
-          <Select
-            value={state.presetId}
-            onChange={(event) => {
-              const preset = machinePresets.find((item) => item.id === event.target.value)
-              if (!preset) return
-              setState((current) => ({
-                ...current,
-                presetId: preset.id,
-                machineClass: preset.class,
-                maxRpm: String(preset.maxRpm),
-                maxFeed: String(preset.maxFeedMmMin),
-                powerKw: String(preset.spindlePowerKw),
-                maxDepth: String(preset.maxDepthMm),
-                collet: String(preset.colletDiameterMm),
-              }))
-            }}
-          >
-            {machinePresets
-              .filter((item) => item.class === state.machineClass)
-              .map((item) => (
-                <option key={item.id} value={item.id}>
-                  {formatMachineOption(item)}
-                </option>
-              ))}
-          </Select>
-        </label>
-      </Card>
-
-      <Card>
-        <p className="text-sm font-medium text-muted">Материал</p>
+        <p className="text-sm font-medium text-muted">1. Материал</p>
         <label className="mt-3 block">
-          <span className="mb-1.5 block text-sm font-medium text-ink-soft">Заготовка</span>
+          <span className="mb-1.5 block text-sm font-medium text-ink-soft">Что обрабатываем</span>
           <Select value={state.materialId} onChange={(event) => patch({ materialId: event.target.value })}>
             {materialCategories.map((category) => (
               <optgroup key={category.id} label={category.label}>
@@ -143,38 +87,10 @@ export function MillingForm({
       </Card>
 
       <Card>
-        <p className="text-sm font-medium text-muted">Настройка инструмента</p>
-        <div className="mt-3 grid gap-3 sm:grid-cols-2">
-          <NumberField
-            id="diameter"
-            label="Диаметр D"
-            unit="мм"
-            value={state.diameter}
-            min={0.1}
-            max={100}
-            error={error && /диаметр/i.test(error) ? error : undefined}
-            onChange={(diameter) => {
-              const d = Number(String(diameter).replace(',', '.'))
-              patch({
-                diameter,
-                ...(state.millType === 'ball' && d > 0 ? { tipRadius: String(Number((d / 2).toFixed(3))) } : {}),
-              })
-            }}
-          />
-          <NumberField
-            id="flutes"
-            label="Количество зубьев z"
-            value={state.flutes}
-            min={1}
-            max={12}
-            step="1"
-            error={error && /зуб/i.test(error) ? error : undefined}
-            onChange={(flutes) => patch({ flutes })}
-          />
-        </div>
+        <p className="text-sm font-medium text-muted">2. Инструмент</p>
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
           <label>
-            <span className="mb-1.5 block text-sm font-medium text-ink-soft">Тип</span>
+            <span className="mb-1.5 block text-sm font-medium text-ink-soft">Тип фрезы</span>
             <Select
               value={state.millType}
               onChange={(event) => {
@@ -205,20 +121,34 @@ export function MillingForm({
               </Select>
             </label>
           )}
-          {compact ? null : (
-            <label>
-              <span className="mb-1.5 block text-sm font-medium text-ink-soft">Покрытие</span>
-              <Select value={state.coating} onChange={(event) => patch({ coating: event.target.value as MillingFormState['coating'] })}>
-                {coatings.map((item) => (
-                  <option key={item.id} value={item.id}>
-                    {item.name}
-                  </option>
-                ))}
-              </Select>
-            </label>
-          )}
         </div>
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
+          <NumberField
+            id="diameter"
+            label="Диаметр D"
+            unit="мм"
+            value={state.diameter}
+            min={0.1}
+            max={100}
+            error={error && /диаметр/i.test(error) ? error : undefined}
+            onChange={(diameter) => {
+              const d = Number(String(diameter).replace(',', '.'))
+              patch({
+                diameter,
+                ...(state.millType === 'ball' && d > 0 ? { tipRadius: String(Number((d / 2).toFixed(3))) } : {}),
+              })
+            }}
+          />
+          <NumberField
+            id="flutes"
+            label="Зубья z"
+            value={state.flutes}
+            min={1}
+            max={12}
+            step="1"
+            error={error && /зуб/i.test(error) ? error : undefined}
+            onChange={(flutes) => patch({ flutes })}
+          />
           <NumberField
             id="fluteLength"
             label="Длина режущей части L"
@@ -283,46 +213,98 @@ export function MillingForm({
 
       {compact ? null : (
         <Card>
-          <div className="flex items-center justify-between gap-3">
-            <p className="text-sm font-medium text-muted">Параметры резания</p>
-            <SegmentedControl
-              ariaLabel="Режим параметров"
-              value={state.paramMode}
-              options={[
-                { value: 'auto', label: 'Автоматически' },
-                { value: 'manual', label: 'Вручную' },
-              ]}
-              onChange={(paramMode) => patch({ paramMode })}
-            />
-          </div>
-          {state.paramMode === 'manual' || state.expert ? (
-            <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              <NumberField id="vc" label="Vc" unit="м/мин" hint={hints.vc} value={state.vc} onChange={(vc) => patch({ vc })} />
-              <NumberField id="fz" label="fz" unit="мм/зуб" hint={hints.fz} hintTitle="Подача на зуб" value={state.fz} onChange={(fz) => patch({ fz })} />
-              <NumberField id="ap" label="ap" unit="мм" hint={hints.ap} value={state.ap} onChange={(ap) => patch({ ap })} />
-              <NumberField id="ae" label="ae" unit="мм" hint={hints.ae} value={state.ae} onChange={(ae) => patch({ ae })} />
-            </div>
-          ) : (
-            <p className="mt-3 text-sm text-muted">
-              Система подберёт справочные Vc, fz, ap и ae внутри диапазона материала и инструмента.
-            </p>
-          )}
-        </Card>
-      )}
-
-      {compact ? null : (
-        <Card>
           <button type="button" className="text-sm font-semibold text-accent-2" onClick={() => setAdvanced(!advanced)}>
-            {advanced ? 'Скрыть расширенные параметры' : 'Расширенные параметры'}
+            {advanced ? 'Скрыть станок и ручной ввод' : 'Станок и ручной ввод'}
           </button>
           {advanced ? (
-            <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              <NumberField id="maxRpm" label="Макс. обороты" unit="об/мин" hint={hints.rpm} value={state.maxRpm} onChange={(maxRpm) => patch({ maxRpm })} />
-              <NumberField id="maxFeed" label="Макс. подача" unit="мм/мин" hint={hints.feed} value={state.maxFeed} onChange={(maxFeed) => patch({ maxFeed })} />
-              <NumberField id="power" label="Мощность шпинделя" unit="кВт" hint={hints.power} value={state.powerKw} onChange={(powerKw) => patch({ powerKw })} />
-              <NumberField id="maxDepth" label="Макс. глубина" unit="мм" hint={hints.depth} value={state.maxDepth} onChange={(maxDepth) => patch({ maxDepth })} />
-              <NumberField id="collet" label="Диаметр цанги" unit="мм" hint={hints.collet} value={state.collet} onChange={(collet) => patch({ collet })} />
-              <label className="flex items-center gap-3 pt-6">
+            <div className="mt-4 space-y-4">
+              <SegmentedControl
+                ariaLabel="Класс станка"
+                value={state.machineClass}
+                options={[
+                  { value: 'hobby', label: 'Хоббийный' },
+                  { value: 'industrial', label: 'Промышленный' },
+                ]}
+                onChange={(machineClass: MachineClass) => {
+                  const preset = machinePresets.find((item) => item.class === machineClass)
+                  if (!preset) return
+                  setState((current) => ({
+                    ...current,
+                    machineClass,
+                    presetId: preset.id,
+                    maxRpm: String(preset.maxRpm),
+                    maxFeed: String(preset.maxFeedMmMin),
+                    powerKw: String(preset.spindlePowerKw),
+                    maxDepth: String(preset.maxDepthMm),
+                    collet: String(preset.colletDiameterMm),
+                  }))
+                }}
+              />
+              <label className="block">
+                <span className="mb-1.5 block text-sm font-medium text-ink-soft">Профиль станка</span>
+                <Select
+                  value={state.presetId}
+                  onChange={(event) => {
+                    const preset = machinePresets.find((item) => item.id === event.target.value)
+                    if (!preset) return
+                    setState((current) => ({
+                      ...current,
+                      presetId: preset.id,
+                      machineClass: preset.class,
+                      maxRpm: String(preset.maxRpm),
+                      maxFeed: String(preset.maxFeedMmMin),
+                      powerKw: String(preset.spindlePowerKw),
+                      maxDepth: String(preset.maxDepthMm),
+                      collet: String(preset.colletDiameterMm),
+                    }))
+                  }}
+                >
+                  {machinePresets
+                    .filter((item) => item.class === state.machineClass)
+                    .map((item) => (
+                      <option key={item.id} value={item.id}>
+                        {formatMachineOption(item)}
+                      </option>
+                    ))}
+                </Select>
+              </label>
+              <label>
+                <span className="mb-1.5 block text-sm font-medium text-ink-soft">Покрытие</span>
+                <Select value={state.coating} onChange={(event) => patch({ coating: event.target.value as MillingFormState['coating'] })}>
+                  {coatings.map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {item.name}
+                    </option>
+                  ))}
+                </Select>
+              </label>
+              <SegmentedControl
+                ariaLabel="Режим параметров"
+                value={state.paramMode}
+                options={[
+                  { value: 'auto', label: 'Автоматически' },
+                  { value: 'manual', label: 'Вручную' },
+                ]}
+                onChange={(paramMode) => patch({ paramMode })}
+              />
+              {state.paramMode === 'manual' || state.expert ? (
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <NumberField id="vc" label="Vc" unit="м/мин" hint={hints.vc} value={state.vc} onChange={(vc) => patch({ vc })} />
+                  <NumberField id="fz" label="fz" unit="мм/зуб" hint={hints.fz} hintTitle="Подача на зуб" value={state.fz} onChange={(fz) => patch({ fz })} />
+                  <NumberField id="ap" label="ap" unit="мм" hint={hints.ap} value={state.ap} onChange={(ap) => patch({ ap })} />
+                  <NumberField id="ae" label="ae" unit="мм" hint={hints.ae} value={state.ae} onChange={(ae) => patch({ ae })} />
+                </div>
+              ) : (
+                <p className="text-sm text-muted">Режимы считаются сами по материалу и фрезе. Станок по умолчанию — хоббийный.</p>
+              )}
+              <div className="grid gap-3 sm:grid-cols-2">
+                <NumberField id="maxRpm" label="Макс. обороты" unit="об/мин" hint={hints.rpm} value={state.maxRpm} onChange={(maxRpm) => patch({ maxRpm })} />
+                <NumberField id="maxFeed" label="Макс. подача" unit="мм/мин" hint={hints.feed} value={state.maxFeed} onChange={(maxFeed) => patch({ maxFeed })} />
+                <NumberField id="power" label="Мощность шпинделя" unit="кВт" hint={hints.power} value={state.powerKw} onChange={(powerKw) => patch({ powerKw })} />
+                <NumberField id="maxDepth" label="Макс. глубина" unit="мм" hint={hints.depth} value={state.maxDepth} onChange={(maxDepth) => patch({ maxDepth })} />
+                <NumberField id="collet" label="Диаметр цанги" unit="мм" hint={hints.collet} value={state.collet} onChange={(collet) => patch({ collet })} />
+              </div>
+              <label className="flex items-center gap-3">
                 <input
                   type="checkbox"
                   checked={state.expert}
@@ -331,7 +313,7 @@ export function MillingForm({
                 />
                 <span className="text-sm">
                   Экспертный режим
-                  <Hint title="Экспертный режим" text="Показывает Vc, fz, ap, ae, оценку мощности и ограничения станка даже в автоматическом подборе." />
+                  <Hint title="Экспертный режим" text="Показывает Vc, fz, ap, ae даже при автоматическом подборе." />
                 </span>
               </label>
             </div>
@@ -341,8 +323,8 @@ export function MillingForm({
 
       {error ? <p className="text-sm font-medium text-danger">{error}</p> : null}
 
-      <Button type="submit" variant="graphite" fullWidth>
-        Рассчитать
+      <Button type="submit" variant="outline" fullWidth>
+        К итогам
       </Button>
     </form>
   )
