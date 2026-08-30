@@ -324,7 +324,7 @@ export function MillingForm({
       {error ? <p className="text-sm font-medium text-danger">{error}</p> : null}
 
       <Button type="submit" variant="primary" fullWidth>
-        К итогам
+        Рассчитать
       </Button>
     </form>
   )

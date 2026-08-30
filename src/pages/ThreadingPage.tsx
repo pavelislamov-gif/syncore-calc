@@ -88,7 +88,7 @@ export function ThreadingPage() {
           <ThreadingResultView result={form.result} />
         ) : (
           <div className="rounded-2xl border border-dashed border-line p-8 text-muted">
-            Выберите размер резьбы и нажмите «К итогам».
+            Выберите размер резьбы и нажмите «Рассчитать».
           </div>
         )}
       </div>
