@@ -2,9 +2,9 @@ import type { MachinePreset } from '@/types/machine'
 
 export const machinePresets: MachinePreset[] = [
   {
-    id: 'hobby-desktop',
+    id: 'hobby-08',
     class: 'hobby',
-    name: 'Хоббийный настольный ЧПУ',
+    name: 'Хоббийный 0.8 кВт',
     maxRpm: 18000,
     maxFeedMmMin: 2000,
     spindlePowerKw: 0.8,
@@ -12,14 +12,24 @@ export const machinePresets: MachinePreset[] = [
     colletDiameterMm: 6,
   },
   {
-    id: 'hobby-router',
+    id: 'hobby-15',
     class: 'hobby',
-    name: 'Хоббийный шпиндель 1.5 кВт',
+    name: 'Хоббийный 1.5 кВт',
     maxRpm: 24000,
     maxFeedMmMin: 4000,
     spindlePowerKw: 1.5,
     maxDepthMm: 8,
     colletDiameterMm: 8,
+  },
+  {
+    id: 'hobby-22',
+    class: 'hobby',
+    name: 'Хоббийный 2.2 кВт',
+    maxRpm: 24000,
+    maxFeedMmMin: 5000,
+    spindlePowerKw: 2.2,
+    maxDepthMm: 10,
+    colletDiameterMm: 13,
   },
   {
     id: 'industrial-3kw',
@@ -55,4 +65,8 @@ export function defaultMachineForClass(machineClass: MachinePreset['class']): Ma
     throw new Error('Machine presets catalog is empty')
   }
   return first
+}
+
+export function formatMachineOption(preset: MachinePreset): string {
+  return `${preset.name} · ${preset.maxRpm.toLocaleString('ru-RU')} об/мин`
 }

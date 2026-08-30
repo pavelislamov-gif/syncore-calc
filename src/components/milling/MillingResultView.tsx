@@ -20,7 +20,7 @@ export function MillingResultView({ result, material, onSaveHistory, onSaveFavor
   const tone = result.status === 'ok' ? 'ok' : result.status === 'warning' ? 'warning' : 'error'
 
   return (
-    <div className="space-y-4">
+    <div id="milling-result" className="scroll-mt-24 space-y-4">
       <div className="grid grid-cols-2 gap-3">
         <ResultHero value={formatRpm(result.rpm)} unit="об/мин" />
         <ResultHero value={formatRpm(result.feedMmMin)} unit="мм/мин" />

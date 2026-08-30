@@ -3,6 +3,7 @@ import { MillingResultView } from '@/components/milling/MillingResultView'
 import { useMillingForm } from '@/hooks/useMillingForm'
 import { saveFavorite, saveHistoryItem } from '@/services/storage'
 import { formatRpm, newId } from '@/utils/format'
+import { scrollToMillingResult } from '@/utils/scroll'
 
 export function MillingPage() {
   const form = useMillingForm()
@@ -33,7 +34,7 @@ export function MillingPage() {
 
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,26rem)_minmax(0,1fr)] lg:items-start">
-      <div>
+      <div className={form.result ? 'order-2 lg:order-1' : undefined}>
         <p className="text-sm font-semibold uppercase tracking-[0.16em] text-muted">Фрезерование</p>
         <h1 className="mt-2 text-3xl font-extrabold tracking-tight">Режимы резания</h1>
         <p className="mt-2 text-ink-soft">
@@ -46,12 +47,14 @@ export function MillingPage() {
             materials={form.materials}
             advanced={form.advanced}
             setAdvanced={form.setAdvanced}
-            onCalculate={() => form.calculate()}
+            onCalculate={() => {
+              if (form.calculate()) scrollToMillingResult()
+            }}
             error={form.error}
           />
         </div>
       </div>
-      <div>
+      <div className={form.result ? 'order-1 lg:order-2' : undefined}>
         {form.result && material ? (
           <MillingResultView
             result={form.result}

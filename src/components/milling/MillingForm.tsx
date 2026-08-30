@@ -1,4 +1,4 @@
-import { machinePresets } from '@/data/machines'
+import { formatMachineOption, machinePresets } from '@/data/machines'
 import { materialCategories } from '@/data/materials'
 import { coatings, cutterMaterials, endMillTypes } from '@/data/tools'
 import { Button } from '@/components/ui/Button'
@@ -106,7 +106,7 @@ export function MillingForm({
               .filter((item) => item.class === state.machineClass)
               .map((item) => (
                 <option key={item.id} value={item.id}>
-                  {item.name}
+                  {formatMachineOption(item)}
                 </option>
               ))}
           </Select>
