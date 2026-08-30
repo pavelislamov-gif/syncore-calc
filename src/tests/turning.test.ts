@@ -58,6 +58,23 @@ describe('turning Ст45 CNMG 120408', () => {
     expect(result.vc).toBeGreaterThan(50)
   })
 
+  it('reduces ap on a weak hobby spindle instead of failing', () => {
+    const result = calculateTurning({
+      materialId: 'st45',
+      operation: 'rough_od',
+      diameterMm: 50,
+      lengthMm: 80,
+      stockMm: 3,
+      insertId: 'CNMG120408',
+      paramMode: 'auto',
+      machine: defaultLathe(),
+      overrides: {},
+    })
+    expect(result.status).not.toBe('error')
+    expect(result.powerKw).toBeLessThanOrEqual(defaultLathe().spindlePowerKw * 1.05)
+    expect(result.checks.some((item) => item.id === 'ap-power')).toBe(true)
+  })
+
   it('rejects invalid diameter', () => {
     expect(() =>
       calculateTurning({

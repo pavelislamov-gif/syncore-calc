@@ -68,20 +68,33 @@ export function calculateTurning(input: TurningInput): TurningResult {
   const theoreticalFeed = calculateTurningFeedRate(rpm, fTarget)
   const feedMmMin = Math.min(theoreticalFeed, input.machine.maxFeedMmMin)
   const feedMmRev = feedMmMin / rpm
-  const ap = Math.min(apTarget, input.machine.maxDepthMm)
+  const efficiency = input.machine.class === 'hobby' ? 0.6 : 0.8
+  let ap = Math.min(apTarget, input.machine.maxDepthMm)
+  let powerKw = calculateTurningPower({ kc: params.kc, ap, feedMmRev, vc, efficiency })
+  let powerLimited = false
+  if (input.paramMode === 'auto' && powerKw > input.machine.spindlePowerKw * 0.9) {
+    const scale = (input.machine.spindlePowerKw * 0.85) / powerKw
+    const reduced = Math.max(0.1, roundTo(ap * scale, 2))
+    if (reduced < ap - 1e-6) {
+      ap = reduced
+      powerKw = calculateTurningPower({ kc: params.kc, ap, feedMmRev, vc, efficiency })
+      powerLimited = true
+    }
+  }
   const stock = input.stockMm > 0 ? input.stockMm : ap
   const passes = calculatePasses(stock, ap)
   const length = input.operation === 'face' ? input.diameterMm / 2 : input.lengthMm
   const timeMin = calculateMachiningTimeMin(length, feedMmMin, passes)
-  const powerKw = calculateTurningPower({
-    kc: params.kc,
-    ap,
-    feedMmRev,
-    vc,
-    efficiency: input.machine.class === 'hobby' ? 0.6 : 0.8,
-  })
 
   const checks: CheckResult[] = []
+  if (powerLimited) {
+    checks.push({
+      id: 'ap-power',
+      severity: 'warning',
+      title: 'Глубина снижена под мощность шпинделя',
+      detail: `Для шпинделя ${input.machine.spindlePowerKw} кВт ap уменьшена до ${roundTo(ap, 2)} мм, проходов: ${calculatePasses(stock, ap)}. Это справочная подстройка, не замена жёсткости станка.`,
+    })
+  }
   if (input.diameterMm > input.machine.colletDiameterMm + 1e-6) {
     checks.push({
       id: 'swing',
