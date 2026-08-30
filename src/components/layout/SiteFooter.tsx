@@ -3,7 +3,14 @@ import { SITE } from '@/data/site'
 export function SiteFooter() {
   return (
     <footer className="mx-auto w-full max-w-6xl px-4 py-8 text-sm text-muted md:px-6">
-      <p>SYNCORE calc · бесплатно, без регистрации. Справочные режимы резания.</p>
+      <p>
+        SYNCORE calc ·{' '}
+        <a href={SITE.publicUrl} className="text-ink underline-offset-2 hover:underline">
+          {SITE.publicHost}
+        </a>
+        {' · '}
+        бесплатно, без регистрации. Справочные режимы резания.
+      </p>
       <p className="mt-2">
         {SITE.author}, {SITE.role} · {SITE.company}, {SITE.city}
       </p>

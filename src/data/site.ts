@@ -1,4 +1,7 @@
 export const SITE = {
+  name: 'SYNCORE calc',
+  publicHost: 'syncore54.ru',
+  publicUrl: 'https://syncore54.ru',
   author: 'Павел Исламов',
   role: 'Технолог',
   company: 'CLUSTER X',

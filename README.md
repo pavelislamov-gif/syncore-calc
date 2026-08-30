@@ -1,5 +1,7 @@
 # SYNCORE calc
 
+Сайт: [syncore54.ru](https://syncore54.ru)
+
 Линейка калькуляторов **SYNCORE**. Автор: [Павел Исламов](https://pavelislamov.ru/) — портфолио, продукты и контакты.
 
 Инженерные калькуляторы для производства и ЧПУ. Рабочие модули: **фрезерование**, **токарка**, **метрическая резьба**, **лазерная резка**.
@@ -27,6 +29,33 @@ npm run dev
 npm run test
 npm run build
 ```
+
+Готовая сборка лежит в `dist/`. Это статический SPA: нужен хостинг файлов и fallback всех путей на `index.html`.
+
+## Домен syncore54.ru
+
+В панели регистратора (или DNS-хостинга):
+
+1. **A / AAAA** или **ALIAS / ANAME** для `@` (apex `syncore54.ru`) — на IP или alias вашего хостинга.
+2. **CNAME** `www` → `syncore54.ru` (или сразу на хостинг, если так требуют).
+3. Включите HTTPS (Let’s Encrypt у хостера или сертификат у Vercel / Cloudflare).
+
+Если деплой на **Vercel**: добавьте домен в Project → Domains. В репозитории уже есть `vercel.json` (SPA rewrite). Для **Netlify** — `public/_redirects`.
+
+На обычном nginx:
+
+```nginx
+server {
+  server_name syncore54.ru www.syncore54.ru;
+  root /var/www/syncore-calc/dist;
+  index index.html;
+  location / {
+    try_files $uri /index.html;
+  }
+}
+```
+
+Счётчик на `/usage` работает только если рядом крутится `npm run preview` / `npm run dev` (есть `/api/telemetry`). На чистой статике задайте внешний коллектор через `VITE_TELEMETRY_URL`.
 
 ## Что умеет сейчас
 
