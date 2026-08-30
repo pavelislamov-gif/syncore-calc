@@ -1,12 +1,10 @@
+import { ResultFooterBlock } from '@/components/results/ResultFooterBlock'
 import { Badge } from '@/components/ui/Badge'
-import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { StatusBanner } from '@/components/ui/StatusBanner'
 import type { MillingResult } from '@/types/milling'
 import type { Material } from '@/types/material'
 import { formatNumber, formatRpm } from '@/utils/format'
-import { Star } from 'lucide-react'
-import { useState } from 'react'
 
 interface Props {
   result: MillingResult
@@ -16,7 +14,6 @@ interface Props {
 }
 
 export function MillingResultView({ result, material, onSaveHistory, onSaveFavorite }: Props) {
-  const [showMath, setShowMath] = useState(false)
   const tone = result.status === 'ok' ? 'ok' : result.status === 'warning' ? 'warning' : 'error'
 
   return (
@@ -68,41 +65,15 @@ export function MillingResultView({ result, material, onSaveHistory, onSaveFavor
         </ul>
       ) : null}
 
-      <Card>
-        <p className="text-sm font-semibold">Почему?</p>
-        <p className="mt-2 text-sm leading-6 text-ink-soft">{result.why}</p>
-        <p className="mt-3 text-xs text-muted">
-          Справочное значение / рекомендуемый диапазон для {material.name}. Это не гарантированный паспортный режим.
-        </p>
-      </Card>
-
-      <div>
-        <button type="button" className="text-sm font-semibold text-accent-2" onClick={() => setShowMath(!showMath)}>
-          {showMath ? 'Скрыть расчёт' : 'Показать расчёт'}
-        </button>
-        {showMath ? (
-          <ol className="mt-3 space-y-3">
-            {result.steps.map((step) => (
-              <li key={step.id} className="rounded-xl bg-paper-2 p-3">
-                <p className="text-sm font-semibold">{step.label}</p>
-                <p className="mt-1 font-mono text-sm">{step.formula}</p>
-                <p className="mt-1 text-sm text-ink-soft">{step.substitution}</p>
-                <p className="mt-1 text-sm font-medium">{step.result}</p>
-              </li>
-            ))}
-          </ol>
-        ) : null}
-      </div>
-
-      <div className="flex flex-col gap-2 sm:flex-row">
-        <Button variant="outline" onClick={onSaveHistory} fullWidth>
-          Сохранить в историю
-        </Button>
-        <Button variant="outline" onClick={onSaveFavorite} fullWidth>
-          <Star className="h-4 w-5" />В избранное
-        </Button>
-      </div>
       <Badge tone={tone}>Единицы: мм · мм/мин · м/мин · об/мин · кВт</Badge>
+
+      <ResultFooterBlock
+        why={result.why}
+        disclaimer={`Справочное значение / рекомендуемый диапазон для ${material.name}. Это не гарантированный паспортный режим.`}
+        steps={result.steps}
+        onSaveHistory={onSaveHistory}
+        onSaveFavorite={onSaveFavorite}
+      />
     </div>
   )
 }

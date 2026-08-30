@@ -1,12 +1,10 @@
+import { ResultFooterBlock } from '@/components/results/ResultFooterBlock'
 import { Badge } from '@/components/ui/Badge'
-import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { StatusBanner } from '@/components/ui/StatusBanner'
 import type { ThreadingResult } from '@/types/threading'
 import type { Material } from '@/types/material'
 import { formatNumber, formatRpm } from '@/utils/format'
-import { Star } from 'lucide-react'
-import { useState } from 'react'
 
 interface Props {
   result: ThreadingResult
@@ -16,7 +14,6 @@ interface Props {
 }
 
 export function ThreadingResultView({ result, material, onSaveHistory, onSaveFavorite }: Props) {
-  const [showMath, setShowMath] = useState(false)
   return (
     <div id="threading-result" className="scroll-mt-24 space-y-4">
       <div className="grid grid-cols-2 gap-3">
@@ -52,32 +49,13 @@ export function ThreadingResultView({ result, material, onSaveHistory, onSaveFav
           <p className="mt-2 text-sm text-ink-soft">{check.detail}</p>
         </Card>
       ))}
-      <Card>
-        <p className="text-sm font-semibold">Почему?</p>
-        <p className="mt-2 text-sm leading-6 text-ink-soft">{result.why}</p>
-        <p className="mt-3 text-xs text-muted">Справочно для {material.name}. Дюймовая резьба — на следующем шаге.</p>
-      </Card>
-      <button type="button" className="text-sm font-semibold text-accent-2" onClick={() => setShowMath(!showMath)}>
-        {showMath ? 'Скрыть расчёт' : 'Показать расчёт'}
-      </button>
-      {showMath
-        ? result.steps.map((step) => (
-            <div key={step.id} className="rounded-xl bg-paper-2 p-3">
-              <p className="text-sm font-semibold">{step.label}</p>
-              <p className="mt-1 font-mono text-sm">{step.formula}</p>
-              <p className="mt-1 text-sm">{step.substitution}</p>
-              <p className="mt-1 font-medium">{step.result}</p>
-            </div>
-          ))
-        : null}
-      <div className="flex flex-col gap-2 sm:flex-row">
-        <Button variant="outline" onClick={onSaveHistory} fullWidth>
-          Сохранить в историю
-        </Button>
-        <Button variant="outline" onClick={onSaveFavorite} fullWidth>
-          <Star className="h-4 w-4" />В избранное
-        </Button>
-      </div>
+      <ResultFooterBlock
+        why={result.why}
+        disclaimer={`Справочно для ${material.name}. Дюймовая резьба — на следующем шаге.`}
+        steps={result.steps}
+        onSaveHistory={onSaveHistory}
+        onSaveFavorite={onSaveFavorite}
+      />
     </div>
   )
 }
