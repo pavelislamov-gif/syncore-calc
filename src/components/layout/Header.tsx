@@ -12,7 +12,7 @@ export function Header({ onOpenMenu }: Props) {
   const { pathname } = useLocation()
   return (
     <header className="sticky top-0 z-30 h-[var(--app-header-height)] overflow-visible border-b border-white/10 bg-black">
-      <div className="mx-auto flex h-full max-w-6xl items-center justify-between gap-4 px-4 md:px-6">
+      <div className="mx-auto flex h-full max-w-6xl items-center justify-between gap-4 overflow-visible px-4 py-2 md:px-6">
         <Link to="/" className="min-w-0 overflow-visible" aria-label="SYNCORE calc">
           <BrandWordmark />
         </Link>

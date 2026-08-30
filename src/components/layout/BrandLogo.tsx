@@ -2,19 +2,19 @@ import { cn } from '@/utils/cn'
 
 export function BrandWordmark({ size = 'md' }: { size?: 'md' | 'lg' }) {
   return (
-    <span className="flex min-w-0 items-center gap-3 overflow-visible">
+    <span className="flex min-w-0 items-end gap-2.5 overflow-visible">
       <img
         src="/logo.png"
         alt="SYNCORE"
         className={cn(
-          'w-auto max-w-[min(15rem,52vw)] shrink-0 object-contain object-left',
-          size === 'lg' ? 'h-12 sm:h-14' : 'h-9 sm:h-10',
+          'w-auto max-w-[min(16rem,58vw)] shrink-0 object-contain object-left',
+          size === 'lg' ? 'h-14 sm:h-16' : 'h-10 sm:h-11',
         )}
       />
       <span
         className={cn(
-          'shrink-0 font-extrabold leading-none tracking-tight text-white',
-          size === 'lg' ? 'text-[1.7rem] sm:text-[1.95rem]' : 'text-[1.15rem] sm:text-[1.25rem]',
+          'mb-[0.42em] shrink-0 font-normal not-italic leading-none tracking-normal text-white [font-synthesis:none]',
+          size === 'lg' ? 'text-base sm:text-lg' : 'text-sm sm:text-[0.95rem]',
         )}
       >
         Calc

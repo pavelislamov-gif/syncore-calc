@@ -10,7 +10,7 @@ export function HomePage() {
   return (
     <div className="space-y-10">
       <section className="max-w-3xl">
-        <div className="inline-flex items-center overflow-visible rounded-2xl bg-black px-5 py-4">
+        <div className="inline-flex items-center overflow-visible rounded-2xl bg-black px-6 py-5">
           <BrandWordmark size="lg" />
         </div>
         <h1 className="mt-3 text-3xl font-extrabold tracking-tight md:text-5xl">Инженерные расчёты для производства</h1>

@@ -38,7 +38,7 @@ body {
 
 :root {
   /* Header: py-3 + h-11 menu button + border — keep sticky result bar below this. */
-  --app-header-height: 4.75rem;
+  --app-header-height: 5.25rem;
 }
 
 button,
