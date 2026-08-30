@@ -3,7 +3,7 @@ import { getMaterial } from '@/data/materials'
 import { millingFormulas } from '@/data/formulas/milling'
 import type { FormulaStep, MillingInput, MillingResult } from '@/types/milling'
 import { CalculationError } from '../errors'
-import { roundTo } from '../units'
+import { formatExact } from '../units'
 import {
   validateDiameter,
   validateFlutes,
@@ -103,7 +103,7 @@ export function calculateMilling(input: MillingInput): MillingResult {
         id: 'rpm-clamped',
         severity: 'warning',
         title: 'Обороты ограничены станком',
-        detail: `Расчётные обороты: ${Math.round(theoreticalRpm).toLocaleString('ru-RU')} об/мин. Ваш станок ограничен ${Math.round(input.machine.maxRpm).toLocaleString('ru-RU')} об/мин.`,
+        detail: `Расчётные обороты: ${formatExact(theoreticalRpm)} об/мин. Ваш станок ограничен ${formatExact(input.machine.maxRpm)} об/мин.`,
       })
     }
   }
@@ -112,7 +112,7 @@ export function calculateMilling(input: MillingInput): MillingResult {
       id: 'feed-limit',
       severity: 'warning',
       title: 'Подача ограничена станком',
-      detail: `Расчётная подача ${Math.round(theoreticalFeed).toLocaleString('ru-RU')} мм/мин превышает максимум ${Math.round(input.machine.maxFeedMmMin).toLocaleString('ru-RU')} мм/мин.`,
+      detail: `Расчётная подача ${formatExact(theoreticalFeed)} мм/мин превышает максимум ${formatExact(input.machine.maxFeedMmMin)} мм/мин.`,
     })
   }
   if (clamped.clamped.ap) {
@@ -120,7 +120,7 @@ export function calculateMilling(input: MillingInput): MillingResult {
       id: 'ap-limit',
       severity: 'warning',
       title: 'Глубина ограничена геометрией',
-      detail: `ap ограничена меньшим из: максимум станка ${input.machine.maxDepthMm} мм и длина режущей части ${tool.fluteLengthMm} мм.`,
+      detail: `ap ограничена меньшим из: максимум станка ${formatExact(input.machine.maxDepthMm)} мм и длина режущей части ${formatExact(tool.fluteLengthMm)} мм.`,
     })
   }
 
@@ -141,50 +141,50 @@ export function calculateMilling(input: MillingInput): MillingResult {
       id: 'vc',
       label: millingFormulas.cuttingSpeed.label,
       formula: millingFormulas.spindleSpeed.formula,
-      substitution: `n = (${roundTo(vcTarget, 1)} × 1000) / (π × ${tool.diameterMm})`,
-      result: `${Math.round(theoreticalRpm)} об/мин (до ограничения станка)`,
+      substitution: `n = (${formatExact(vcTarget)} × 1000) / (π × ${formatExact(tool.diameterMm)})`,
+      result: `${formatExact(theoreticalRpm)} об/мин (до ограничения станка)`,
     },
     {
       id: 'n',
       label: 'Обороты после ограничения станка',
       formula: 'n_fact = min(n, n_max)',
-      substitution: `min(${Math.round(theoreticalRpm)}, ${input.machine.maxRpm})`,
-      result: `${Math.round(rpm)} об/мин`,
+      substitution: `min(${formatExact(theoreticalRpm)}, ${formatExact(input.machine.maxRpm)})`,
+      result: `${formatExact(rpm)} об/мин`,
     },
     {
       id: 'vc-actual',
       label: millingFormulas.cuttingSpeed.label,
       formula: millingFormulas.cuttingSpeed.formula,
-      substitution: `Vc = (π × ${tool.diameterMm} × ${Math.round(rpm)}) / 1000`,
-      result: `${roundTo(vcActual, 1)} м/мин`,
+      substitution: `Vc = (π × ${formatExact(tool.diameterMm)} × ${formatExact(rpm)}) / 1000`,
+      result: `${formatExact(vcActual)} м/мин`,
     },
     {
       id: 'vf',
       label: millingFormulas.feedRate.label,
       formula: millingFormulas.feedRate.formula,
-      substitution: `Vf = ${Math.round(rpm)} × ${tool.flutes} × ${roundTo(fzTarget, 3)}`,
-      result: `${roundTo(theoreticalFeed, 1)} мм/мин`,
+      substitution: `Vf = ${formatExact(rpm)} × ${tool.flutes} × ${formatExact(fzTarget)}`,
+      result: `${formatExact(theoreticalFeed)} мм/мин`,
     },
     {
       id: 'plunge',
       label: millingFormulas.plunge.label,
       formula: millingFormulas.plunge.formula,
-      substitution: `Vf_z = ${roundTo(feedMmMin, 1)} × ${roundTo(plungeK, 3)}`,
-      result: `${roundTo(plungeMmMin, 1)} мм/мин`,
+      substitution: `Vf_z = ${formatExact(feedMmMin)} × ${formatExact(plungeK)}`,
+      result: `${formatExact(plungeMmMin)} мм/мин`,
     },
     {
       id: 'helical',
       label: millingFormulas.helicalPlunge.label,
       formula: millingFormulas.helicalPlunge.formula,
-      substitution: `Vf_helical = ${roundTo(feedMmMin, 1)} × 0.55`,
-      result: `${roundTo(helicalPlungeMmMin, 1)} мм/мин`,
+      substitution: `Vf_helical = ${formatExact(feedMmMin)} × 0.55`,
+      result: `${formatExact(helicalPlungeMmMin)} мм/мин`,
     },
     {
       id: 'p',
       label: millingFormulas.power.label,
       formula: millingFormulas.power.formula,
-      substitution: `P = (${roundTo(ap, 2)} × ${roundTo(ae, 2)} × ${roundTo(feedMmMin, 1)} × ${material.milling.specificCuttingForceKc}) / (60×10⁶ × η)`,
-      result: `${roundTo(powerKw, 2)} кВт (оценка)`,
+      substitution: `P = (${formatExact(ap)} × ${formatExact(ae)} × ${formatExact(feedMmMin)} × ${material.milling.specificCuttingForceKc}) / (60×10⁶ × η)`,
+      result: `${formatExact(powerKw)} кВт (оценка)`,
     },
   ]
 
@@ -209,7 +209,7 @@ export function calculateMilling(input: MillingInput): MillingResult {
         : finalStatus === 'warning'
           ? 'Режим рассчитан, но есть предупреждения — проверьте ограничения станка и нагрузку.'
           : 'Режим требует корректировки: один или несколько параметров выходят за безопасные пределы.',
-    why: `Для материала ${material.name} и фрезы Ø${formatD(tool.diameterMm)} мм с ${tool.flutes} зубьями выбран справочный диапазон скорости резания ${roundTo(vcRange.min, 0)}–${roundTo(vcRange.max, 0)} м/мин и подачи на зуб ${roundTo(fzRange.min, 3)}–${roundTo(fzRange.max, 3)} мм/зуб (${tool.cutterMaterial}, ${coatingLabel(tool.coating)}). Геометрия: L=${formatD(tool.fluteLengthMm)} мм${tool.tipRadiusMm > 0 ? `, r=${formatD(tool.tipRadiusMm)} мм` : ''}${tool.includedAngleDeg != null ? `, α=${tool.includedAngleDeg}°` : ''}. Значения — справочные, не гарантированный паспортный режим.`,
+    why: `Для материала ${material.name} и фрезы Ø${formatExact(tool.diameterMm)} мм с ${tool.flutes} зубьями выбран справочный диапазон скорости резания ${formatExact(vcRange.min)}–${formatExact(vcRange.max)} м/мин и подачи на зуб ${formatExact(fzRange.min)}–${formatExact(fzRange.max)} мм/зуб (${tool.cutterMaterial}, ${coatingLabel(tool.coating)}). Геометрия: L=${formatExact(tool.fluteLengthMm)} мм${tool.tipRadiusMm > 0 ? `, r=${formatExact(tool.tipRadiusMm)} мм` : ''}${tool.includedAngleDeg != null ? `, α=${formatExact(tool.includedAngleDeg)}°` : ''}. Значения — справочные, не гарантированный паспортный режим.`,
     steps,
     usedRecommendedRanges: {
       vc: { min: vcRange.min, max: vcRange.max, recommended: vcRange.recommended },
@@ -243,10 +243,6 @@ function resolveGeometry(tool: MillingInput['tool']): Required<Pick<
     tipRadiusMm,
     includedAngleDeg: needsAngle ? (tool.includedAngleDeg ?? defaults.includedAngleDeg) : (tool.includedAngleDeg ?? null),
   }
-}
-
-function formatD(value: number): string {
-  return roundTo(value, 2).toString()
 }
 
 function coatingLabel(id: string): string {

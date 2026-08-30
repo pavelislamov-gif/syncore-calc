@@ -111,7 +111,7 @@ function ResultHero({ code, value, unit }: { code: string; value: string; unit: 
   return (
     <Card className="bg-graphite text-white">
       <p className="text-xs font-bold tracking-[0.2em] text-accent">{code}</p>
-      <p className="mt-1 font-mono text-3xl font-semibold tracking-tight md:text-4xl">{value}</p>
+      <p className="mt-1 break-all font-mono text-2xl font-semibold tracking-tight md:text-3xl">{value}</p>
       <p className="mt-1 text-sm text-white/70">{unit}</p>
     </Card>
   )

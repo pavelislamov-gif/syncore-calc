@@ -28,6 +28,15 @@ export function wToKw(w: number): number {
   return w / 1000
 }
 
+/** Display the computed value without rounding. Trailing zeros are not forced. */
+export function formatExact(value: number): string {
+  if (!Number.isFinite(value)) return '—'
+  return value.toLocaleString('ru-RU', {
+    maximumFractionDigits: 12,
+    minimumFractionDigits: 0,
+  })
+}
+
 export function roundTo(value: number, digits: number): number {
   const factor = 10 ** digits
   return Math.round(value * factor) / factor

@@ -2,7 +2,7 @@ import type { CheckResult, CheckSeverity, MillingResult } from '@/types/milling'
 import type { MachineLimits } from '@/types/machine'
 import type { Material } from '@/types/material'
 import type { MillToolInput } from '@/types/tool'
-import { roundTo } from '../units'
+import { formatExact } from '../units'
 
 export function evaluateMillingChecks(input: {
   rpm: number
@@ -26,7 +26,7 @@ export function evaluateMillingChecks(input: {
       id: 'rpm-limit',
       severity: 'warning',
       title: 'Обороты ограничены станком',
-      detail: `Расчётные обороты: ${Math.round(input.rpm)} об/мин. Ваш станок ограничен ${formatInt(machine.maxRpm)} об/мин.`,
+      detail: `Расчётные обороты: ${formatExact(input.rpm)} об/мин. Ваш станок ограничен ${formatExact(machine.maxRpm)} об/мин.`,
     })
   }
 
@@ -149,10 +149,6 @@ export function applyMachineClamps(
   }
 }
 
-function formatInt(value: number): string {
-  return Math.round(value).toLocaleString('ru-RU')
-}
-
-function formatNum(value: number, digits = 1): string {
-  return roundTo(value, digits).toLocaleString('ru-RU')
+function formatNum(value: number, _digits?: number): string {
+  return formatExact(value)
 }

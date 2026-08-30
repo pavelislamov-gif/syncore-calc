@@ -16,7 +16,7 @@ export function ThreadingPage() {
       kind: 'threading',
       title: `${form.result.designation} × ${form.result.pitchMm} · ${material.shortName}`,
       createdAt: new Date().toISOString(),
-      summary: `${formatRpm(form.result.rpm)} об/мин · отверстие ${form.result.tapDrillMm.toFixed(2)} мм`,
+      summary: `${formatRpm(form.result.rpm)} об/мин · отверстие ${formatRpm(form.result.tapDrillMm)} мм`,
       payload: { state: form.state, result: form.result },
     })
   }

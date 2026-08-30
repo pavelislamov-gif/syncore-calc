@@ -18,7 +18,7 @@ export function TurningPage() {
       kind: 'turning',
       title: `${material.shortName} + ${form.state.insertId} · ${op.label}`,
       createdAt: new Date().toISOString(),
-      summary: `${formatRpm(form.result.rpm)} об/мин · ${Math.round(form.result.feedMmMin)} мм/мин`,
+      summary: `${formatRpm(form.result.rpm)} об/мин · ${formatRpm(form.result.feedMmMin)} мм/мин`,
       payload: { state: form.state, result: form.result },
     })
   }

@@ -1,12 +1,11 @@
-export function formatNumber(value: number, digits = 0): string {
-  return value.toLocaleString('ru-RU', {
-    maximumFractionDigits: digits,
-    minimumFractionDigits: digits,
-  })
+import { formatExact } from '@/engine/units'
+
+export function formatNumber(value: number, _digits?: number): string {
+  return formatExact(value)
 }
 
 export function formatRpm(value: number): string {
-  return Math.round(value).toLocaleString('ru-RU')
+  return formatExact(value)
 }
 
 export function newId(): string {

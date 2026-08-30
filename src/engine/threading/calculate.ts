@@ -3,7 +3,7 @@ import { getTurningParams } from '@/data/materials/turning'
 import { getMetricThread, threadingFormulas } from '@/data/threading/metric'
 import type { ThreadingInput, ThreadingResult } from '@/types/threading'
 import { CalculationError } from '../errors'
-import { roundTo } from '../units'
+import { formatExact } from '../units'
 import { calculateTurningCuttingSpeed, calculateTurningFeedRate, calculateTurningSpindleSpeed } from '../turning/kinematics'
 
 const METRIC_HEIGHT_FACTOR = 0.54127
@@ -57,7 +57,7 @@ export function calculateThread(input: ThreadingInput): ThreadingResult {
       id: 'rpm',
       severity: 'warning' as const,
       title: 'Обороты ограничены станком',
-      detail: `Расчётные ${Math.round(theoreticalRpm)} об/мин, максимум станка ${input.machine.maxRpm} об/мин.`,
+      detail: `Расчётные ${formatExact(theoreticalRpm)} об/мин, максимум станка ${formatExact(input.machine.maxRpm)} об/мин.`,
     })
   }
   if (input.internal && tapDrillMm <= 0) {
@@ -98,28 +98,28 @@ export function calculateThread(input: ThreadingInput): ThreadingResult {
         label: 'Отверстие под резьбу',
         formula: threadingFormulas.tapDrill,
         substitution: `d1 ≈ ${diameter} − ${pitch}`,
-        result: `${roundTo(tapDrillMm, 2)} мм`,
+        result: `${formatExact(tapDrillMm)} мм`,
       },
       {
         id: 'h1',
         label: 'Глубина резьбы',
         formula: threadingFormulas.depth,
         substitution: `H1 = 0.54127 × ${pitch}`,
-        result: `${roundTo(threadDepthMm, 3)} мм`,
+        result: `${formatExact(threadDepthMm)} мм`,
       },
       {
         id: 'n',
         label: 'Обороты',
         formula: threadingFormulas.spindle,
-        substitution: `n = (${roundTo(vcTarget, 1)} × 1000) / (π × ${diameter})`,
-        result: `${Math.round(rpm)} об/мин`,
+        substitution: `n = (${formatExact(vcTarget)} × 1000) / (π × ${formatExact(diameter)})`,
+        result: `${formatExact(rpm)} об/мин`,
       },
       {
         id: 'f',
         label: 'Подача резца',
         formula: threadingFormulas.feed,
         substitution: `f = ${pitch}`,
-        result: `${pitch} мм/об · ${roundTo(feedMmMin, 1)} мм/мин`,
+        result: `${pitch} мм/об · ${formatExact(feedMmMin)} мм/мин`,
       },
     ],
   }

@@ -7,7 +7,7 @@ import { turningFormulas } from '@/data/formulas/turning'
 import type { CheckResult } from '@/types/milling'
 import type { TurningInput, TurningResult } from '@/types/turning'
 import { CalculationError } from '../errors'
-import { roundTo } from '../units'
+import { formatExact } from '../units'
 import { validateOverride } from '../validation'
 import {
   calculateMachiningTimeMin,
@@ -77,7 +77,7 @@ export function calculateTurning(input: TurningInput): TurningResult {
   let powerLimited = false
   if (input.paramMode === 'auto' && powerKw > input.machine.spindlePowerKw * 0.9) {
     const scale = (input.machine.spindlePowerKw * 0.85) / powerKw
-    const reduced = Math.max(0.1, roundTo(ap * scale, 2))
+    const reduced = Math.max(0.1, ap * scale)
     if (reduced < ap - 1e-6) {
       ap = reduced
       powerKw = calculateTurningPower({ kc: params.kc, ap, feedMmRev, vc, efficiency })
@@ -95,7 +95,7 @@ export function calculateTurning(input: TurningInput): TurningResult {
       id: 'ap-power',
       severity: 'warning',
       title: 'Глубина снижена под мощность шпинделя',
-      detail: `Для шпинделя ${input.machine.spindlePowerKw} кВт ap уменьшена до ${roundTo(ap, 2)} мм, проходов: ${calculatePasses(stock, ap)}. Это справочная подстройка, не замена жёсткости станка.`,
+      detail: `Для шпинделя ${input.machine.spindlePowerKw} кВт ap уменьшена до ${formatExact(ap)} мм, проходов: ${calculatePasses(stock, ap)}. Это справочная подстройка, не замена жёсткости станка.`,
     })
   }
   if (input.diameterMm > input.machine.colletDiameterMm + 1e-6) {
@@ -111,7 +111,7 @@ export function calculateTurning(input: TurningInput): TurningResult {
       id: 'rpm',
       severity: 'warning',
       title: 'Обороты ограничены станком',
-      detail: `Расчётные обороты: ${Math.round(theoreticalRpm).toLocaleString('ru-RU')} об/мин. Станок ограничен ${Math.round(input.machine.maxRpm).toLocaleString('ru-RU')} об/мин.`,
+      detail: `Расчётные обороты: ${formatExact(theoreticalRpm)} об/мин. Станок ограничен ${formatExact(input.machine.maxRpm)} об/мин.`,
     })
   }
   if (theoreticalFeed > input.machine.maxFeedMmMin + 0.5) {
@@ -119,7 +119,7 @@ export function calculateTurning(input: TurningInput): TurningResult {
       id: 'feed',
       severity: 'warning',
       title: 'Подача ограничена станком',
-      detail: `Расчётная минутная подача ${Math.round(theoreticalFeed)} мм/мин превышает максимум ${input.machine.maxFeedMmMin} мм/мин.`,
+      detail: `Расчётная минутная подача ${formatExact(theoreticalFeed)} мм/мин превышает максимум ${formatExact(input.machine.maxFeedMmMin)} мм/мин.`,
     })
   }
   if (powerKw > input.machine.spindlePowerKw * 1.05) {
@@ -127,14 +127,14 @@ export function calculateTurning(input: TurningInput): TurningResult {
       id: 'power',
       severity: 'error',
       title: 'Ориентировочная мощность выше шпинделя',
-      detail: `Оценка ${roundTo(powerKw, 2)} кВт при шпинделе ${input.machine.spindlePowerKw} кВт.`,
+      detail: `Оценка ${formatExact(powerKw)} кВт при шпинделе ${input.machine.spindlePowerKw} кВт.`,
     })
   } else if (powerKw > input.machine.spindlePowerKw * 0.85) {
     checks.push({
       id: 'power-high',
       severity: 'warning',
       title: 'Высокая загрузка шпинделя',
-      detail: `Оценка ${roundTo(powerKw, 2)} кВт при ${input.machine.spindlePowerKw} кВт.`,
+      detail: `Оценка ${formatExact(powerKw)} кВт при ${input.machine.spindlePowerKw} кВт.`,
     })
   }
   if (insert?.polished && (material.category === 'steel' || material.category === 'stainless' || material.category === 'cast_iron')) {
@@ -150,7 +150,7 @@ export function calculateTurning(input: TurningInput): TurningResult {
       id: 'radius',
       severity: 'warning',
       title: 'Подача велика для радиуса вершины',
-      detail: `f = ${roundTo(feedMmRev, 3)} мм/об при радиусе ${insert.noseRadiusMm} мм. Справочно f обычно не больше ~0.8×re.`,
+      detail: `f = ${formatExact(feedMmRev)} мм/об при радиусе ${insert.noseRadiusMm} мм. Справочно f обычно не больше ~0.8×re.`,
     })
   }
   if (vc < vcRange.min * 0.8 || vc > vcRange.max * 1.2) {
@@ -158,7 +158,7 @@ export function calculateTurning(input: TurningInput): TurningResult {
       id: 'vc',
       severity: 'warning',
       title: 'Vc вне справочного диапазона',
-      detail: `${roundTo(vc, 0)} м/мин при диапазоне ${roundTo(vcRange.min, 0)}–${roundTo(vcRange.max, 0)} м/мин.`,
+      detail: `${formatExact(vc)} м/мин при диапазоне ${formatExact(vcRange.min)}–${formatExact(vcRange.max)} м/мин.`,
     })
   }
 
@@ -188,35 +188,35 @@ export function calculateTurning(input: TurningInput): TurningResult {
         : status === 'warning'
           ? 'Режим рассчитан, но проверьте ограничения станка и нагрузку.'
           : 'Режим требует корректировки.',
-    why: `Для ${material.name}, резца «${cutter?.name ?? 'не задан'}», операции «${operation.label}» и Ø${roundTo(input.diameterMm, 1)} мм выбран справочный диапазон Vc ${roundTo(vcRange.min, 0)}–${roundTo(vcRange.max, 0)} м/мин${insert ? `, пластина ${insert.iso}` : ''}. Это справочные значения, не паспортный режим конкретной марки.`,
+    why: `Для ${material.name}, резца «${cutter?.name ?? 'не задан'}», операции «${operation.label}» и Ø${formatExact(input.diameterMm)} мм выбран справочный диапазон Vc ${formatExact(vcRange.min)}–${formatExact(vcRange.max)} м/мин${insert ? `, пластина ${insert.iso}` : ''}. Это справочные значения, не паспортный режим конкретной марки.`,
     steps: [
       {
         id: 'n',
         label: 'Обороты',
         formula: turningFormulas.spindleSpeed,
-        substitution: `n = (${roundTo(vcTarget, 1)} × 1000) / (π × ${input.diameterMm})`,
-        result: `${Math.round(theoreticalRpm)} об/мин → ${Math.round(rpm)} об/мин`,
+        substitution: `n = (${formatExact(vcTarget)} × 1000) / (π × ${formatExact(input.diameterMm)})`,
+        result: `${formatExact(theoreticalRpm)} об/мин → ${formatExact(rpm)} об/мин`,
       },
       {
         id: 'vf',
         label: 'Минутная подача',
         formula: turningFormulas.feedRate,
-        substitution: `Vf = ${Math.round(rpm)} × ${roundTo(feedMmRev, 3)}`,
-        result: `${roundTo(feedMmMin, 1)} мм/мин`,
+        substitution: `Vf = ${formatExact(rpm)} × ${formatExact(feedMmRev)}`,
+        result: `${formatExact(feedMmMin)} мм/мин`,
       },
       {
         id: 'p',
         label: 'Мощность',
         formula: turningFormulas.power,
-        substitution: `P = (${params.kc} × ${roundTo(ap, 2)} × ${roundTo(feedMmRev, 3)} × ${roundTo(vc, 1)}) / (60×10³ × η)`,
-        result: `${roundTo(powerKw, 2)} кВт (оценка)`,
+        substitution: `P = (${params.kc} × ${formatExact(ap)} × ${formatExact(feedMmRev)} × ${formatExact(vc)}) / (60×10³ × η)`,
+        result: `${formatExact(powerKw)} кВт (оценка)`,
       },
       {
         id: 'npass',
         label: 'Проходы и время',
         formula: `${turningFormulas.passes}; ${turningFormulas.time}`,
-        substitution: `припуск ${roundTo(stock, 2)} мм, L = ${roundTo(length, 1)} мм`,
-        result: `${passes} проход(а), ≈ ${roundTo(timeMin, 2)} мин`,
+        substitution: `припуск ${formatExact(stock)} мм, L = ${formatExact(length)} мм`,
+        result: `${passes} проход(а), ≈ ${formatExact(timeMin)} мин`,
       },
     ],
     usedRecommendedRanges: {
