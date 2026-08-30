@@ -18,9 +18,9 @@ export function HomePage() {
           <Link to="/milling">
             <Button variant="graphite">Открыть фрезерование</Button>
           </Link>
-          <a href="#quick">
-            <Button variant="outline">Быстрый расчёт</Button>
-          </a>
+          <Link to="/turning">
+            <Button variant="outline">Открыть токарку</Button>
+          </Link>
         </div>
       </section>
 
@@ -37,7 +37,7 @@ export function HomePage() {
           title="Токарная обработка"
           description="Расчёт режимов точения, расточки, канавок, отрезки и резьбы."
           to="/turning"
-          action="Следующий этап"
+          action="Открыть калькулятор"
         />
         <ModuleCard
           icon={<ScanLine className="h-5 w-5" />}
@@ -51,7 +51,7 @@ export function HomePage() {
       <section>
         <p className="text-sm font-medium text-muted">В будущем</p>
         <div className="mt-3 flex flex-wrap gap-2">
-          {['Раскрой материала', 'Резьба', 'Сверление', 'Конвертер единиц', 'Справочник материалов', 'Справочник инструмента'].map(
+          {['Раскрой материала', 'Сверление (отдельный модуль)', 'Конвертер единиц', 'Дюймовая резьба'].map(
             (item) => (
               <span key={item} className="rounded-full bg-white px-3 py-2 text-sm text-ink-soft ring-1 ring-line">
                 {item}

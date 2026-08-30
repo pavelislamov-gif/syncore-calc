@@ -1,6 +1,6 @@
 export interface SavedCalculation {
   id: string
-  kind: 'milling'
+  kind: 'milling' | 'turning' | 'threading'
   title: string
   createdAt: string
   summary: string
@@ -12,7 +12,7 @@ export type FavoriteId = string
 export interface FavoriteCombination {
   id: FavoriteId
   title: string
-  kind: 'milling'
+  kind: 'milling' | 'turning' | 'threading'
   createdAt: string
   payload: Record<string, unknown>
 }

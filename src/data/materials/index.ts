@@ -1,5 +1,6 @@
 import type { Material, MaterialCategory } from '@/types/material'
 import { aluminumMaterials } from './aluminum'
+import { castIronMaterials } from './castIron'
 import { nonferrousMaterials } from './nonferrous'
 import { plasticMaterials } from './plastics'
 import { stainlessMaterials } from './stainless'
@@ -11,6 +12,7 @@ export const materials: Material[] = [
   ...steelMaterials,
   ...stainlessMaterials,
   ...nonferrousMaterials,
+  ...castIronMaterials,
   ...plasticMaterials,
   ...woodMaterials,
 ]
@@ -20,6 +22,7 @@ export const materialCategories: { id: MaterialCategory; label: string }[] = [
   { id: 'steel', label: 'Сталь' },
   { id: 'stainless', label: 'Нержавеющая сталь' },
   { id: 'nonferrous', label: 'Цветные металлы' },
+  { id: 'cast_iron', label: 'Чугун' },
   { id: 'plastic', label: 'Пластики' },
   { id: 'wood', label: 'Дерево' },
 ]

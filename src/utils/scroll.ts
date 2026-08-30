@@ -1,8 +1,12 @@
-export function scrollToMillingResult() {
+export function scrollToResult(elementId: string) {
   window.setTimeout(() => {
-    document.getElementById('milling-result')?.scrollIntoView({
+    document.getElementById(elementId)?.scrollIntoView({
       behavior: 'smooth',
       block: 'start',
     })
   }, 40)
+}
+
+export function scrollToMillingResult() {
+  scrollToResult('milling-result')
 }

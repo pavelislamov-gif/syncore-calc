@@ -1,11 +1,11 @@
 import { NavLink } from 'react-router-dom'
-import { Calculator, History, House, ScanLine, Star } from 'lucide-react'
+import { Calculator, History, House, Scissors, Star } from 'lucide-react'
 import { cn } from '@/utils/cn'
 
 const items = [
   { to: '/', label: 'Главная', icon: House, end: true },
   { to: '/milling', label: 'Фреза', icon: Calculator },
-  { to: '/laser', label: 'Лазер', icon: ScanLine },
+  { to: '/turning', label: 'Токарка', icon: Scissors },
   { to: '/history', label: 'История', icon: History },
   { to: '/favorites', label: 'Избранное', icon: Star },
 ]

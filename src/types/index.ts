@@ -18,4 +18,7 @@ export type {
   CheckResult,
   FormulaStep,
 } from './milling'
+export type { TurningOperation, TurningInput, TurningResult, TurningMaterialParams } from './turning'
+export type { InsertDefinition, InsertShape } from './insert'
+export type { MetricThread, ThreadingInput, ThreadingResult } from './threading'
 export type { SavedCalculation, FavoriteCombination } from './history'
