@@ -200,6 +200,7 @@ export function MillingForm({
           flutes={Number(state.flutes)}
           type={state.millType}
           typeName={endMillTypes.find((item) => item.type === state.millType)?.name ?? 'Концевая'}
+          cutterMaterial={state.cutterMaterial}
         />
       </Card>
 
