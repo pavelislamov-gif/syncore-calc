@@ -4,6 +4,7 @@ import { MobileResultBar } from '@/components/layout/MobileResultBar'
 import { useThreadingForm } from '@/hooks/useThreadingForm'
 import { saveFavorite, saveHistoryItem } from '@/services/storage'
 import { Link } from 'react-router-dom'
+import { Button } from '@/components/ui/Button'
 import { formatNumber, formatRpm, newId } from '@/utils/format'
 import { scrollToResult } from '@/utils/scroll'
 
@@ -49,11 +50,13 @@ export function ThreadingPage() {
         <p className="text-sm font-semibold uppercase tracking-[0.16em] text-muted">Токарная обработка</p>
         <h1 className="mt-2 text-2xl font-extrabold tracking-tight sm:text-3xl">Метрическая резьба</h1>
         <p className="mt-2 text-ink-soft">
-          Операция токарки: M3–M30, отверстие под резьбу, подача за оборот равна шагу.{' '}
-          <Link to="/turning" className="font-semibold text-accent-2">
-            К точению
-          </Link>
+          Операция токарки: M3–M30, отверстие под резьбу, подача за оборот равна шагу.
         </p>
+        <Link to="/turning" className="mt-4 inline-flex w-full sm:w-auto">
+          <Button variant="primary" fullWidth>
+            К точению
+          </Button>
+        </Link>
         <div className="mt-6">
           <ThreadingForm
             state={form.state}
