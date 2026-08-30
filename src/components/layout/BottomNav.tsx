@@ -1,12 +1,13 @@
 import { NavLink, useLocation } from 'react-router-dom'
-import { Calculator, Menu, ScanLine, Scissors } from 'lucide-react'
+import { Menu } from 'lucide-react'
 import { cn } from '@/utils/cn'
 import { isMoreRoute, isTurningSection } from '@/components/layout/nav'
+import { LaserProcessIcon, MillingProcessIcon, TurningProcessIcon } from '@/components/icons/ProcessIcons'
 
 const items = [
-  { to: '/milling', label: 'Фреза', icon: Calculator, match: (path: string) => path.startsWith('/milling') },
-  { to: '/turning', label: 'Токарка', icon: Scissors, match: isTurningSection },
-  { to: '/laser', label: 'Лазер', icon: ScanLine, match: (path: string) => path.startsWith('/laser') },
+  { to: '/milling', label: 'Фреза', Icon: MillingProcessIcon, match: (path: string) => path.startsWith('/milling') },
+  { to: '/turning', label: 'Токарка', Icon: TurningProcessIcon, match: isTurningSection },
+  { to: '/laser', label: 'Лазер', Icon: LaserProcessIcon, match: (path: string) => path.startsWith('/laser') },
 ] as const
 
 interface Props {
@@ -30,7 +31,7 @@ export function BottomNav({ onOpenMore }: Props) {
                 )
               }
             >
-              <item.icon className="h-5 w-5" />
+              <item.Icon className="h-6 w-6" />
               {item.label}
             </NavLink>
           </li>

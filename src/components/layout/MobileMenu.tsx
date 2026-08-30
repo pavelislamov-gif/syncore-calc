@@ -2,6 +2,13 @@ import { NavLink, useLocation } from 'react-router-dom'
 import { moreLinks, primaryNav, isTurningSection } from '@/components/layout/nav'
 import { cn } from '@/utils/cn'
 import { X } from 'lucide-react'
+import { LaserProcessIcon, MillingProcessIcon, TurningProcessIcon } from '@/components/icons/ProcessIcons'
+
+const menuIcons = {
+  '/milling': MillingProcessIcon,
+  '/turning': TurningProcessIcon,
+  '/laser': LaserProcessIcon,
+} as const
 
 interface Props {
   open: boolean
@@ -25,24 +32,28 @@ export function MobileMenu({ open, onClose }: Props) {
         </div>
         <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted">Калькуляторы</p>
         <ul className="mt-2 grid grid-cols-3 gap-2">
-          {primaryNav.map((item) => (
+          {primaryNav.map((item) => {
+            const Icon = menuIcons[item.to]
+            return (
             <li key={item.to}>
               <NavLink
                 to={item.to}
                 onClick={onClose}
                 className={({ isActive }) =>
                   cn(
-                    'flex min-h-12 items-center rounded-xl px-3 text-sm font-semibold ring-1 ring-line',
+                    'flex min-h-[4.25rem] flex-col items-center justify-center gap-1 rounded-xl px-2 py-2 text-sm font-semibold ring-1 ring-line',
                     isActive || (item.to === '/turning' && isTurningSection(pathname))
                       ? 'bg-graphite text-white ring-graphite'
                       : 'bg-paper-2 text-ink',
                   )
                 }
               >
+                <Icon className="h-7 w-7" />
                 {item.label}
               </NavLink>
             </li>
-          ))}
+            )
+          })}
         </ul>
         <p className="mt-5 text-xs font-medium uppercase tracking-[0.14em] text-muted">Ещё</p>
         <ul className="mt-2 space-y-1">
