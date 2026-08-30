@@ -24,11 +24,11 @@ export function LaserResultView({ result, material, onSaveHistory, onSaveFavorit
         <Hero code="P" value={`${formatRpm(result.powerPct)}`} unit="% мощности" />
       </div>
       <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
-        <Metric label="Скорость" value={`${formatNumber(result.speedMmS, 2)} мм/с`} />
-        <Metric label="Газ" value={result.gas} />
-        <Metric label="Давление" value={`${formatNumber(result.pressureBar, 2)} бар`} />
-        <Metric label="Фокус" value={`${formatNumber(result.focusMm, 2)} мм`} />
-        <Metric label="Пробивка" value={`${formatRpm(result.pierceTimeMs)} мс`} />
+        <Metric label="Скорость / Speed" value={`${formatNumber(result.speedMmS, 2)} мм/с`} />
+        <Metric label="Газ / Gas" value={result.gas} />
+        <Metric label="Давление / Pressure" value={`${formatNumber(result.pressureBar, 2)} бар`} />
+        <Metric label="Фокус / Focus" value={`${formatNumber(result.focusMm, 2)} мм`} />
+        <Metric label="Пробивка / Pierce" value={`${formatRpm(result.pierceTimeMs)} мс`} />
         <Metric label="Время контура" value={`${formatNumber(result.timeMin, 2)} мин`} />
         <Metric label="Керф (оценка)" value={`${formatNumber(result.kerfMm, 2)} мм`} />
         <Metric label="Мин. мощность" value={`${formatRpm(result.minPowerW)} Вт`} />
