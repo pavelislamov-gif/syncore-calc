@@ -3,7 +3,7 @@ import { ArrowRight } from 'lucide-react'
 import { BrandWordmark } from '@/components/layout/BrandLogo'
 import { LaserProcessIcon, MillingProcessIcon, TurningProcessIcon } from '@/components/icons/ProcessIcons'
 import { Button } from '@/components/ui/Button'
-import { Card } from '@/components/ui/Card'
+import { SITE } from '@/data/site'
 
 export function HomePage() {
   return (
@@ -71,6 +71,27 @@ export function HomePage() {
             </span>
           ))}
         </div>
+      </section>
+
+      <section>
+        <Card className="max-w-3xl">
+          <p className="text-sm font-semibold uppercase tracking-[0.14em] text-muted">Автор</p>
+          <h2 className="mt-2 text-xl font-bold">
+            {SITE.author} · {SITE.role}
+          </h2>
+          <p className="mt-2 text-sm leading-6 text-ink-soft">
+            {SITE.company}, {SITE.city}. Оснастка, ЧПУ и другие продукты — на сайте-портфолио. SYNCORE calc — бесплатный
+            калькулятор режимов из этой линейки.
+          </p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <a href={SITE.portfolioUrl} target="_blank" rel="noreferrer">
+              <Button variant="graphite">Портфолио и продукты</Button>
+            </a>
+            <a href={SITE.telegramUrl} target="_blank" rel="noreferrer">
+              <Button variant="outline">Telegram</Button>
+            </a>
+          </div>
+        </Card>
       </section>
     </div>
   )

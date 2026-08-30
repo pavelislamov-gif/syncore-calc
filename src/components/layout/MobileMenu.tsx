@@ -3,6 +3,7 @@ import { moreLinks, primaryNav, isTurningSection } from '@/components/layout/nav
 import { cn } from '@/utils/cn'
 import { X } from 'lucide-react'
 import { LaserProcessIcon, MillingProcessIcon, TurningProcessIcon } from '@/components/icons/ProcessIcons'
+import { SITE } from '@/data/site'
 
 const menuIcons = {
   '/milling': MillingProcessIcon,
@@ -35,23 +36,23 @@ export function MobileMenu({ open, onClose }: Props) {
           {primaryNav.map((item) => {
             const Icon = menuIcons[item.to]
             return (
-            <li key={item.to}>
-              <NavLink
-                to={item.to}
-                onClick={onClose}
-                className={({ isActive }) =>
-                  cn(
-                    'flex min-h-[4.25rem] flex-col items-center justify-center gap-1 rounded-xl px-2 py-2 text-sm font-semibold ring-1 ring-line',
-                    isActive || (item.to === '/turning' && isTurningSection(pathname))
-                      ? 'bg-graphite text-white ring-graphite'
-                      : 'bg-paper-2 text-ink',
-                  )
-                }
-              >
-                <Icon className="h-7 w-7" />
-                {item.label}
-              </NavLink>
-            </li>
+              <li key={item.to}>
+                <NavLink
+                  to={item.to}
+                  onClick={onClose}
+                  className={({ isActive }) =>
+                    cn(
+                      'flex min-h-[4.25rem] flex-col items-center justify-center gap-1 rounded-xl px-2 py-2 text-sm font-semibold ring-1 ring-line',
+                      isActive || (item.to === '/turning' && isTurningSection(pathname))
+                        ? 'bg-graphite text-white ring-graphite'
+                        : 'bg-paper-2 text-ink',
+                    )
+                  }
+                >
+                  <Icon className="h-7 w-7" />
+                  {item.label}
+                </NavLink>
+              </li>
             )
           })}
         </ul>
@@ -74,6 +75,39 @@ export function MobileMenu({ open, onClose }: Props) {
               </NavLink>
             </li>
           ))}
+        </ul>
+        <p className="mt-5 text-xs font-medium uppercase tracking-[0.14em] text-muted">Контакты</p>
+        <ul className="mt-2 space-y-1 pb-2">
+          <li>
+            <a
+              href={SITE.portfolioUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="flex min-h-12 items-center rounded-xl px-3 text-sm font-semibold text-ink-soft"
+            >
+              Портфолио и продукты
+            </a>
+          </li>
+          <li>
+            <a
+              href={SITE.telegramUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="flex min-h-12 items-center rounded-xl px-3 text-sm font-semibold text-ink-soft"
+            >
+              Telegram
+            </a>
+          </li>
+          <li>
+            <a href={`mailto:${SITE.email}`} className="flex min-h-12 items-center rounded-xl px-3 text-sm font-semibold text-ink-soft">
+              {SITE.email}
+            </a>
+          </li>
+          <li>
+            <a href={`tel:${SITE.phone}`} className="flex min-h-12 items-center rounded-xl px-3 text-sm font-semibold text-ink-soft">
+              {SITE.phoneLabel}
+            </a>
+          </li>
         </ul>
       </div>
     </div>

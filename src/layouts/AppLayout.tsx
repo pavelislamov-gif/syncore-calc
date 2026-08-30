@@ -3,6 +3,7 @@ import { Outlet, useLocation } from 'react-router-dom'
 import { BottomNav } from '@/components/layout/BottomNav'
 import { Header } from '@/components/layout/Header'
 import { MobileMenu } from '@/components/layout/MobileMenu'
+import { SiteFooter } from '@/components/layout/SiteFooter'
 import { trackPageView } from '@/services/telemetry/client'
 
 export function AppLayout() {
@@ -33,9 +34,7 @@ export function AppLayout() {
       <main className="mx-auto w-full max-w-6xl px-4 py-6 md:px-6 md:py-8">
         <Outlet />
       </main>
-      <footer className="mx-auto hidden max-w-6xl px-6 py-8 text-sm text-muted lg:block">
-        SYNCORE calc · бесплатно, без регистрации. Справочные режимы резания.
-      </footer>
+      <SiteFooter />
       <BottomNav onOpenMore={() => setMenuOpen(true)} />
       <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
     </div>
