@@ -1,21 +1,13 @@
 import { Link, NavLink } from 'react-router-dom'
-import { Gauge } from 'lucide-react'
+import { Gauge, Menu } from 'lucide-react'
 import { cn } from '@/utils/cn'
+import { headerLinks } from '@/components/layout/nav'
 
-const links = [
-  { to: '/', label: 'Главная' },
-  { to: '/milling', label: 'Фрезерование' },
-  { to: '/turning', label: 'Токарка' },
-  { to: '/threading', label: 'Резьба' },
-  { to: '/laser', label: 'Лазер' },
-  { to: '/materials', label: 'Материалы' },
-  { to: '/tools', label: 'Инструмент' },
-  { to: '/history', label: 'История' },
-  { to: '/favorites', label: 'Избранное' },
-  { to: '/pro', label: 'PRO' },
-]
+interface Props {
+  onOpenMenu: () => void
+}
 
-export function Header() {
+export function Header({ onOpenMenu }: Props) {
   return (
     <header className="sticky top-0 z-30 border-b border-line/80 bg-paper/90 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 md:px-6">
@@ -26,7 +18,7 @@ export function Header() {
           TechCalc
         </Link>
         <nav className="hidden items-center gap-1 overflow-x-auto lg:flex">
-          {links.map((link) => (
+          {headerLinks.map((link) => (
             <NavLink
               key={link.to}
               to={link.to}
@@ -42,6 +34,14 @@ export function Header() {
             </NavLink>
           ))}
         </nav>
+        <button
+          type="button"
+          className="flex h-11 w-11 items-center justify-center rounded-xl text-ink lg:hidden"
+          aria-label="Открыть меню"
+          onClick={onOpenMenu}
+        >
+          <Menu className="h-6 w-6" />
+        </button>
       </div>
     </header>
   )

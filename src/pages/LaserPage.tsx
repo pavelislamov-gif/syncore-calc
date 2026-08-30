@@ -2,6 +2,7 @@ import { LaserForm } from '@/components/laser/LaserForm'
 import { LaserResultView } from '@/components/laser/LaserResultView'
 import { useLaserForm } from '@/hooks/useLaserForm'
 import { saveFavorite, saveHistoryItem } from '@/services/storage'
+import { MobileResultBar } from '@/components/layout/MobileResultBar'
 import { formatRpm, newId } from '@/utils/format'
 import { scrollToResult } from '@/utils/scroll'
 
@@ -33,10 +34,20 @@ export function LaserPage() {
   }
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[minmax(0,26rem)_minmax(0,1fr)] lg:items-start">
-      <div>
+    <>
+      {form.result ? (
+        <MobileResultBar
+          items={[
+            { code: 'F', value: formatRpm(form.result.speedMmMin), unit: 'мм/мин' },
+            { code: 'P', value: formatRpm(form.result.powerPct), unit: '%' },
+            { code: 'Газ', value: form.result.gas, unit: '' },
+          ]}
+        />
+      ) : null}
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,26rem)_minmax(0,1fr)] lg:items-start">
+      <div className="order-2 lg:order-1">
         <p className="text-sm font-semibold uppercase tracking-[0.16em] text-muted">Лазерная резка</p>
-        <h1 className="mt-2 text-3xl font-extrabold tracking-tight">Режимы резки</h1>
+        <h1 className="mt-2 text-2xl font-extrabold tracking-tight sm:text-3xl">Режимы резки</h1>
         <p className="mt-2 text-ink-soft">
           Материал и толщина — скорость, газ, фокус, пробивка и слой для контроллера. Значения справочные.
         </p>
@@ -56,7 +67,7 @@ export function LaserPage() {
           />
         </div>
       </div>
-      <div>
+      <div className="order-1 lg:order-2">
         {form.result && material ? (
           <LaserResultView
             result={form.result}
@@ -71,5 +82,6 @@ export function LaserPage() {
         )}
       </div>
     </div>
+    </>
   )
 }

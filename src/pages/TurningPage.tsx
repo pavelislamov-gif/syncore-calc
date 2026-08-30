@@ -2,6 +2,7 @@ import { TurningForm } from '@/components/turning/TurningForm'
 import { TurningResultView } from '@/components/turning/TurningResultView'
 import { useTurningForm } from '@/hooks/useTurningForm'
 import { saveFavorite, saveHistoryItem } from '@/services/storage'
+import { MobileResultBar } from '@/components/layout/MobileResultBar'
 import { formatRpm, newId } from '@/utils/format'
 import { scrollToResult } from '@/utils/scroll'
 import { getTurningOperation } from '@/data/formulas/operations'
@@ -35,10 +36,19 @@ export function TurningPage() {
   }
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[minmax(0,26rem)_minmax(0,1fr)] lg:items-start">
-      <div>
+    <>
+      {form.result ? (
+        <MobileResultBar
+          items={[
+            { code: 'S', value: formatRpm(form.result.rpm), unit: 'об/мин' },
+            { code: 'F', value: formatRpm(form.result.feedMmMin), unit: 'мм/мин' },
+          ]}
+        />
+      ) : null}
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,26rem)_minmax(0,1fr)] lg:items-start">
+      <div className="order-2 lg:order-1">
         <p className="text-sm font-semibold uppercase tracking-[0.16em] text-muted">Токарная обработка</p>
-        <h1 className="mt-2 text-3xl font-extrabold tracking-tight">Режимы точения</h1>
+        <h1 className="mt-2 text-2xl font-extrabold tracking-tight sm:text-3xl">Режимы точения</h1>
         <p className="mt-2 text-ink-soft">Материал, затем резец и пластина — справа сразу итог. Значения справочные.</p>
         <div className="mt-6">
           <TurningForm
@@ -55,7 +65,7 @@ export function TurningPage() {
           />
         </div>
       </div>
-      <div>
+      <div className="order-1 lg:order-2">
         {form.result && material ? (
           <TurningResultView
             result={form.result}
@@ -70,5 +80,6 @@ export function TurningPage() {
         )}
       </div>
     </div>
+    </>
   )
 }

@@ -2,6 +2,7 @@ import { MillingForm } from '@/components/milling/MillingForm'
 import { MillingResultView } from '@/components/milling/MillingResultView'
 import { useMillingForm } from '@/hooks/useMillingForm'
 import { saveFavorite, saveHistoryItem } from '@/services/storage'
+import { MobileResultBar } from '@/components/layout/MobileResultBar'
 import { formatRpm, newId } from '@/utils/format'
 import { scrollToMillingResult } from '@/utils/scroll'
 
@@ -33,10 +34,20 @@ export function MillingPage() {
   }
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[minmax(0,26rem)_minmax(0,1fr)] lg:items-start">
-      <div>
+    <>
+      {form.result ? (
+        <MobileResultBar
+          items={[
+            { code: 'S', value: formatRpm(form.result.rpm), unit: 'об/мин' },
+            { code: 'F', value: formatRpm(form.result.feedMmMin), unit: 'мм/мин' },
+            { code: 'Fz', value: formatRpm(form.result.plungeMmMin), unit: 'Z' },
+          ]}
+        />
+      ) : null}
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,26rem)_minmax(0,1fr)] lg:items-start">
+      <div className="order-2 lg:order-1">
         <p className="text-sm font-semibold uppercase tracking-[0.16em] text-muted">Фрезерование</p>
-        <h1 className="mt-2 text-3xl font-extrabold tracking-tight">Режимы резания</h1>
+        <h1 className="mt-2 text-2xl font-extrabold tracking-tight sm:text-3xl">Режимы резания</h1>
         <p className="mt-2 text-ink-soft">Материал, затем фреза — справа сразу итог. Станок по умолчанию хоббийный.</p>
         <div className="mt-6">
           <MillingForm
@@ -52,7 +63,7 @@ export function MillingPage() {
           />
         </div>
       </div>
-      <div>
+      <div className="order-1 lg:order-2">
         {form.result && material ? (
           <MillingResultView
             result={form.result}
@@ -67,5 +78,6 @@ export function MillingPage() {
         )}
       </div>
     </div>
+    </>
   )
 }

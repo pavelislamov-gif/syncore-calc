@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowRight, ScanLine, Scissors, Sparkles } from 'lucide-react'
+import { ArrowRight, ScanLine, Scissors, Sparkles, Spline } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { QuickCalc } from '@/components/home/QuickCalc'
@@ -10,19 +10,23 @@ export function HomePage() {
     <div className="space-y-10">
       <section className="max-w-3xl">
         <p className="text-sm font-semibold uppercase tracking-[0.16em] text-accent-2">TechCalc</p>
-        <h1 className="mt-3 text-4xl font-extrabold tracking-tight md:text-5xl">Инженерные расчёты для производства</h1>
-        <p className="mt-4 text-lg text-ink-soft">Материал и инструмент — режимы для фрезера, токарки и лазера.</p>
+        <h1 className="mt-3 text-3xl font-extrabold tracking-tight md:text-5xl">Инженерные расчёты для производства</h1>
+        <p className="mt-4 text-base text-ink-soft sm:text-lg">Материал и инструмент — режимы для фрезера, токарки и лазера.</p>
         <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-          <Link to="/milling">
-            <Button variant="graphite">Открыть фрезерование</Button>
+          <Link to="/milling" className="sm:flex-1 lg:flex-none">
+            <Button variant="graphite" fullWidth>
+              Открыть фрезерование
+            </Button>
           </Link>
-          <Link to="/laser">
-            <Button variant="outline">Открыть лазер</Button>
+          <Link to="/laser" className="sm:flex-1 lg:flex-none">
+            <Button variant="outline" fullWidth>
+              Открыть лазер
+            </Button>
           </Link>
         </div>
       </section>
 
-      <section className="grid gap-4 md:grid-cols-3">
+      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <ModuleCard
           icon={<Sparkles className="h-5 w-5" />}
           title="Фрезерование"
@@ -40,8 +44,15 @@ export function HomePage() {
         <ModuleCard
           icon={<ScanLine className="h-5 w-5" />}
           title="Лазерная резка"
-          description="Скорость, газ, фокус, пробивка и настройки слоя для контроллера."
+          description="Скорость, газ, фокус, пробивка и настройки слоя."
           to="/laser"
+          action="Открыть калькулятор"
+        />
+        <ModuleCard
+          icon={<Spline className="h-5 w-5" />}
+          title="Резьба"
+          description="Метрическая резьба: отверстие, шаг и подача."
+          to="/threading"
           action="Открыть калькулятор"
         />
       </section>

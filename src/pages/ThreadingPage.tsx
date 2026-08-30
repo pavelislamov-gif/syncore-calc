@@ -1,5 +1,6 @@
 import { ThreadingForm } from '@/components/threading/ThreadingForm'
 import { ThreadingResultView } from '@/components/threading/ThreadingResultView'
+import { MobileResultBar } from '@/components/layout/MobileResultBar'
 import { useThreadingForm } from '@/hooks/useThreadingForm'
 import { saveFavorite, saveHistoryItem } from '@/services/storage'
 import { formatNumber, formatRpm, newId } from '@/utils/format'
@@ -33,10 +34,19 @@ export function ThreadingPage() {
   }
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[minmax(0,26rem)_minmax(0,1fr)] lg:items-start">
-      <div className={form.result ? 'order-2 lg:order-1' : undefined}>
+    <>
+      {form.result ? (
+        <MobileResultBar
+          items={[
+            { code: 'S', value: formatRpm(form.result.rpm), unit: 'об/мин' },
+            { code: 'd1', value: formatNumber(form.result.tapDrillMm, 2), unit: 'мм' },
+          ]}
+        />
+      ) : null}
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,26rem)_minmax(0,1fr)] lg:items-start">
+      <div className="order-2 lg:order-1">
         <p className="text-sm font-semibold uppercase tracking-[0.16em] text-muted">Резьба</p>
-        <h1 className="mt-2 text-3xl font-extrabold tracking-tight">Метрическая резьба</h1>
+        <h1 className="mt-2 text-2xl font-extrabold tracking-tight sm:text-3xl">Метрическая резьба</h1>
         <p className="mt-2 text-ink-soft">
           M3–M30, шаг и отверстие под резьбу. Для резца подача за оборот равна шагу. Дюймовая резьба будет позже.
         </p>
@@ -54,7 +64,7 @@ export function ThreadingPage() {
           />
         </div>
       </div>
-      <div className={form.result ? 'order-1 lg:order-2' : undefined}>
+      <div className="order-1 lg:order-2">
         {form.result && material ? (
           <ThreadingResultView
             result={form.result}
@@ -69,5 +79,6 @@ export function ThreadingPage() {
         )}
       </div>
     </div>
+    </>
   )
 }
