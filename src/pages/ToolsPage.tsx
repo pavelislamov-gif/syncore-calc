@@ -1,6 +1,6 @@
 import { coatings, cutterMaterials, endMillTypes } from '@/data/tools'
 import { cutterKinds } from '@/data/tools/cutters'
-import { inserts } from '@/data/inserts'
+import { groupedInserts, inserts } from '@/data/inserts'
 import { Card } from '@/components/ui/Card'
 
 export function ToolsPage() {
@@ -8,8 +8,7 @@ export function ToolsPage() {
     <div className="max-w-3xl">
       <h1 className="text-3xl font-extrabold tracking-tight">Инструмент</h1>
       <p className="mt-2 text-ink-soft">
-        Типы фрез, покрытия и токарные пластины. Коэффициенты и типоразмеры — справочные, не замена каталога
-        производителя.
+        Типы фрез, виды резцов и ходовые ISO-пластины. Типоразмеры справочные, не марка сплава производителя.
       </p>
       <div className="mt-6 grid gap-4">
         <Card>
@@ -49,16 +48,19 @@ export function ToolsPage() {
             ))}
           </ul>
         </Card>
-        <Card>
-          <h2 className="font-bold">Токарные пластины</h2>
-          <ul className="mt-3 space-y-2">
-            {inserts.map((item) => (
-              <li key={item.id} className="text-sm text-ink-soft">
-                <span className="font-medium text-ink">{item.iso}</span> · re {item.noseRadiusMm} мм · {item.notes}
-              </li>
-            ))}
-          </ul>
-        </Card>
+        {groupedInserts(inserts).map((group) => (
+          <Card key={group.id}>
+            <h2 className="font-bold">{group.title}</h2>
+            <p className="mt-1 text-sm text-ink-soft">{group.blurb}</p>
+            <ul className="mt-3 space-y-2">
+              {group.items.map((item) => (
+                <li key={item.id} className="text-sm text-ink-soft">
+                  <span className="font-medium text-ink">{item.iso}</span> · {item.geometry}. {item.notes}
+                </li>
+              ))}
+            </ul>
+          </Card>
+        ))}
       </div>
     </div>
   )

@@ -7,6 +7,7 @@ export function recommendTurningVc(
   params: TurningMaterialParams,
   operation: TurningOperation,
   cutter?: CutterKind,
+  insert?: InsertDefinition | null,
 ): number {
   const base = params.vcCarbide.recommended
   const factor: Record<TurningOperation, number> = {
@@ -18,7 +19,8 @@ export function recommendTurningVc(
     cutoff: 0.45,
     drill: 0.55,
   }
-  return base * factor[operation] * (cutter?.vcFactor ?? 1)
+  const polished = insert?.polished ? 1.2 : 1
+  return base * factor[operation] * (cutter?.vcFactor ?? 1) * polished
 }
 
 export function recommendTurningFeed(
@@ -49,8 +51,13 @@ export function recommendTurningAp(params: TurningMaterialParams, operation: Tur
   return raw
 }
 
-export function vcRangeForOperation(params: TurningMaterialParams, operation: TurningOperation, cutter?: CutterKind) {
-  const recommended = recommendTurningVc(params, operation, cutter)
+export function vcRangeForOperation(
+  params: TurningMaterialParams,
+  operation: TurningOperation,
+  cutter?: CutterKind,
+  insert?: InsertDefinition | null,
+) {
+  const recommended = recommendTurningVc(params, operation, cutter, insert)
   const base = params.vcCarbide.recommended || 1
   const factor = recommended / base
   return {

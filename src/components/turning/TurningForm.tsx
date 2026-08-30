@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { turningOperations } from '@/data/formulas/operations'
 import { cutterKinds, getCutterKind } from '@/data/tools/cutters'
-import { insertsForGroups } from '@/data/inserts'
+import { groupedInserts, insertsForCategories } from '@/data/inserts'
 import { lathePresets } from '@/data/machines/lathes'
 import { materialCategories } from '@/data/materials'
 import { Button } from '@/components/ui/Button'
@@ -131,7 +131,7 @@ export function TurningForm({
             value={state.cutterId}
             onChange={(event) => {
               const cutter = getCutterKind(event.target.value)
-              const nextInserts = insertsForGroups(cutter?.insertGroups ?? [])
+              const nextInserts = insertsForCategories(cutter?.insertGroups ?? [])
               const keep = nextInserts.some((item) => item.id === state.insertId)
               patch({
                 cutterId: event.target.value,
@@ -163,10 +163,14 @@ export function TurningForm({
               />
             </span>
             <Select value={state.insertId} onChange={(event) => patch({ insertId: event.target.value })}>
-              {insertsForGroups(getCutterKind(state.cutterId)?.insertGroups ?? []).map((item) => (
-                <option key={item.id} value={item.id}>
-                  {item.iso} · re {item.noseRadiusMm} мм · {item.shape}
-                </option>
+              {groupedInserts(insertsForCategories(getCutterKind(state.cutterId)?.insertGroups ?? [])).map((group) => (
+                <optgroup key={group.id} label={group.title}>
+                  {group.items.map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {item.iso} · {item.geometry}
+                    </option>
+                  ))}
+                </optgroup>
               ))}
             </Select>
           </label>

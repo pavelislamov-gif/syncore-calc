@@ -1,5 +1,7 @@
 export type InsertDuty = 'roughing' | 'finishing' | 'general' | 'grooving' | 'threading'
 
+export type InsertCategory = 'negative' | 'positive' | 'groove' | 'fillet' | 'thread_ext' | 'thread_int'
+
 export interface InsertDefinition {
   id: string
   iso: string
@@ -12,5 +14,7 @@ export interface InsertDefinition {
   grade: string
   coating: string
   notes: string
-  groups: string[]
+  category: InsertCategory
+  geometry: string
+  polished: boolean
 }

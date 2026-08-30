@@ -56,8 +56,8 @@ export function calculateTurning(input: TurningInput): TurningResult {
     throw new CalculationError('insert', 'Выберите пластину. Для сверления и резца HSS пластина не нужна.')
   }
 
-  const vcRange = vcRangeForOperation(params, input.operation, cutter)
-  const autoVc = recommendTurningVc(params, input.operation, cutter)
+  const vcRange = vcRangeForOperation(params, input.operation, cutter, insert)
+  const autoVc = recommendTurningVc(params, input.operation, cutter, insert)
   const autoF = recommendTurningFeed(params, input.operation, insert ?? null, cutter)
   const autoAp = recommendTurningAp(params, input.operation, input.stockMm)
 
@@ -135,6 +135,14 @@ export function calculateTurning(input: TurningInput): TurningResult {
       severity: 'warning',
       title: 'Высокая загрузка шпинделя',
       detail: `Оценка ${roundTo(powerKw, 2)} кВт при ${input.machine.spindlePowerKw} кВт.`,
+    })
+  }
+  if (insert?.polished && (material.category === 'steel' || material.category === 'stainless' || material.category === 'cast_iron')) {
+    checks.push({
+      id: 'polished-steel',
+      severity: 'warning',
+      title: 'Полированная пластина не для стали',
+      detail: `${insert.iso} (AL/AK) рассчитана на алюминий, медь и пластики. На ${material.name} кромка быстро садится.`,
     })
   }
   if (insert && insert.duty !== 'threading' && insert.duty !== 'grooving' && feedMmRev > insert.noseRadiusMm * 0.85) {
