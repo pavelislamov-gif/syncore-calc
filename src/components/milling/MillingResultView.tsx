@@ -38,6 +38,13 @@ export function MillingResultView({ result, material, onSaveHistory, onSaveFavor
         <Metric label="Скорость резания" value={`${formatNumber(result.vc, 0)} м/мин`} />
         <Metric label="Глубина резания" value={`${formatNumber(result.ap, 2)} мм`} />
         <Metric label="Ширина резания" value={`${formatNumber(result.ae, 2)} мм`} />
+        <Metric label="Длина режущей части" value={`${formatNumber(result.geometry.fluteLengthMm, 1)} мм`} />
+        {result.geometry.tipRadiusMm > 0 ? (
+          <Metric label="Радиус r" value={`${formatNumber(result.geometry.tipRadiusMm, 2)} мм`} />
+        ) : null}
+        {result.geometry.includedAngleDeg != null ? (
+          <Metric label="Угол α" value={`${formatNumber(result.geometry.includedAngleDeg, 0)}°`} />
+        ) : null}
         <Metric label="Винтовое врезание" value={`${formatRpm(result.helicalPlungeMmMin)} мм/мин`} />
       </div>
       <Metric label="Ориентировочная мощность" value={`${formatNumber(result.powerKw, 2)} кВт`} />

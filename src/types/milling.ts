@@ -58,6 +58,12 @@ export interface MillingResult {
     vc: { min: number; max: number; recommended: number }
     fz: { min: number; max: number; recommended: number }
   }
+  geometry: {
+    fluteLengthMm: number
+    shankDiameterMm: number
+    tipRadiusMm: number
+    includedAngleDeg: number | null
+  }
   clamped: {
     rpm: boolean
     feed: boolean

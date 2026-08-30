@@ -22,8 +22,8 @@ export function calculatePower(input: {
   return (ap * ae * feedMmMin * kc) / (60 * 1e6 * efficiency)
 }
 
-export function recommendDepth(diameterMm: number, ratio: number, maxDepthMm: number): number {
-  return Math.min(diameterMm * ratio, maxDepthMm)
+export function recommendDepth(diameterMm: number, ratio: number, maxDepthMm: number, fluteLengthMm = Infinity): number {
+  return Math.min(diameterMm * ratio, maxDepthMm, fluteLengthMm)
 }
 
 export function recommendWidth(diameterMm: number, ratio: number): number {

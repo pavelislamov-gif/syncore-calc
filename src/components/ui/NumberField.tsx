@@ -13,9 +13,10 @@ interface Props {
   min?: number
   max?: number
   step?: string
+  disabled?: boolean
 }
 
-export function NumberField({ id, label, hint, hintTitle, unit, value, onChange, error, min, max, step = 'any' }: Props) {
+export function NumberField({ id, label, hint, hintTitle, unit, value, onChange, error, min, max, step = 'any', disabled }: Props) {
   return (
     <label className="block">
       <span className="mb-1.5 flex items-center gap-1 text-sm font-medium text-ink-soft">
@@ -31,6 +32,7 @@ export function NumberField({ id, label, hint, hintTitle, unit, value, onChange,
           max={max}
           step={step}
           value={value}
+          disabled={disabled}
           invalid={Boolean(error)}
           className={unit ? 'pr-14' : undefined}
           onChange={(event) => onChange(event.target.value)}

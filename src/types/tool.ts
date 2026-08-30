@@ -30,4 +30,8 @@ export interface MillToolInput {
   type: EndMillType
   cutterMaterial: CutterMaterial
   coating: CoatingId
+  fluteLengthMm?: number
+  shankDiameterMm?: number
+  tipRadiusMm?: number
+  includedAngleDeg?: number | null
 }

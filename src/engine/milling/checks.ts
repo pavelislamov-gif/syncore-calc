@@ -48,6 +48,15 @@ export function evaluateMillingChecks(input: {
     })
   }
 
+  if ((tool.fluteLengthMm ?? 0) > 0 && input.ap > (tool.fluteLengthMm ?? 0) + 1e-6) {
+    checks.push({
+      id: 'ap-flute',
+      severity: 'warning',
+      title: 'Глубина больше длины режущей части',
+      detail: `ap = ${formatNum(input.ap)} мм, длина режущей части ${formatNum(tool.fluteLengthMm ?? 0)} мм. Глубже режут уже хвостовиком.`,
+    })
+  }
+
   if (input.ae > tool.diameterMm * 1.01) {
     checks.push({
       id: 'ae-diameter',
@@ -120,10 +129,11 @@ export function applyMachineClamps(
   ae: number,
   machine: MachineLimits,
   diameterMm: number,
+  fluteLengthMm = Infinity,
 ): Pick<MillingResult, 'rpm' | 'feedMmMin' | 'ap' | 'ae' | 'clamped'> {
   const clampedRpm = Math.min(rpm, machine.maxRpm)
   const clampedFeed = Math.min(feedMmMin, machine.maxFeedMmMin)
-  const clampedAp = Math.min(ap, machine.maxDepthMm)
+  const clampedAp = Math.min(ap, machine.maxDepthMm, fluteLengthMm)
   const clampedAe = Math.min(ae, diameterMm)
   return {
     rpm: clampedRpm,

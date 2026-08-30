@@ -1,3 +1,4 @@
+import { defaultToolGeometry } from '@/data/tools/geometry'
 import { getMaterial } from '@/data/materials'
 import { millingFormulas } from '@/data/formulas/milling'
 import type { FormulaStep, MillingInput, MillingResult } from '@/types/milling'
@@ -8,6 +9,7 @@ import {
   validateFlutes,
   validateMachineLimits,
   validateOverride,
+  validateToolGeometry,
 } from '../validation'
 import { applyMachineClamps, evaluateMillingChecks } from './checks'
 import { calculateFeedPerTooth, calculateFeedRate, calculateHelicalPlungeFeed, calculatePlungeFeed, plungeRatio } from './feed'
@@ -20,6 +22,7 @@ export function calculateMilling(input: MillingInput): MillingResult {
     ...validateDiameter(input.tool.diameterMm),
     ...validateFlutes(input.tool.flutes),
     ...validateMachineLimits(input.machine),
+    ...validateToolGeometry(resolveGeometry(input.tool)),
     ...validateOverride('vc', input.overrides.vc, 1, 2000, 'Скорость резания'),
     ...validateOverride('fz', input.overrides.fz, 0.001, 1, 'Подача на зуб'),
     ...validateOverride('ap', input.overrides.ap, 0.01, 100, 'Глубина резания'),
@@ -35,35 +38,37 @@ export function calculateMilling(input: MillingInput): MillingResult {
     throw new CalculationError('material', 'Выберите материал из справочника.')
   }
 
-  const vcRange = recommendVc(material, input.tool.cutterMaterial, input.tool.coating)
-  const fzRange = recommendFz(material, input.tool.diameterMm, input.tool.cutterMaterial)
+  const tool = resolveGeometry(input.tool)
+
+  const vcRange = recommendVc(material, tool.cutterMaterial, tool.coating)
+  const fzRange = recommendFz(material, tool.diameterMm, tool.cutterMaterial)
   const ratios = input.machineClass === 'industrial' ? 'industrial' : 'hobby'
 
   const autoVc = conservativeVc(vcRange, input.machineClass)
   const autoFz = fzRange.recommended
-  const autoAp = recommendDepth(input.tool.diameterMm, material.milling.apToDiameter[ratios], input.machine.maxDepthMm)
-  const autoAe = recommendWidth(input.tool.diameterMm, material.milling.aeToDiameter[ratios])
+  const autoAp = recommendDepth(tool.diameterMm, material.milling.apToDiameter[ratios], input.machine.maxDepthMm, tool.fluteLengthMm)
+  const autoAe = recommendWidth(tool.diameterMm, material.milling.aeToDiameter[ratios])
 
   const vcTarget = input.paramMode === 'manual' && input.overrides.vc != null ? input.overrides.vc : autoVc
   const fzTarget = input.paramMode === 'manual' && input.overrides.fz != null ? input.overrides.fz : autoFz
   const apTarget = input.paramMode === 'manual' && input.overrides.ap != null ? input.overrides.ap : autoAp
   const aeTarget = input.paramMode === 'manual' && input.overrides.ae != null ? input.overrides.ae : autoAe
 
-  const theoreticalRpm = calculateSpindleSpeed(vcTarget, input.tool.diameterMm)
-  const theoreticalFeed = calculateFeedRate(Math.min(theoreticalRpm, input.machine.maxRpm), input.tool.flutes, fzTarget)
+  const theoreticalRpm = calculateSpindleSpeed(vcTarget, tool.diameterMm)
+  const theoreticalFeed = calculateFeedRate(Math.min(theoreticalRpm, input.machine.maxRpm), tool.flutes, fzTarget)
 
-  const clamped = applyMachineClamps(theoreticalRpm, theoreticalFeed, apTarget, aeTarget, input.machine, input.tool.diameterMm)
+  const clamped = applyMachineClamps(theoreticalRpm, theoreticalFeed, apTarget, aeTarget, input.machine, tool.diameterMm, tool.fluteLengthMm)
   const rpm = clamped.rpm
-  const vcActual = calculateCuttingSpeed(rpm, input.tool.diameterMm)
+  const vcActual = calculateCuttingSpeed(rpm, tool.diameterMm)
   const feedMmMin = clamped.feedMmMin
-  const fzActual = calculateFeedPerTooth(feedMmMin, rpm, input.tool.flutes)
-  const plungeK = plungeRatio(material.machinability, input.tool.type)
+  const fzActual = calculateFeedPerTooth(feedMmMin, rpm, tool.flutes)
+  const plungeK = plungeRatio(material.machinability, tool.type)
   let plungeMmMin = calculatePlungeFeed(feedMmMin, plungeK)
   if (plungeMmMin > input.machine.maxFeedMmMin) {
     plungeMmMin = input.machine.maxFeedMmMin
   }
   const helicalPlungeMmMin = Math.min(calculateHelicalPlungeFeed(feedMmMin), input.machine.maxFeedMmMin)
-  const fzPlunge = calculateFeedPerTooth(plungeMmMin, rpm, input.tool.flutes)
+  const fzPlunge = calculateFeedPerTooth(plungeMmMin, rpm, tool.flutes)
   const ap = clamped.ap
   const ae = clamped.ae
   const powerKw = calculatePower({
@@ -86,7 +91,7 @@ export function calculateMilling(input: MillingInput): MillingResult {
     vcRange,
     fzRange,
     machine: input.machine,
-    tool: input.tool,
+    tool,
     material,
   })
 
@@ -110,6 +115,14 @@ export function calculateMilling(input: MillingInput): MillingResult {
       detail: `Расчётная подача ${Math.round(theoreticalFeed).toLocaleString('ru-RU')} мм/мин превышает максимум ${Math.round(input.machine.maxFeedMmMin).toLocaleString('ru-RU')} мм/мин.`,
     })
   }
+  if (clamped.clamped.ap) {
+    checks.push({
+      id: 'ap-limit',
+      severity: 'warning',
+      title: 'Глубина ограничена геометрией',
+      detail: `ap ограничена меньшим из: максимум станка ${input.machine.maxDepthMm} мм и длина режущей части ${tool.fluteLengthMm} мм.`,
+    })
+  }
 
   const finalStatus = checks.some((item) => item.severity === 'error')
     ? 'error'
@@ -128,7 +141,7 @@ export function calculateMilling(input: MillingInput): MillingResult {
       id: 'vc',
       label: millingFormulas.cuttingSpeed.label,
       formula: millingFormulas.spindleSpeed.formula,
-      substitution: `n = (${roundTo(vcTarget, 1)} × 1000) / (π × ${input.tool.diameterMm})`,
+      substitution: `n = (${roundTo(vcTarget, 1)} × 1000) / (π × ${tool.diameterMm})`,
       result: `${Math.round(theoreticalRpm)} об/мин (до ограничения станка)`,
     },
     {
@@ -142,14 +155,14 @@ export function calculateMilling(input: MillingInput): MillingResult {
       id: 'vc-actual',
       label: millingFormulas.cuttingSpeed.label,
       formula: millingFormulas.cuttingSpeed.formula,
-      substitution: `Vc = (π × ${input.tool.diameterMm} × ${Math.round(rpm)}) / 1000`,
+      substitution: `Vc = (π × ${tool.diameterMm} × ${Math.round(rpm)}) / 1000`,
       result: `${roundTo(vcActual, 1)} м/мин`,
     },
     {
       id: 'vf',
       label: millingFormulas.feedRate.label,
       formula: millingFormulas.feedRate.formula,
-      substitution: `Vf = ${Math.round(rpm)} × ${input.tool.flutes} × ${roundTo(fzTarget, 3)}`,
+      substitution: `Vf = ${Math.round(rpm)} × ${tool.flutes} × ${roundTo(fzTarget, 3)}`,
       result: `${roundTo(theoreticalFeed, 1)} мм/мин`,
     },
     {
@@ -196,13 +209,39 @@ export function calculateMilling(input: MillingInput): MillingResult {
         : finalStatus === 'warning'
           ? 'Режим рассчитан, но есть предупреждения — проверьте ограничения станка и нагрузку.'
           : 'Режим требует корректировки: один или несколько параметров выходят за безопасные пределы.',
-    why: `Для материала ${material.name} и фрезы Ø${formatD(input.tool.diameterMm)} мм с ${input.tool.flutes} зубьями выбран справочный диапазон скорости резания ${roundTo(vcRange.min, 0)}–${roundTo(vcRange.max, 0)} м/мин и подачи на зуб ${roundTo(fzRange.min, 3)}–${roundTo(fzRange.max, 3)} мм/зуб (${input.tool.cutterMaterial}, ${coatingLabel(input.tool.coating)}). Значения — справочные, не гарантированный паспортный режим.`,
+    why: `Для материала ${material.name} и фрезы Ø${formatD(tool.diameterMm)} мм с ${tool.flutes} зубьями выбран справочный диапазон скорости резания ${roundTo(vcRange.min, 0)}–${roundTo(vcRange.max, 0)} м/мин и подачи на зуб ${roundTo(fzRange.min, 3)}–${roundTo(fzRange.max, 3)} мм/зуб (${tool.cutterMaterial}, ${coatingLabel(tool.coating)}). Геометрия: L=${formatD(tool.fluteLengthMm)} мм${tool.tipRadiusMm > 0 ? `, r=${formatD(tool.tipRadiusMm)} мм` : ''}${tool.includedAngleDeg != null ? `, α=${tool.includedAngleDeg}°` : ''}. Значения — справочные, не гарантированный паспортный режим.`,
     steps,
     usedRecommendedRanges: {
       vc: { min: vcRange.min, max: vcRange.max, recommended: vcRange.recommended },
       fz: { min: fzRange.min, max: fzRange.max, recommended: fzRange.recommended },
     },
+    geometry: {
+      fluteLengthMm: tool.fluteLengthMm,
+      shankDiameterMm: tool.shankDiameterMm,
+      tipRadiusMm: tool.tipRadiusMm,
+      includedAngleDeg: tool.includedAngleDeg,
+    },
     clamped: clamped.clamped,
+  }
+}
+
+function resolveGeometry(tool: MillingInput['tool']): Required<Pick<
+  MillingInput['tool'],
+  'diameterMm' | 'flutes' | 'type' | 'cutterMaterial' | 'coating' | 'fluteLengthMm' | 'shankDiameterMm' | 'tipRadiusMm'
+>> & { includedAngleDeg: number | null } {
+  const defaults = defaultToolGeometry(tool.type, tool.diameterMm)
+  const tipRadiusMm = tool.type === 'ball' ? tool.diameterMm / 2 : (tool.tipRadiusMm ?? defaults.tipRadiusMm)
+  const needsAngle = tool.type === 'chamfer' || tool.type === 'drill'
+  return {
+    diameterMm: tool.diameterMm,
+    flutes: tool.flutes,
+    type: tool.type,
+    cutterMaterial: tool.cutterMaterial,
+    coating: tool.coating,
+    fluteLengthMm: tool.fluteLengthMm ?? defaults.fluteLengthMm,
+    shankDiameterMm: tool.shankDiameterMm ?? defaults.shankDiameterMm,
+    tipRadiusMm,
+    includedAngleDeg: needsAngle ? (tool.includedAngleDeg ?? defaults.includedAngleDeg) : (tool.includedAngleDeg ?? null),
   }
 }
 

@@ -1,6 +1,7 @@
 import { useMemo, useRef, useState } from 'react'
 import { defaultMachineForClass, machinePresets } from '@/data/machines'
 import { getMaterial, listMaterials } from '@/data/materials'
+import { geometryToFormFields } from '@/data/tools/geometry'
 import { calculateMilling } from '@/engine/milling'
 import { CalculationError } from '@/engine/errors'
 import type { MachineClass, MachineLimits } from '@/types/machine'
@@ -27,6 +28,10 @@ export interface MillingFormState {
   fz: string
   ap: string
   ae: string
+  fluteLength: string
+  shankDiameter: string
+  tipRadius: string
+  includedAngle: string
 }
 
 const hobby = defaultMachineForClass('hobby')
@@ -51,6 +56,7 @@ export const initialMillingState: MillingFormState = {
   fz: '',
   ap: '',
   ae: '',
+  ...geometryToFormFields('endmill', 6),
 }
 
 function num(value: string): number {
@@ -70,14 +76,20 @@ export function machineFromForm(state: MillingFormState): MachineLimits {
 }
 
 export function runMilling(state: MillingFormState): MillingResult {
+  const diameterMm = num(state.diameter)
+  const angleRaw = state.includedAngle.trim()
   return calculateMilling({
     materialId: state.materialId,
     tool: {
-      diameterMm: num(state.diameter),
+      diameterMm,
       flutes: Number(state.flutes),
       type: state.millType,
       cutterMaterial: state.cutterMaterial,
       coating: state.coating,
+      fluteLengthMm: num(state.fluteLength),
+      shankDiameterMm: num(state.shankDiameter),
+      tipRadiusMm: state.millType === 'ball' ? diameterMm / 2 : num(state.tipRadius) || 0,
+      includedAngleDeg: angleRaw === '' ? null : num(angleRaw),
     },
     machine: machineFromForm(state),
     paramMode: state.paramMode,

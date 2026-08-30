@@ -1,6 +1,7 @@
 import { formatMachineOption, machinePresets } from '@/data/machines'
 import { materialCategories } from '@/data/materials'
 import { coatings, cutterMaterials, endMillTypes } from '@/data/tools'
+import { geometryToFormFields, toolGeometryFields } from '@/data/tools/geometry'
 import { EndMillDiagram } from '@/components/diagrams/EndMillDiagram'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
@@ -22,6 +23,10 @@ const hints = {
   power: 'Паспортная мощность шпинделя. Оценка нагрузки сравнивается с этим значением.',
   depth: 'Максимальная глубина, которую вы готовы доверить этому станку за один проход.',
   collet: 'Максимальный диаметр хвостовика/цанги. Фреза большего диаметра будет отмечена как ошибка.',
+  fluteLength: 'Длина режущей части (Flute Length). ap не должна быть больше этого значения — ниже идёт хвостовик.',
+  shank: 'Диаметр хвостовика под цангу. Часто 6 мм при рабочей части меньше 6 мм.',
+  tipRadius: 'Радиус на торце: для сферической равен D/2, для радиусной — радиус угла. Геометрия инструмента, не паспортный режим.',
+  includedAngle: 'Угол при вершине (Included Angle). Для фаски обычно 90°, для сверла 118°.',
 }
 
 interface Props {
@@ -48,6 +53,9 @@ export function MillingForm({
   function patch(partial: Partial<MillingFormState>) {
     setState((current) => ({ ...current, ...partial }))
   }
+
+  const geoFields = toolGeometryFields(state.millType)
+  const diameterNum = Number(String(state.diameter).replace(',', '.'))
 
   return (
     <form
@@ -135,21 +143,27 @@ export function MillingForm({
       </Card>
 
       <Card>
-        <p className="text-sm font-medium text-muted">Фреза</p>
+        <p className="text-sm font-medium text-muted">Настройка инструмента</p>
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
           <NumberField
             id="diameter"
-            label="Диаметр"
+            label="Диаметр D"
             unit="мм"
             value={state.diameter}
             min={0.1}
             max={100}
             error={error && /диаметр/i.test(error) ? error : undefined}
-            onChange={(diameter) => patch({ diameter })}
+            onChange={(diameter) => {
+              const d = Number(String(diameter).replace(',', '.'))
+              patch({
+                diameter,
+                ...(state.millType === 'ball' && d > 0 ? { tipRadius: String(Number((d / 2).toFixed(3))) } : {}),
+              })
+            }}
           />
           <NumberField
             id="flutes"
-            label="Количество зубьев"
+            label="Количество зубьев z"
             value={state.flutes}
             min={1}
             max={12}
@@ -158,18 +172,25 @@ export function MillingForm({
             onChange={(flutes) => patch({ flutes })}
           />
         </div>
-        {compact ? null : (
-          <div className="mt-3 grid gap-3 sm:grid-cols-3">
-            <label>
-              <span className="mb-1.5 block text-sm font-medium text-ink-soft">Тип</span>
-              <Select value={state.millType} onChange={(event) => patch({ millType: event.target.value as MillingFormState['millType'] })}>
-                {endMillTypes.map((item) => (
-                  <option key={item.id} value={item.type}>
-                    {item.name}
-                  </option>
-                ))}
-              </Select>
-            </label>
+        <div className="mt-3 grid gap-3 sm:grid-cols-2">
+          <label>
+            <span className="mb-1.5 block text-sm font-medium text-ink-soft">Тип</span>
+            <Select
+              value={state.millType}
+              onChange={(event) => {
+                const millType = event.target.value as MillingFormState['millType']
+                const d = Number(String(state.diameter).replace(',', '.'))
+                patch({ millType, ...geometryToFormFields(millType, d > 0 ? d : 6) })
+              }}
+            >
+              {endMillTypes.map((item) => (
+                <option key={item.id} value={item.type}>
+                  {item.name}
+                </option>
+              ))}
+            </Select>
+          </label>
+          {compact ? null : (
             <label>
               <span className="mb-1.5 block text-sm font-medium text-ink-soft">Материал фрезы</span>
               <Select
@@ -183,6 +204,8 @@ export function MillingForm({
                 ))}
               </Select>
             </label>
+          )}
+          {compact ? null : (
             <label>
               <span className="mb-1.5 block text-sm font-medium text-ink-soft">Покрытие</span>
               <Select value={state.coating} onChange={(event) => patch({ coating: event.target.value as MillingFormState['coating'] })}>
@@ -193,13 +216,68 @@ export function MillingForm({
                 ))}
               </Select>
             </label>
-          </div>
-        )}
+          )}
+        </div>
+        <div className="mt-3 grid gap-3 sm:grid-cols-2">
+          <NumberField
+            id="fluteLength"
+            label="Длина режущей части L"
+            unit="мм"
+            hint={hints.fluteLength}
+            value={state.fluteLength}
+            min={0.5}
+            max={300}
+            error={error && /режущей/i.test(error) ? error : undefined}
+            onChange={(fluteLength) => patch({ fluteLength })}
+          />
+          <NumberField
+            id="shankDiameter"
+            label="Хвостовик"
+            unit="мм"
+            hint={hints.shank}
+            value={state.shankDiameter}
+            min={0.5}
+            max={50}
+            error={error && /хвостовик/i.test(error) ? error : undefined}
+            onChange={(shankDiameter) => patch({ shankDiameter })}
+          />
+          {geoFields.tipRadius ? (
+            <NumberField
+              id="tipRadius"
+              label={state.millType === 'ball' ? 'Радиус сферы r' : 'Радиус r'}
+              unit="мм"
+              hint={hints.tipRadius}
+              value={state.millType === 'ball' && diameterNum > 0 ? String(Number((diameterNum / 2).toFixed(3))) : state.tipRadius}
+              min={0}
+              max={50}
+              disabled={geoFields.tipRadiusLocked}
+              error={error && /радиус/i.test(error) ? error : undefined}
+              onChange={(tipRadius) => patch({ tipRadius })}
+            />
+          ) : null}
+          {geoFields.includedAngle ? (
+            <NumberField
+              id="includedAngle"
+              label="Угол при вершине α"
+              unit="°"
+              hint={hints.includedAngle}
+              value={state.includedAngle}
+              min={20}
+              max={160}
+              error={error && /угол/i.test(error) ? error : undefined}
+              onChange={(includedAngle) => patch({ includedAngle })}
+            />
+          ) : null}
+        </div>
         <EndMillDiagram
-          diameterMm={Number(String(state.diameter).replace(',', '.'))}
+          diameterMm={diameterNum}
           flutes={Number(state.flutes)}
           type={state.millType}
           typeName={endMillTypes.find((item) => item.type === state.millType)?.name ?? 'Концевая'}
+          fluteLengthMm={Number(String(state.fluteLength).replace(',', '.'))}
+          shankDiameterMm={Number(String(state.shankDiameter).replace(',', '.'))}
+          tipRadiusMm={state.millType === 'ball' && diameterNum > 0 ? diameterNum / 2 : Number(String(state.tipRadius).replace(',', '.'))}
+          includedAngleDeg={state.includedAngle === '' ? null : Number(String(state.includedAngle).replace(',', '.'))}
         />
       </Card>
 

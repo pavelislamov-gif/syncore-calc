@@ -12,7 +12,7 @@ import {
 } from '@/engine'
 import { CalculationError } from '@/engine/errors'
 import { inchToMm, mmToInch, roundTo, wToKw } from '@/engine/units'
-import { validateDiameter, validateFlutes } from '@/engine/validation'
+import { validateDiameter, validateFlutes, validateToolGeometry } from '@/engine/validation'
 
 describe('spindle speed', () => {
   it('computes n = (Vc × 1000) / (π × D)', () => {
@@ -83,6 +83,18 @@ describe('validation', () => {
     expect(validateFlutes(0).length).toBeGreaterThan(0)
     expect(validateFlutes(2)).toEqual([])
   })
+
+  it('rejects a tip radius larger than D/2', () => {
+    const errors = validateToolGeometry({
+      diameterMm: 6,
+      type: 'corner_radius',
+      fluteLengthMm: 24,
+      shankDiameterMm: 6,
+      tipRadiusMm: 4,
+      includedAngleDeg: null,
+    })
+    expect(errors[0]?.message).toMatch(/D\/2/)
+  })
 })
 
 describe('milling engine AMg6 Ø6 2Z', () => {
@@ -124,6 +136,20 @@ describe('milling engine AMg6 Ø6 2Z', () => {
     expect(roundTo(result.plungeMmMin, 1)).toBe(roundTo(1440 * result.plungeRatio, 1))
     expect(roundTo(result.helicalPlungeMmMin, 0)).toBe(792)
     expect(result.steps.some((step) => step.id === 'plunge')).toBe(true)
+    expect(result.geometry.fluteLengthMm).toBe(24)
+    expect(result.geometry.tipRadiusMm).toBe(0)
+  })
+
+  it('clamps ap to flute length', () => {
+    const result = calculateMilling({
+      ...base,
+      paramMode: 'manual',
+      overrides: { vc: 100, fz: 0.03, ap: 20, ae: 2 },
+      tool: { ...base.tool, fluteLengthMm: 3 },
+    })
+    expect(result.ap).toBe(3)
+    expect(result.clamped.ap).toBe(true)
+    expect(result.geometry.fluteLengthMm).toBe(3)
   })
 
   it('uses a higher Z plunge ratio for drills than for end mills', () => {

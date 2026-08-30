@@ -56,6 +56,40 @@ export function validateMachineLimits(input: {
   return errors
 }
 
+export function validateToolGeometry(input: {
+  diameterMm: number
+  type: string
+  fluteLengthMm: number
+  shankDiameterMm: number
+  tipRadiusMm: number
+  includedAngleDeg: number | null
+}): ValidationError[] {
+  const errors: ValidationError[] = []
+  if (!isPositive(input.fluteLengthMm) || input.fluteLengthMm > 300) {
+    errors.push({ field: 'fluteLengthMm', message: 'Длина режущей части: от 0.5 до 300 мм.' })
+  }
+  if (!isPositive(input.shankDiameterMm) || input.shankDiameterMm > 50) {
+    errors.push({ field: 'shankDiameterMm', message: 'Диаметр хвостовика: от 0.5 до 50 мм.' })
+  }
+  if (!Number.isFinite(input.tipRadiusMm) || input.tipRadiusMm < 0) {
+    errors.push({ field: 'tipRadiusMm', message: 'Радиус должен быть нулём или больше.' })
+  } else if (input.tipRadiusMm > input.diameterMm / 2 + 1e-6) {
+    errors.push({ field: 'tipRadiusMm', message: 'Радиус не может быть больше D/2.' })
+  }
+  if (input.type === 'corner_radius' && input.tipRadiusMm < 0.01) {
+    errors.push({ field: 'tipRadiusMm', message: 'Для радиусной фрезы укажите радиус угла больше нуля.' })
+  }
+  if (input.type === 'chamfer' || input.type === 'drill') {
+    const angle = input.includedAngleDeg
+    if (angle == null || !Number.isFinite(angle)) {
+      errors.push({ field: 'includedAngleDeg', message: 'Укажите угол при вершине.' })
+    } else if (angle < 20 || angle > 160) {
+      errors.push({ field: 'includedAngleDeg', message: 'Угол при вершине: от 20° до 160°.' })
+    }
+  }
+  return errors
+}
+
 export function validateOverride(
   field: string,
   value: number | undefined,
