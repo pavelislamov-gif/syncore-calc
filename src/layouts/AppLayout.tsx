@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { NavLink, Outlet, useLocation } from 'react-router-dom'
+import { Outlet, useLocation } from 'react-router-dom'
 import { BottomNav } from '@/components/layout/BottomNav'
 import { Header } from '@/components/layout/Header'
 import { MobileMenu } from '@/components/layout/MobileMenu'
@@ -34,10 +34,7 @@ export function AppLayout() {
         <Outlet />
       </main>
       <footer className="mx-auto hidden max-w-6xl px-6 py-8 text-sm text-muted lg:block">
-        SYNCORE calc · бесплатно, без регистрации. Справочные режимы резания.{' '}
-        <NavLink to="/usage" className="text-ink underline-offset-2 hover:underline">
-          Посещаемость
-        </NavLink>
+        SYNCORE calc · бесплатно, без регистрации. Справочные режимы резания.
       </footer>
       <BottomNav onOpenMore={() => setMenuOpen(true)} />
       <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
