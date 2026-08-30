@@ -13,7 +13,6 @@ const CAP_RATIO = 0.65
 const CALC_SIZE = LETTER_H / CAP_RATIO
 const CALC_X = 352
 const CALC_BASELINE = LETTER_BOTTOM - 3
-const CALC_X = 352
 
 export function BrandWordmark({ size = 'md' }: { size?: 'md' | 'lg' }) {
   return (
