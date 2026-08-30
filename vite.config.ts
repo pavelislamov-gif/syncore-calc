@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
-import { telemetryPlugin } from './vite-telemetry'
+import { telemetryPlugin } from './vite-telemetry.ts'
 
 const root = path.dirname(fileURLToPath(import.meta.url))
 

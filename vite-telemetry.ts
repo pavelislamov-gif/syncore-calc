@@ -3,7 +3,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import type { IncomingMessage, ServerResponse } from 'node:http'
 import type { Plugin } from 'vite'
-import { summarizeTelemetry, type TelemetryEvent, type TelemetryStore } from './src/services/telemetry/summary'
+import { summarizeTelemetry, type TelemetryEvent, type TelemetryStore } from './src/services/telemetry/summary.ts'
 
 const MAX_EVENTS = 8000
 
