@@ -13,7 +13,7 @@ export function HomePage() {
         </div>
         <h1 className="mt-3 text-3xl font-extrabold tracking-tight md:text-5xl">Инженерные расчёты для производства</h1>
         <p className="mt-4 text-base text-ink-soft sm:text-lg">
-          Три направления: фрезерование, токарка и лазерная резка. Резьба — внутри токарки.
+          Бесплатно, без регистрации. Три направления: фрезерование, токарка и лазерная резка. Резьба — внутри токарки.
         </p>
         <div className="mt-6 grid gap-3 sm:grid-cols-3">
           <Link to="/milling">

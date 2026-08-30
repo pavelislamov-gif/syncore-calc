@@ -3,6 +3,7 @@ import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { BottomNav } from '@/components/layout/BottomNav'
 import { Header } from '@/components/layout/Header'
 import { MobileMenu } from '@/components/layout/MobileMenu'
+import { trackPageView } from '@/services/telemetry/client'
 
 export function AppLayout() {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -10,6 +11,7 @@ export function AppLayout() {
 
   useEffect(() => {
     setMenuOpen(false)
+    trackPageView(location.pathname)
   }, [location.pathname])
 
   useEffect(() => {
@@ -32,9 +34,9 @@ export function AppLayout() {
         <Outlet />
       </main>
       <footer className="mx-auto hidden max-w-6xl px-6 py-8 text-sm text-muted lg:block">
-        SYNCORE calc · справочные режимы резания. Фактический режим зависит от станка, инструмента и заготовки.{' '}
-        <NavLink to="/pro" className="text-ink underline-offset-2 hover:underline">
-          PRO
+        SYNCORE calc · бесплатно, без регистрации. Справочные режимы резания.{' '}
+        <NavLink to="/usage" className="text-ink underline-offset-2 hover:underline">
+          Посещаемость
         </NavLink>
       </footer>
       <BottomNav onOpenMore={() => setMenuOpen(true)} />

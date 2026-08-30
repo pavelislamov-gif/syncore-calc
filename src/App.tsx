@@ -10,6 +10,7 @@ import { ProPage } from '@/pages/ProPage'
 import { ThreadingPage } from '@/pages/ThreadingPage'
 import { ToolsPage } from '@/pages/ToolsPage'
 import { TurningPage } from '@/pages/TurningPage'
+import { UsagePage } from '@/pages/UsagePage'
 
 export default function App() {
   return (
@@ -25,6 +26,7 @@ export default function App() {
         <Route path="/history" element={<HistoryPage />} />
         <Route path="/favorites" element={<FavoritesPage />} />
         <Route path="/pro" element={<ProPage />} />
+        <Route path="/usage" element={<UsagePage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
     </Routes>

@@ -1,13 +1,13 @@
 export const PLAN_FEATURES = [
-  { id: 'basic-milling', label: 'Базовое фрезерование (хобби)', free: true, pro: true },
-  { id: 'basic-materials', label: 'Базовые материалы', free: true, pro: true },
-  { id: 'industrial', label: 'Промышленный режим фрезерования', free: false, pro: true },
-  { id: 'all-materials', label: 'Полная база материалов', free: false, pro: true },
-  { id: 'turning', label: 'Токарная обработка', free: false, pro: true },
-  { id: 'threading', label: 'Резьба', free: false, pro: true },
-  { id: 'laser', label: 'Лазерная резка', free: false, pro: true },
-  { id: 'history', label: 'История расчётов', free: false, pro: true },
-  { id: 'favorites', label: 'Избранное', free: false, pro: true },
+  { id: 'basic-milling', label: 'Фрезерование', free: true, pro: true },
+  { id: 'basic-materials', label: 'Справочник материалов', free: true, pro: true },
+  { id: 'industrial', label: 'Промышленный режим фрезерования', free: true, pro: true },
+  { id: 'all-materials', label: 'Полная база материалов', free: true, pro: true },
+  { id: 'turning', label: 'Токарная обработка', free: true, pro: true },
+  { id: 'threading', label: 'Резьба', free: true, pro: true },
+  { id: 'laser', label: 'Лазерная резка', free: true, pro: true },
+  { id: 'history', label: 'История расчётов', free: true, pro: true },
+  { id: 'favorites', label: 'Избранное', free: true, pro: true },
   { id: 'pdf', label: 'Экспорт PDF / CSV', free: false, pro: true },
 ] as const
 

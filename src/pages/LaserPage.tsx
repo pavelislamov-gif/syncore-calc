@@ -6,6 +6,7 @@ import { saveFavorite, saveHistoryItem } from '@/services/storage'
 import { MobileResultBar } from '@/components/layout/MobileResultBar'
 import { formatRpm, newId } from '@/utils/format'
 import { scrollToResult } from '@/utils/scroll'
+import { trackCalculate } from '@/services/telemetry/client'
 
 export function LaserPage() {
   const form = useLaserForm()
@@ -61,7 +62,10 @@ export function LaserPage() {
             setAdvanced={form.setAdvanced}
             applySource={form.applySource}
             onCalculate={() => {
-              if (form.calculate()) scrollToResult('laser-result')
+              if (form.calculate()) {
+                trackCalculate('laser')
+                scrollToResult('laser-result')
+              }
             }}
             error={form.error}
             preview={form.result}

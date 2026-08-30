@@ -6,6 +6,7 @@ import { saveFavorite, saveHistoryItem } from '@/services/storage'
 import { MobileResultBar } from '@/components/layout/MobileResultBar'
 import { formatRpm, newId } from '@/utils/format'
 import { scrollToResult } from '@/utils/scroll'
+import { trackCalculate } from '@/services/telemetry/client'
 import { getTurningOperation } from '@/data/formulas/operations'
 
 export function TurningPage() {
@@ -62,7 +63,10 @@ export function TurningPage() {
             setAdvanced={form.setAdvanced}
             applyLathe={form.applyLathe}
             onCalculate={() => {
-              if (form.calculate()) scrollToResult('turning-result')
+              if (form.calculate()) {
+                trackCalculate('turning')
+                scrollToResult('turning-result')
+              }
             }}
             error={form.error}
           />

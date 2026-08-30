@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/Button'
 import { formatNumber, formatRpm, newId } from '@/utils/format'
 import { scrollToResult } from '@/utils/scroll'
+import { trackCalculate } from '@/services/telemetry/client'
 
 export function ThreadingPage() {
   const form = useThreadingForm()
@@ -66,7 +67,10 @@ export function ThreadingPage() {
             spec={form.spec}
             threads={form.threads}
             onCalculate={() => {
-              if (form.calculate()) scrollToResult('threading-result')
+              if (form.calculate()) {
+                trackCalculate('threading')
+                scrollToResult('threading-result')
+              }
             }}
             error={form.error}
           />

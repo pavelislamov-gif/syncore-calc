@@ -6,6 +6,7 @@ import { saveFavorite, saveHistoryItem } from '@/services/storage'
 import { MobileResultBar } from '@/components/layout/MobileResultBar'
 import { formatRpm, newId } from '@/utils/format'
 import { scrollToMillingResult } from '@/utils/scroll'
+import { trackCalculate } from '@/services/telemetry/client'
 
 export function MillingPage() {
   const form = useMillingForm()
@@ -58,7 +59,10 @@ export function MillingPage() {
             advanced={form.advanced}
             setAdvanced={form.setAdvanced}
             onCalculate={() => {
-              if (form.calculate()) scrollToMillingResult()
+              if (form.calculate()) {
+                trackCalculate('milling')
+                scrollToMillingResult()
+              }
             }}
             error={form.error}
           />

@@ -13,7 +13,7 @@ export const headerLinks = [
   { to: '/tools', label: 'Инструмент' },
   { to: '/history', label: 'История' },
   { to: '/favorites', label: 'Избранное' },
-  { to: '/pro', label: 'PRO' },
+  { to: '/usage', label: 'Посещаемость' },
 ] as const
 
 export const moreLinks = [
@@ -22,7 +22,8 @@ export const moreLinks = [
   { to: '/tools', label: 'Инструмент' },
   { to: '/history', label: 'История' },
   { to: '/favorites', label: 'Избранное' },
-  { to: '/pro', label: 'PRO' },
+  { to: '/usage', label: 'Посещаемость' },
+  { to: '/pro', label: 'PRO позже' },
 ] as const
 
 export function isMoreRoute(pathname: string): boolean {
