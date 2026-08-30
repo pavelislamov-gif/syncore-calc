@@ -11,7 +11,7 @@ interface Props {
 export function Header({ onOpenMenu }: Props) {
   const { pathname } = useLocation()
   return (
-    <header className="sticky top-0 z-30 h-[var(--app-header-height)] border-b border-line/80 bg-paper/90 backdrop-blur">
+    <header className="sticky top-0 z-30 h-[var(--app-header-height)] border-b border-white/10 bg-black">
       <div className="mx-auto flex h-full max-w-6xl items-center justify-between gap-4 px-4 md:px-6">
         <Link to="/" className="min-w-0" aria-label="SYNCORE calc">
           <BrandWordmark />
@@ -24,8 +24,8 @@ export function Header({ onOpenMenu }: Props) {
               end={link.to === '/'}
               className={({ isActive }) =>
                 cn(
-                  'rounded-lg px-2.5 py-2 text-sm font-medium text-muted transition-colors hover:text-ink',
-                  (isActive || (link.to === '/turning' && isTurningSection(pathname))) && 'bg-white text-ink shadow-sm',
+                  'rounded-lg px-2.5 py-2 text-sm font-medium text-white/55 transition-colors hover:text-white',
+                  (isActive || (link.to === '/turning' && isTurningSection(pathname))) && 'bg-white/10 text-white',
                 )
               }
             >
@@ -35,7 +35,7 @@ export function Header({ onOpenMenu }: Props) {
         </nav>
         <button
           type="button"
-          className="flex h-11 w-11 items-center justify-center rounded-xl text-ink lg:hidden"
+          className="flex h-11 w-11 items-center justify-center rounded-xl text-white lg:hidden"
           aria-label="Открыть меню"
           onClick={onOpenMenu}
         >

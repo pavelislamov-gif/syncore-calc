@@ -7,7 +7,10 @@ export function HomePage() {
   return (
     <div className="space-y-10">
       <section className="max-w-3xl">
-        <p className="text-sm font-semibold uppercase tracking-[0.16em] text-accent-2">SYNCORE calc</p>
+        <div className="inline-flex items-center rounded-xl bg-black px-3 py-2">
+          <img src="/logo.png" alt="SYNCORE" className="h-8 w-auto" />
+        </div>
+        <p className="mt-4 text-sm font-semibold uppercase tracking-[0.16em] text-accent">SYNCORE calc</p>
         <h1 className="mt-3 text-3xl font-extrabold tracking-tight md:text-5xl">Инженерные расчёты для производства</h1>
         <p className="mt-4 text-base text-ink-soft sm:text-lg">
           Три направления: фрезерование, токарка и лазерная резка. Резьба — внутри токарки.

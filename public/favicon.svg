@@ -1,13 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
-  <rect width="32" height="32" rx="8" fill="#171B1F"/>
-  <path
-    d="M16 5.2 26.4 11v10L16 26.8 5.6 21V11L16 5.2Z"
-    stroke="#0E8F7B"
-    stroke-width="1.6"
-    stroke-linejoin="round"
-  />
-  <path
-    d="M16 10.2 21.6 13.4v5.2L16 21.8 10.4 18.6v-5.2L16 10.2Z"
-    fill="#0E8F7B"
-  />
+  <rect width="32" height="32" rx="8" fill="#000000"/>
+  <text x="5" y="22" font-family="Arial Black, Arial, sans-serif" font-size="14" font-weight="800" fill="#FFFFFF">S</text>
+  <text x="16" y="22" font-family="Arial Black, Arial, sans-serif" font-size="14" font-weight="800" fill="#F15A17">C</text>
 </svg>

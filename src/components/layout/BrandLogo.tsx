@@ -1,17 +1,16 @@
 import { cn } from '@/utils/cn'
 
 export function BrandMark({ className }: { className?: string }) {
-  return <img src="/logo.svg" alt="" className={cn('h-9 w-9 shrink-0', className)} />
+  return (
+    <img src="/logo.png" alt="SYNCORE" className={cn('h-8 w-auto max-w-[12.5rem] object-contain object-left', className)} />
+  )
 }
 
-export function BrandWordmark({ compact }: { compact?: boolean }) {
+export function BrandWordmark() {
   return (
-    <span className="flex items-center gap-2 font-extrabold tracking-tight">
+    <span className="flex min-w-0 items-center gap-2.5">
       <BrandMark />
-      <span className="leading-none">
-        SYNCORE
-        {compact ? null : <span className="ml-1.5 font-semibold text-accent-2">calc</span>}
-      </span>
+      <span className="hidden text-[13px] font-semibold uppercase tracking-[0.14em] text-white/70 sm:inline">calc</span>
     </span>
   )
 }
