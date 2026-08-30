@@ -1,11 +1,11 @@
-import { formatExact } from '@/engine/units'
+import { formatDec, formatInt } from '@/engine/units'
 
-export function formatNumber(value: number, _digits?: number): string {
-  return formatExact(value)
+export function formatNumber(value: number, digits = 0): string {
+  return formatDec(value, digits)
 }
 
 export function formatRpm(value: number): string {
-  return formatExact(value)
+  return formatInt(value)
 }
 
 export function newId(): string {

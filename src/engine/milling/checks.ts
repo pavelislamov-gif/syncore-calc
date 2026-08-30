@@ -2,7 +2,7 @@ import type { CheckResult, CheckSeverity, MillingResult } from '@/types/milling'
 import type { MachineLimits } from '@/types/machine'
 import type { Material } from '@/types/material'
 import type { MillToolInput } from '@/types/tool'
-import { formatExact } from '../units'
+import { formatDec, formatInt } from '../units'
 
 export function evaluateMillingChecks(input: {
   rpm: number
@@ -26,7 +26,7 @@ export function evaluateMillingChecks(input: {
       id: 'rpm-limit',
       severity: 'warning',
       title: 'Обороты ограничены станком',
-      detail: `Расчётные обороты: ${formatExact(input.rpm)} об/мин. Ваш станок ограничен ${formatExact(machine.maxRpm)} об/мин.`,
+      detail: `Расчётные обороты: ${formatInt(input.rpm)} об/мин. Ваш станок ограничен ${formatInt(machine.maxRpm)} об/мин.`,
     })
   }
 
@@ -96,7 +96,7 @@ export function evaluateMillingChecks(input: {
       id: 'vc-range',
       severity: 'warning',
       title: 'Vc вне справочного диапазона',
-      detail: `Скорость резания ${formatNum(input.vc)} м/мин при справочном диапазоне ${formatNum(input.vcRange.min)}–${formatNum(input.vcRange.max)} м/мин.`,
+      detail: `Скорость резания ${formatDec(input.vc)} м/мин при справочном диапазоне ${formatDec(input.vcRange.min)}–${formatDec(input.vcRange.max)} м/мин.`,
     })
   }
 
@@ -105,7 +105,7 @@ export function evaluateMillingChecks(input: {
       id: 'fz-range',
       severity: 'warning',
       title: 'fz вне справочного диапазона',
-      detail: `Подача на зуб ${formatNum(input.fz, 3)} мм/зуб при справочном диапазоне ${formatNum(input.fzRange.min, 3)}–${formatNum(input.fzRange.max, 3)} мм/зуб.`,
+      detail: `Подача на зуб ${formatDec(input.fz)} мм/зуб при справочном диапазоне ${formatDec(input.fzRange.min)}–${formatDec(input.fzRange.max)} мм/зуб.`,
     })
   }
 
@@ -149,6 +149,6 @@ export function applyMachineClamps(
   }
 }
 
-function formatNum(value: number, _digits?: number): string {
-  return formatExact(value)
+function formatNum(value: number, digits = 2): string {
+  return formatDec(value, digits)
 }

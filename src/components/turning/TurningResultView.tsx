@@ -23,11 +23,11 @@ export function TurningResultView({ result, material, onSaveHistory, onSaveFavor
     <div id="turning-result" className="scroll-mt-24 space-y-4">
       <div className="grid grid-cols-2 gap-3">
         <Hero code="S" value={formatRpm(result.rpm)} unit="об/мин" />
-        <Hero code="F" value={formatNumber(result.feedMmMin, 0)} unit="мм/мин" />
+        <Hero code="F" value={formatRpm(result.feedMmMin)} unit="мм/мин" />
       </div>
       <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
-        <Metric label="f · подача" value={`${formatNumber(result.feedMmRev, 3)} мм/об`} />
-        <Metric label="Скорость резания" value={`${formatNumber(result.vc, 0)} м/мин`} />
+        <Metric label="f · подача" value={`${formatNumber(result.feedMmRev, 2)} мм/об`} />
+        <Metric label="Скорость резания" value={`${formatNumber(result.vc, 2)} м/мин`} />
         <Metric label="Глубина резания" value={`${formatNumber(result.ap, 2)} мм`} />
         <Metric label="Проходы" value={`${result.passes}`} />
         <Metric label="Мощность (оценка)" value={`${formatNumber(result.powerKw, 2)} кВт`} />
@@ -86,9 +86,11 @@ export function TurningResultView({ result, material, onSaveHistory, onSaveFavor
 
 function Hero({ code, value, unit }: { code: string; value: string; unit: string }) {
   return (
-    <Card className="bg-graphite text-white">
+    <Card className="min-w-0 bg-graphite text-white">
       <p className="text-xs font-bold tracking-[0.2em] text-accent">{code}</p>
-      <p className="mt-1 break-all font-mono text-2xl font-semibold tracking-tight md:text-3xl">{value}</p>
+      <p className="mt-1 whitespace-nowrap font-mono text-2xl font-semibold leading-none tabular-nums">
+        {value}
+      </p>
       <p className="mt-1 text-sm text-white/70">{unit}</p>
     </Card>
   )
@@ -96,9 +98,9 @@ function Hero({ code, value, unit }: { code: string; value: string; unit: string
 
 function Metric({ label, value }: { label: string; value: string }) {
   return (
-    <Card className="p-4">
+    <Card className="min-w-0 p-4">
       <p className="text-xs font-medium text-muted">{label}</p>
-      <p className="mt-1 text-lg font-semibold">{value}</p>
+      <p className="mt-1 whitespace-nowrap font-mono text-lg font-semibold tabular-nums">{value}</p>
     </Card>
   )
 }

@@ -20,24 +20,28 @@ export function ThreadingResultView({ result, material, onSaveHistory, onSaveFav
   return (
     <div id="threading-result" className="scroll-mt-24 space-y-4">
       <div className="grid grid-cols-2 gap-3">
-        <Card className="bg-graphite text-white">
+        <Card className="min-w-0 bg-graphite text-white">
           <p className="text-sm text-white/70">{result.designation}</p>
-          <p className="mt-1 font-mono text-3xl font-semibold">{formatNumber(result.nominalDiameterMm, 1)}</p>
+          <p className="mt-1 whitespace-nowrap font-mono text-2xl font-semibold leading-none tabular-nums">
+            {formatNumber(result.nominalDiameterMm, 2)}
+          </p>
           <p className="text-sm text-white/70">мм · шаг {formatNumber(result.pitchMm, 2)}</p>
         </Card>
-        <Card className="bg-graphite text-white">
+        <Card className="min-w-0 bg-graphite text-white">
           <p className="text-xs font-bold tracking-[0.2em] text-accent">S</p>
-          <p className="mt-1 font-mono text-3xl font-semibold">{formatRpm(result.rpm)}</p>
+          <p className="mt-1 whitespace-nowrap font-mono text-2xl font-semibold leading-none tabular-nums">
+            {formatRpm(result.rpm)}
+          </p>
           <p className="mt-1 text-sm text-white/70">об/мин</p>
         </Card>
       </div>
       <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
         <Metric label="Отверстие под резьбу" value={`${formatNumber(result.tapDrillMm, 2)} мм`} />
-        <Metric label="Глубина резьбы" value={`${formatNumber(result.threadDepthMm, 3)} мм`} />
+        <Metric label="Глубина резьбы" value={`${formatNumber(result.threadDepthMm, 2)} мм`} />
         <Metric label="Проходы" value={`${result.passes}`} />
         <Metric label="F · подача = шаг" value={`${formatNumber(result.feedMmRev, 2)} мм/об`} />
-        <Metric label="F · минутная подача" value={`${formatNumber(result.feedMmMin, 0)} мм/мин`} />
-        <Metric label="Vc" value={`${formatNumber(result.vc, 0)} м/мин`} />
+        <Metric label="F · минутная подача" value={`${formatRpm(result.feedMmMin)} мм/мин`} />
+        <Metric label="Vc" value={`${formatNumber(result.vc, 2)} м/мин`} />
       </div>
       <StatusBanner status={result.status} title={result.statusTitle}>
         {result.explanation}
@@ -80,9 +84,9 @@ export function ThreadingResultView({ result, material, onSaveHistory, onSaveFav
 
 function Metric({ label, value }: { label: string; value: string }) {
   return (
-    <Card className="p-4">
+    <Card className="min-w-0 p-4">
       <p className="text-xs font-medium text-muted">{label}</p>
-      <p className="mt-1 text-lg font-semibold">{value}</p>
+      <p className="mt-1 whitespace-nowrap font-mono text-lg font-semibold tabular-nums">{value}</p>
     </Card>
   )
 }

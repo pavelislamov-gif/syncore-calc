@@ -28,7 +28,19 @@ export function wToKw(w: number): number {
   return w / 1000
 }
 
-/** Display the computed value without rounding. Trailing zeros are not forced. */
+/** Integer display for spindle rpm and feed in mm/min. */
+export function formatInt(value: number): string {
+  if (!Number.isFinite(value)) return '—'
+  return value.toFixed(0)
+}
+
+/** Two-decimal (or custom) display for feeds, Vc, power, depth, time. */
+export function formatDec(value: number, digits = 2): string {
+  if (!Number.isFinite(value)) return '—'
+  return value.toFixed(digits)
+}
+
+/** Unrounded value for formula substitutions (inputs), not result cards. */
 export function formatExact(value: number): string {
   if (!Number.isFinite(value)) return '—'
   return value.toLocaleString('ru-RU', {

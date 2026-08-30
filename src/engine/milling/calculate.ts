@@ -3,7 +3,7 @@ import { getMaterial } from '@/data/materials'
 import { millingFormulas } from '@/data/formulas/milling'
 import type { FormulaStep, MillingInput, MillingResult } from '@/types/milling'
 import { CalculationError } from '../errors'
-import { formatExact } from '../units'
+import { formatDec, formatExact, formatInt } from '../units'
 import {
   validateDiameter,
   validateFlutes,
@@ -103,7 +103,7 @@ export function calculateMilling(input: MillingInput): MillingResult {
         id: 'rpm-clamped',
         severity: 'warning',
         title: 'Обороты ограничены станком',
-        detail: `Расчётные обороты: ${formatExact(theoreticalRpm)} об/мин. Ваш станок ограничен ${formatExact(input.machine.maxRpm)} об/мин.`,
+        detail: `Расчётные обороты: ${formatInt(theoreticalRpm)} об/мин. Ваш станок ограничен ${formatInt(input.machine.maxRpm)} об/мин.`,
       })
     }
   }
@@ -112,7 +112,7 @@ export function calculateMilling(input: MillingInput): MillingResult {
       id: 'feed-limit',
       severity: 'warning',
       title: 'Подача ограничена станком',
-      detail: `Расчётная подача ${formatExact(theoreticalFeed)} мм/мин превышает максимум ${formatExact(input.machine.maxFeedMmMin)} мм/мин.`,
+      detail: `Расчётная подача ${formatInt(theoreticalFeed)} мм/мин превышает максимум ${formatInt(input.machine.maxFeedMmMin)} мм/мин.`,
     })
   }
   if (clamped.clamped.ap) {
@@ -120,7 +120,7 @@ export function calculateMilling(input: MillingInput): MillingResult {
       id: 'ap-limit',
       severity: 'warning',
       title: 'Глубина ограничена геометрией',
-      detail: `ap ограничена меньшим из: максимум станка ${formatExact(input.machine.maxDepthMm)} мм и длина режущей части ${formatExact(tool.fluteLengthMm)} мм.`,
+      detail: `ap ограничена меньшим из: максимум станка ${formatDec(input.machine.maxDepthMm)} мм и длина режущей части ${formatDec(tool.fluteLengthMm)} мм.`,
     })
   }
 
@@ -142,49 +142,49 @@ export function calculateMilling(input: MillingInput): MillingResult {
       label: millingFormulas.cuttingSpeed.label,
       formula: millingFormulas.spindleSpeed.formula,
       substitution: `n = (${formatExact(vcTarget)} × 1000) / (π × ${formatExact(tool.diameterMm)})`,
-      result: `${formatExact(theoreticalRpm)} об/мин (до ограничения станка)`,
+      result: `${formatInt(theoreticalRpm)} об/мин (до ограничения станка)`,
     },
     {
       id: 'n',
       label: 'Обороты после ограничения станка',
       formula: 'n_fact = min(n, n_max)',
       substitution: `min(${formatExact(theoreticalRpm)}, ${formatExact(input.machine.maxRpm)})`,
-      result: `${formatExact(rpm)} об/мин`,
+      result: `${formatInt(rpm)} об/мин`,
     },
     {
       id: 'vc-actual',
       label: millingFormulas.cuttingSpeed.label,
       formula: millingFormulas.cuttingSpeed.formula,
       substitution: `Vc = (π × ${formatExact(tool.diameterMm)} × ${formatExact(rpm)}) / 1000`,
-      result: `${formatExact(vcActual)} м/мин`,
+      result: `${formatDec(vcActual)} м/мин`,
     },
     {
       id: 'vf',
       label: millingFormulas.feedRate.label,
       formula: millingFormulas.feedRate.formula,
       substitution: `Vf = ${formatExact(rpm)} × ${tool.flutes} × ${formatExact(fzTarget)}`,
-      result: `${formatExact(theoreticalFeed)} мм/мин`,
+      result: `${formatInt(theoreticalFeed)} мм/мин`,
     },
     {
       id: 'plunge',
       label: millingFormulas.plunge.label,
       formula: millingFormulas.plunge.formula,
       substitution: `Vf_z = ${formatExact(feedMmMin)} × ${formatExact(plungeK)}`,
-      result: `${formatExact(plungeMmMin)} мм/мин`,
+      result: `${formatInt(plungeMmMin)} мм/мин`,
     },
     {
       id: 'helical',
       label: millingFormulas.helicalPlunge.label,
       formula: millingFormulas.helicalPlunge.formula,
       substitution: `Vf_helical = ${formatExact(feedMmMin)} × 0.55`,
-      result: `${formatExact(helicalPlungeMmMin)} мм/мин`,
+      result: `${formatInt(helicalPlungeMmMin)} мм/мин`,
     },
     {
       id: 'p',
       label: millingFormulas.power.label,
       formula: millingFormulas.power.formula,
       substitution: `P = (${formatExact(ap)} × ${formatExact(ae)} × ${formatExact(feedMmMin)} × ${material.milling.specificCuttingForceKc}) / (60×10⁶ × η)`,
-      result: `${formatExact(powerKw)} кВт (оценка)`,
+      result: `${formatDec(powerKw)} кВт (оценка)`,
     },
   ]
 
