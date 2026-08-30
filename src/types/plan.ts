@@ -16,7 +16,6 @@ export interface Entitlements {
   turning: boolean
   threading: boolean
   laser: boolean
-  cypCut: boolean
   history: boolean
   favorites: boolean
   pdfExport: boolean

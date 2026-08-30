@@ -28,7 +28,7 @@ describe('speed scaling', () => {
 })
 
 describe('fiber mild steel 1.5 kW', () => {
-  it('returns O2 cut speed, CypCut mm/s and pierce time for 3 mm Ст3', () => {
+  it('returns O2 cut speed, mm/s and pierce time for 3 mm Ст3', () => {
     const result = calculateLaser({
       materialId: 'st3',
       thicknessMm: 3,
@@ -46,7 +46,7 @@ describe('fiber mild steel 1.5 kW', () => {
     expect(result.speedMmMin).toBeLessThan(5000)
     expect(roundTo(result.speedMmS, 2)).toBe(roundTo(result.speedMmMin / 60, 2))
     expect(result.pierceTimeMs).toBeGreaterThan(200)
-    expect(result.cypCut.powerPct).toBeGreaterThan(50)
+    expect(result.powerPct).toBeGreaterThan(50)
     expect(result.status).toBe('ok')
   })
 

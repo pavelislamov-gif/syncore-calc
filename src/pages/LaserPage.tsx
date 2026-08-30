@@ -36,9 +36,9 @@ export function LaserPage() {
     <div className="grid gap-8 lg:grid-cols-[minmax(0,26rem)_minmax(0,1fr)] lg:items-start">
       <div>
         <p className="text-sm font-semibold uppercase tracking-[0.16em] text-muted">Лазерная резка</p>
-        <h1 className="mt-2 text-3xl font-extrabold tracking-tight">Режимы и CypCut</h1>
+        <h1 className="mt-2 text-3xl font-extrabold tracking-tight">Режимы резки</h1>
         <p className="mt-2 text-ink-soft">
-          Материал и толщина — скорость, газ, фокус и слой для контроллера. Значения справочные.
+          Материал и толщина — скорость, газ, фокус и время контура. Значения справочные.
         </p>
         <div className="mt-6">
           <LaserForm

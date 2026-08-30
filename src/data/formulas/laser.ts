@@ -7,8 +7,8 @@ export const laserFormulas = {
     label: 'Время реза',
     formula: 'T = L / Vf',
   },
-  cypCutSpeed: {
-    label: 'CypCut Speed',
-    formula: 'Speed [mm/s] = Vf [мм/мин] / 60',
+  speedMmS: {
+    label: 'Скорость в мм/с',
+    formula: 'v = Vf / 60',
   },
 }

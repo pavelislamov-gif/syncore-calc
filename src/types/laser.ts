@@ -41,21 +41,6 @@ export interface LaserInput {
   }
 }
 
-export interface CypCutParams {
-  speedMmS: number
-  powerPct: number
-  frequencyHz: number
-  dutyPct: number
-  gas: AssistGas
-  pressureBar: number
-  focusMm: number
-  nozzleMm: number
-  pierceTimeMs: number
-  piercePowerPct: number
-  cutHeightMm: number
-  pierceHeightMm: number
-}
-
 export interface LaserResult {
   family: LaserFamily
   speedMmMin: number
@@ -66,11 +51,14 @@ export interface LaserResult {
   focusMm: number
   nozzleMm: number
   pierceTimeMs: number
+  piercePowerPct: number
+  pierceHeightMm: number
   cutHeightMm: number
+  frequencyHz: number
+  dutyPct: number
   timeMin: number
   kerfMm: number
   minPowerW: number
-  cypCut: CypCutParams
   status: CheckSeverity
   statusTitle: string
   checks: CheckResult[]

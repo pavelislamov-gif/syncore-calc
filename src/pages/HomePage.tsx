@@ -40,7 +40,7 @@ export function HomePage() {
         <ModuleCard
           icon={<ScanLine className="h-5 w-5" />}
           title="Лазерная резка"
-          description="Расчёт параметров лазерной резки металла и параметры для CypCut."
+          description="Скорость, газ, фокус и пробивка по материалу и толщине."
           to="/laser"
           action="Открыть калькулятор"
         />

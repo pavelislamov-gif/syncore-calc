@@ -2,7 +2,6 @@ import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { StatusBanner } from '@/components/ui/StatusBanner'
-import { CypCutPanel } from '@/components/laser/CypCutPanel'
 import type { LaserResult } from '@/types/laser'
 import type { Material } from '@/types/material'
 import { formatNumber, formatRpm } from '@/utils/format'
@@ -24,12 +23,12 @@ export function LaserResultView({ result, material, onSaveHistory, onSaveFavorit
     <div id="laser-result" className="scroll-mt-24 space-y-4">
       <div className="grid grid-cols-2 gap-3">
         <Hero code="F" value={formatRpm(result.speedMmMin)} unit="мм/мин" />
-        <Hero code="Speed" value={formatNumber(result.speedMmS, 2)} unit="mm/s · CypCut" />
+        <Hero code="P" value={`${formatRpm(result.powerPct)}`} unit="% мощности" />
       </div>
       <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
-        <Metric label="Мощность слоя" value={`${formatRpm(result.powerPct)} %`} />
+        <Metric label="Скорость" value={`${formatNumber(result.speedMmS, 2)} мм/с`} />
         <Metric label="Газ" value={result.gas} />
-        <Metric label="Давление" value={`${formatNumber(result.pressureBar, 2)} bar`} />
+        <Metric label="Давление" value={`${formatNumber(result.pressureBar, 2)} бар`} />
         <Metric label="Фокус" value={`${formatNumber(result.focusMm, 2)} мм`} />
         <Metric label="Пробивка" value={`${formatRpm(result.pierceTimeMs)} мс`} />
         <Metric label="Время контура" value={`${formatNumber(result.timeMin, 2)} мин`} />
@@ -49,8 +48,6 @@ export function LaserResultView({ result, material, onSaveHistory, onSaveFavorit
           <p className="mt-2 text-sm text-ink-soft">{check.detail}</p>
         </Card>
       ))}
-
-      <CypCutPanel params={result.cypCut} />
 
       <Card>
         <p className="text-sm font-semibold">Почему?</p>
@@ -84,7 +81,7 @@ export function LaserResultView({ result, material, onSaveHistory, onSaveFavorit
           <Star className="h-4 w-4" />В избранное
         </Button>
       </div>
-      <Badge tone={tone}>Единицы: мм · мм/мин · mm/s · % · bar · Вт</Badge>
+      <Badge tone={tone}>Единицы: мм · мм/мин · мм/с · % · бар · Вт</Badge>
     </div>
   )
 }

@@ -1,7 +1,7 @@
 import { getMaterial } from '@/data/materials'
 import { laserFormulas } from '@/data/formulas/laser'
 import { getLaserFamilyTable, laserFamilyForCategory } from '@/data/laser/regimes'
-import type { AssistGas, CypCutParams, LaserInput, LaserResult } from '@/types/laser'
+import type { AssistGas, LaserInput, LaserResult } from '@/types/laser'
 import type { CheckResult } from '@/types/milling'
 import { CalculationError } from '../errors'
 import { formatDec, formatExact, formatInt } from '../units'
@@ -67,21 +67,6 @@ export function calculateLaser(input: LaserInput): LaserResult {
   const speedMmS = speedMmMin / 60
   const timeMin = input.cutLengthMm / speedMmMin + pierceTimeMs / 60000
 
-  const cypCut: CypCutParams = {
-    speedMmS,
-    powerPct,
-    frequencyHz,
-    dutyPct,
-    gas,
-    pressureBar,
-    focusMm,
-    nozzleMm,
-    pierceTimeMs,
-    piercePowerPct,
-    cutHeightMm,
-    pierceHeightMm,
-  }
-
   const checks = evaluateChecks({
     input,
     family,
@@ -115,11 +100,14 @@ export function calculateLaser(input: LaserInput): LaserResult {
     focusMm,
     nozzleMm,
     pierceTimeMs,
+    piercePowerPct,
+    pierceHeightMm,
     cutHeightMm,
+    frequencyHz,
+    dutyPct,
     timeMin,
     kerfMm,
     minPowerW: point.minPowerW,
-    cypCut,
     status,
     statusTitle,
     checks,
@@ -129,7 +117,7 @@ export function calculateLaser(input: LaserInput): LaserResult {
         : status === 'warning'
           ? 'Режим посчитан, но проверьте источник, газ и паспорт станка.'
           : 'Так резать не стоит: мощность, источник или материал не сходятся.',
-    why: `Для ${material.name}, ${formatDec(input.thicknessMm)} мм, ${input.sourceKind === 'fiber' ? 'волокно' : 'CO₂'} ${formatInt(input.powerW)} Вт выбран газ ${gas} и скорость около ${formatInt(speedMmMin)} мм/мин. Это справочный старт для CypCut, не паспорт конкретной головы и резонатора. ${table.notes}`,
+    why: `Для ${material.name}, ${formatDec(input.thicknessMm)} мм, ${input.sourceKind === 'fiber' ? 'волокно' : 'CO₂'} ${formatInt(input.powerW)} Вт выбран газ ${gas} и скорость около ${formatInt(speedMmMin)} мм/мин. Это справочный старт, не паспорт конкретной головы и резонатора. ${table.notes}`,
     steps: [
       {
         id: 'v',
@@ -139,11 +127,11 @@ export function calculateLaser(input: LaserInput): LaserResult {
         result: `${formatInt(speedMmMin)} мм/мин`,
       },
       {
-        id: 'cyp',
-        label: laserFormulas.cypCutSpeed.label,
-        formula: laserFormulas.cypCutSpeed.formula,
-        substitution: `Speed = ${formatInt(speedMmMin)} / 60`,
-        result: `${formatDec(speedMmS)} mm/s`,
+        id: 'vs',
+        label: laserFormulas.speedMmS.label,
+        formula: laserFormulas.speedMmS.formula,
+        substitution: `v = ${formatInt(speedMmMin)} / 60`,
+        result: `${formatDec(speedMmS)} мм/с`,
       },
       {
         id: 't',
