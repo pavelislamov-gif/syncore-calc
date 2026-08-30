@@ -11,9 +11,9 @@ interface Props {
 export function Header({ onOpenMenu }: Props) {
   const { pathname } = useLocation()
   return (
-    <header className="sticky top-0 z-30 h-[var(--app-header-height)] border-b border-white/10 bg-black">
+    <header className="sticky top-0 z-30 h-[var(--app-header-height)] overflow-visible border-b border-white/10 bg-black">
       <div className="mx-auto flex h-full max-w-6xl items-center justify-between gap-4 px-4 md:px-6">
-        <Link to="/" className="min-w-0" aria-label="SYNCORE calc">
+        <Link to="/" className="min-w-0 overflow-visible" aria-label="SYNCORE calc">
           <BrandWordmark />
         </Link>
         <nav className="hidden items-center gap-1 overflow-x-auto lg:flex">
