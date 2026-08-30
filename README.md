@@ -32,45 +32,7 @@ npm run build
 
 Готовая сборка лежит в `dist/`. Это статический SPA: любые пути вроде `/milling` должны отдавать `index.html`.
 
-## Публикация: GitHub + Beget (как портфолио)
-
-[pavelislamov.ru](https://pavelislamov.ru/) уже работает так: **файлы — GitHub Pages**, **DNS — Beget** (`ns1.beget.ru` / `ns2.beget.ru`). Калькулятор на [syncore54.ru](https://syncore54.ru) лучше выложить так же.
-
-### 1. GitHub
-
-1. Создайте репозиторий на том же аккаунте, что и портфолио, и запушьте этот проект.
-2. Settings → Pages: Source = **GitHub Actions**.
-3. Settings → Pages → Custom domain: `syncore54.ru`, включите **Enforce HTTPS** после проверки DNS.
-4. Workflow `.github/workflows/pages.yml` собирает `dist/` и выкладывает Pages. Для SPA копируется `404.html` (прямой заход на `/milling`).
-
-В `public/CNAME` уже указан `syncore54.ru`.
-
-### 2. DNS в панели Beget
-
-Раздел **Домены** → DNS-записи для `syncore54.ru` (те же A, что у портфолио):
-
-| Имя | Тип | Значение |
-| --- | --- | --- |
-| `@` | A | `185.199.108.153` |
-| `@` | A | `185.199.109.153` |
-| `@` | A | `185.199.110.153` |
-| `@` | A | `185.199.111.153` |
-| `www` | CNAME | `ВАШ-ЛОГИН.github.io.` |
-
-Логин GitHub тот же, что у `www.pavelislamov.ru` (`….github.io`). Не прикрепляйте `syncore54.ru` к сайту в разделе «Сайты» Beget — иначе панель перезапишет A-записи на IP хостинга и Pages перестанет открываться.
-
-SSL выдаёт GitHub, не Let’s Encrypt в Beget.
-
-### Другой вариант: файлы на хостинге Beget
-
-Если хотите хранить калькулятор в `public_html` на Beget (не Pages):
-
-1. В [Сайты](https://beget.com/ru/kb/manual/sajty) создайте сайт, прикрепите `syncore54.ru`.
-2. Залейте содержимое `dist/` в `public_html` (файловый менеджер или FTP). Файл `.htaccess` уже в сборке — Apache отдаст SPA-маршруты.
-3. В настройках домена включите редирект на HTTPS.
-
-Счётчик `/usage` на чистой статике (и Pages, и `public_html`) не работает — нужен `VITE_TELEMETRY_URL` или Plausible / Umami.
-
+Как выложить на **syncore54.ru** (GitHub Pages + DNS Beget, как портфолио): **[ПУБЛИКАЦИЯ.md](./ПУБЛИКАЦИЯ.md)**.
 
 ## Что умеет сейчас
 
