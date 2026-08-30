@@ -118,7 +118,7 @@ export function TurningForm({
           ))}
           <Link
             to="/threading"
-            className="inline-flex min-h-11 items-center rounded-xl px-3 text-sm font-semibold text-accent-2 ring-1 ring-line"
+            className="inline-flex min-h-11 items-center rounded-xl bg-card px-3 text-sm font-semibold text-ink-soft ring-1 ring-line hover:text-ink"
           >
             Нарезание резьбы
           </Link>

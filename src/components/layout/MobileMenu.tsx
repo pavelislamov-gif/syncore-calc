@@ -1,5 +1,5 @@
-import { NavLink } from 'react-router-dom'
-import { moreLinks, primaryNav } from '@/components/layout/nav'
+import { NavLink, useLocation } from 'react-router-dom'
+import { moreLinks, primaryNav, isTurningSection } from '@/components/layout/nav'
 import { cn } from '@/utils/cn'
 import { X } from 'lucide-react'
 
@@ -9,6 +9,7 @@ interface Props {
 }
 
 export function MobileMenu({ open, onClose }: Props) {
+  const { pathname } = useLocation()
   if (!open) return null
 
   return (
@@ -23,7 +24,7 @@ export function MobileMenu({ open, onClose }: Props) {
           </button>
         </div>
         <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted">Калькуляторы</p>
-        <ul className="mt-2 grid grid-cols-2 gap-2">
+        <ul className="mt-2 grid grid-cols-3 gap-2">
           {primaryNav.map((item) => (
             <li key={item.to}>
               <NavLink
@@ -32,7 +33,9 @@ export function MobileMenu({ open, onClose }: Props) {
                 className={({ isActive }) =>
                   cn(
                     'flex min-h-12 items-center rounded-xl px-3 text-sm font-semibold ring-1 ring-line',
-                    isActive ? 'bg-graphite text-white ring-graphite' : 'bg-paper-2 text-ink',
+                    isActive || (item.to === '/turning' && isTurningSection(pathname))
+                      ? 'bg-graphite text-white ring-graphite'
+                      : 'bg-paper-2 text-ink',
                   )
                 }
               >

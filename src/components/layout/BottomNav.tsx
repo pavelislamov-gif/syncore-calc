@@ -1,13 +1,12 @@
 import { NavLink, useLocation } from 'react-router-dom'
-import { Calculator, Menu, ScanLine, Scissors, Spline } from 'lucide-react'
+import { Calculator, Menu, ScanLine, Scissors } from 'lucide-react'
 import { cn } from '@/utils/cn'
-import { isMoreRoute } from '@/components/layout/nav'
+import { isMoreRoute, isTurningSection } from '@/components/layout/nav'
 
 const items = [
-  { to: '/milling', label: 'Фреза', icon: Calculator },
-  { to: '/turning', label: 'Токарка', icon: Scissors },
-  { to: '/laser', label: 'Лазер', icon: ScanLine },
-  { to: '/threading', label: 'Резьба', icon: Spline },
+  { to: '/milling', label: 'Фреза', icon: Calculator, match: (path: string) => path.startsWith('/milling') },
+  { to: '/turning', label: 'Токарка', icon: Scissors, match: isTurningSection },
+  { to: '/laser', label: 'Лазер', icon: ScanLine, match: (path: string) => path.startsWith('/laser') },
 ] as const
 
 interface Props {
@@ -19,15 +18,15 @@ export function BottomNav({ onOpenMore }: Props) {
 
   return (
     <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-card/95 px-1 py-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] backdrop-blur lg:hidden">
-      <ul className="grid grid-cols-5">
+      <ul className="grid grid-cols-4">
         {items.map((item) => (
           <li key={item.to}>
             <NavLink
               to={item.to}
-              className={({ isActive }) =>
+              className={() =>
                 cn(
                   'flex flex-col items-center gap-1 rounded-xl px-1 py-1 text-[11px] font-medium text-muted',
-                  isActive && 'text-ink',
+                  item.match(pathname) && 'text-ink',
                 )
               }
             >

@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowRight, ScanLine, Scissors, Sparkles, Spline } from 'lucide-react'
+import { ArrowRight, ScanLine, Scissors, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { QuickCalc } from '@/components/home/QuickCalc'
@@ -11,33 +11,40 @@ export function HomePage() {
       <section className="max-w-3xl">
         <p className="text-sm font-semibold uppercase tracking-[0.16em] text-accent-2">TechCalc</p>
         <h1 className="mt-3 text-3xl font-extrabold tracking-tight md:text-5xl">Инженерные расчёты для производства</h1>
-        <p className="mt-4 text-base text-ink-soft sm:text-lg">Материал и инструмент — режимы для фрезера, токарки и лазера.</p>
-        <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-          <Link to="/milling" className="sm:flex-1 lg:flex-none">
+        <p className="mt-4 text-base text-ink-soft sm:text-lg">
+          Три направления: фрезерование, токарка и лазерная резка. Резьба — внутри токарки.
+        </p>
+        <div className="mt-6 grid gap-3 sm:grid-cols-3">
+          <Link to="/milling">
             <Button variant="graphite" fullWidth>
-              Открыть фрезерование
+              Фрезерование
             </Button>
           </Link>
-          <Link to="/laser" className="sm:flex-1 lg:flex-none">
+          <Link to="/turning">
             <Button variant="outline" fullWidth>
-              Открыть лазер
+              Токарка
+            </Button>
+          </Link>
+          <Link to="/laser">
+            <Button variant="outline" fullWidth>
+              Лазерная резка
             </Button>
           </Link>
         </div>
       </section>
 
-      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <section className="grid gap-4 sm:grid-cols-3">
         <ModuleCard
           icon={<Sparkles className="h-5 w-5" />}
           title="Фрезерование"
-          description="Материал и фреза — обороты, подача и врезание по Z."
+          description="Материал и фреза — обороты, подача XY и врезание по Z."
           to="/milling"
           action="Открыть калькулятор"
         />
         <ModuleCard
           icon={<Scissors className="h-5 w-5" />}
           title="Токарная обработка"
-          description="Материал и резец — обороты и подача для точения."
+          description="Точение, канавка, отрезка и метрическая резьба."
           to="/turning"
           action="Открыть калькулятор"
         />
@@ -46,13 +53,6 @@ export function HomePage() {
           title="Лазерная резка"
           description="Скорость, газ, фокус, пробивка и настройки слоя."
           to="/laser"
-          action="Открыть калькулятор"
-        />
-        <ModuleCard
-          icon={<Spline className="h-5 w-5" />}
-          title="Резьба"
-          description="Метрическая резьба: отверстие, шаг и подача."
-          to="/threading"
           action="Открыть калькулятор"
         />
       </section>

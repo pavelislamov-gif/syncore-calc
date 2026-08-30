@@ -49,7 +49,9 @@ export function TurningPage() {
       <div className="order-2 lg:order-1">
         <p className="text-sm font-semibold uppercase tracking-[0.16em] text-muted">Токарная обработка</p>
         <h1 className="mt-2 text-2xl font-extrabold tracking-tight sm:text-3xl">Режимы точения</h1>
-        <p className="mt-2 text-ink-soft">Материал, затем резец и пластина — справа сразу итог. Значения справочные.</p>
+        <p className="mt-2 text-ink-soft">
+          Материал, затем резец — режимы точения. Нарезание резьбы — отдельная операция в блоке инструмента.
+        </p>
         <div className="mt-6">
           <TurningForm
             state={form.state}

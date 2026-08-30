@@ -1,13 +1,14 @@
-import { Link, NavLink } from 'react-router-dom'
+import { Link, NavLink, useLocation } from 'react-router-dom'
 import { Gauge, Menu } from 'lucide-react'
 import { cn } from '@/utils/cn'
-import { headerLinks } from '@/components/layout/nav'
+import { headerLinks, isTurningSection } from '@/components/layout/nav'
 
 interface Props {
   onOpenMenu: () => void
 }
 
 export function Header({ onOpenMenu }: Props) {
+  const { pathname } = useLocation()
   return (
     <header className="sticky top-0 z-30 border-b border-line/80 bg-paper/90 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 md:px-6">
@@ -26,7 +27,7 @@ export function Header({ onOpenMenu }: Props) {
               className={({ isActive }) =>
                 cn(
                   'rounded-lg px-2.5 py-2 text-sm font-medium text-muted transition-colors hover:text-ink',
-                  isActive && 'bg-white text-ink shadow-sm',
+                  (isActive || (link.to === '/turning' && isTurningSection(pathname))) && 'bg-white text-ink shadow-sm',
                 )
               }
             >

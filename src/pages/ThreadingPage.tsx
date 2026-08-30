@@ -3,6 +3,7 @@ import { ThreadingResultView } from '@/components/threading/ThreadingResultView'
 import { MobileResultBar } from '@/components/layout/MobileResultBar'
 import { useThreadingForm } from '@/hooks/useThreadingForm'
 import { saveFavorite, saveHistoryItem } from '@/services/storage'
+import { Link } from 'react-router-dom'
 import { formatNumber, formatRpm, newId } from '@/utils/format'
 import { scrollToResult } from '@/utils/scroll'
 
@@ -45,10 +46,13 @@ export function ThreadingPage() {
       ) : null}
       <div className="grid gap-8 lg:grid-cols-[minmax(0,26rem)_minmax(0,1fr)] lg:items-start">
       <div className="order-2 lg:order-1">
-        <p className="text-sm font-semibold uppercase tracking-[0.16em] text-muted">Резьба</p>
+        <p className="text-sm font-semibold uppercase tracking-[0.16em] text-muted">Токарная обработка</p>
         <h1 className="mt-2 text-2xl font-extrabold tracking-tight sm:text-3xl">Метрическая резьба</h1>
         <p className="mt-2 text-ink-soft">
-          M3–M30, шаг и отверстие под резьбу. Для резца подача за оборот равна шагу. Дюймовая резьба будет позже.
+          Операция токарки: M3–M30, отверстие под резьбу, подача за оборот равна шагу.{' '}
+          <Link to="/turning" className="font-semibold text-accent-2">
+            К точению
+          </Link>
         </p>
         <div className="mt-6">
           <ThreadingForm
