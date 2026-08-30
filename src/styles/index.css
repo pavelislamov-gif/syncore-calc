@@ -36,6 +36,11 @@ body {
   min-height: 100dvh;
 }
 
+:root {
+  /* Header: py-3 + h-11 menu button + border — keep sticky result bar below this. */
+  --app-header-height: 4.5rem;
+}
+
 button,
 input,
 select,

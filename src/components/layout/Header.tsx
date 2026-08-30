@@ -10,8 +10,8 @@ interface Props {
 export function Header({ onOpenMenu }: Props) {
   const { pathname } = useLocation()
   return (
-    <header className="sticky top-0 z-30 border-b border-line/80 bg-paper/90 backdrop-blur">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 md:px-6">
+    <header className="sticky top-0 z-30 h-[var(--app-header-height)] border-b border-line/80 bg-paper/90 backdrop-blur">
+      <div className="mx-auto flex h-full max-w-6xl items-center justify-between gap-4 px-4 md:px-6">
         <Link to="/" className="flex items-center gap-2 font-extrabold tracking-tight">
           <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-graphite text-white">
             <Gauge className="h-5 w-5" />
