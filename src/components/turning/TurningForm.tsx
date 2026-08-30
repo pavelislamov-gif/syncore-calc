@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom'
 import { turningOperations } from '@/data/formulas/operations'
 import { cutterKinds, getCutterKind } from '@/data/tools/cutters'
-import { groupedInserts, insertsForCategories } from '@/data/inserts'
+import { groupedInserts, getInsert, insertsForCategories } from '@/data/inserts'
+import { InsertDiagram } from '@/components/diagrams/InsertDiagram'
 import { lathePresets } from '@/data/machines/lathes'
 import { materialCategories } from '@/data/materials'
 import { Button } from '@/components/ui/Button'
@@ -43,6 +44,7 @@ export function TurningForm({
   error,
 }: Props) {
   const operation = turningOperations.find((item) => item.id === state.operation)
+  const selectedInsert = getInsert(state.insertId)
   function patch(partial: Partial<TurningFormState>) {
     setState((current) => ({ ...current, ...partial }))
   }
@@ -174,6 +176,7 @@ export function TurningForm({
               ))}
             </Select>
           </label>
+          {selectedInsert ? <InsertDiagram insert={selectedInsert} /> : null}
         </Card>
       )}
 

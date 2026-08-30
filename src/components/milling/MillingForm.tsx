@@ -1,6 +1,7 @@
 import { formatMachineOption, machinePresets } from '@/data/machines'
 import { materialCategories } from '@/data/materials'
 import { coatings, cutterMaterials, endMillTypes } from '@/data/tools'
+import { EndMillDiagram } from '@/components/diagrams/EndMillDiagram'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { Hint } from '@/components/ui/Hint'
@@ -194,6 +195,12 @@ export function MillingForm({
             </label>
           </div>
         )}
+        <EndMillDiagram
+          diameterMm={Number(String(state.diameter).replace(',', '.'))}
+          flutes={Number(state.flutes)}
+          type={state.millType}
+          typeName={endMillTypes.find((item) => item.type === state.millType)?.name ?? 'Концевая'}
+        />
       </Card>
 
       {compact ? null : (
