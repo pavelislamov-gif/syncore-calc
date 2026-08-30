@@ -3,6 +3,7 @@ import { ArrowRight } from 'lucide-react'
 import { BrandWordmark } from '@/components/layout/BrandLogo'
 import { LaserProcessIcon, MillingProcessIcon, TurningProcessIcon } from '@/components/icons/ProcessIcons'
 import { Button } from '@/components/ui/Button'
+import { Card } from '@/components/ui/Card'
 import { SITE } from '@/data/site'
 
 export function HomePage() {
