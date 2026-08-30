@@ -21,6 +21,12 @@ export function SiteFooter() {
           {SITE.phoneLabel}
         </a>
       </p>
+      <p className="mt-3 text-xs">
+        Иконки обработки:{' '}
+        <a href="https://www.flaticon.com/ru" className="text-ink underline-offset-2 hover:underline" target="_blank" rel="noreferrer">
+          Flaticon
+        </a>
+      </p>
     </footer>
   )
 }
