@@ -23,6 +23,25 @@ export function UsagePage() {
   const [busy, setBusy] = useState(false)
 
   useEffect(() => {
+    const robots = document.querySelector('meta[name="robots"]')
+    const previous = robots?.getAttribute('content') ?? ''
+    if (robots) robots.setAttribute('content', 'noindex,nofollow')
+    else {
+      const tag = document.createElement('meta')
+      tag.name = 'robots'
+      tag.content = 'noindex,nofollow'
+      document.head.appendChild(tag)
+    }
+    return () => {
+      const current = document.querySelector('meta[name="robots"]')
+      if (current) {
+        if (previous) current.setAttribute('content', previous)
+        else current.remove()
+      }
+    }
+  }, [])
+
+  useEffect(() => {
     const stored = sessionStorage.getItem(TOKEN_KEY)
     if (stored) void unlock(stored)
   }, [])
@@ -82,10 +101,11 @@ export function UsagePage() {
           }}
         >
           <label className="block">
-            <span className="mb-1.5 block text-sm font-medium text-ink-soft">Пароль</span>
+            <span className="mb-1.5 block text-sm font-medium text-ink-soft">Ключ STATS_TOKEN</span>
             <Input
               type="password"
-              autoComplete="current-password"
+              autoComplete="off"
+              name="stats-token"
               value={draft}
               onChange={(event) => setDraft(event.target.value)}
               invalid={Boolean(error)}

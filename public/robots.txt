@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /usage
 
 Sitemap: https://syncore54.ru/sitemap.xml
