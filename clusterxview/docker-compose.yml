@@ -1,0 +1,44 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: clusterxview
+      POSTGRES_PASSWORD: clusterxview
+      POSTGRES_DB: clusterxview
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U clusterxview"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://clusterxview:clusterxview@db:5432/clusterxview
+      JWT_SECRET: ${JWT_SECRET:-change-me-in-production}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000,http://127.0.0.1:3000}
+      SEED_DEMO: ${SEED_DEMO:-true}
+      DOCUMENTS_DIR: /data/documents
+      BACKUPS_DIR: /data/backups
+    volumes:
+      - documents:/data/documents
+      - backups:/data/backups
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
+  documents:
+  backups:
