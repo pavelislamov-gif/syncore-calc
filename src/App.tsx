@@ -1,4 +1,6 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
+import { PageMeta } from '@/components/seo/PageMeta'
+import { routePathVariants } from '@/data/seo'
 import { AppLayout } from '@/layouts/AppLayout'
 import { FavoritesPage } from '@/pages/FavoritesPage'
 import { HistoryPage } from '@/pages/HistoryPage'
@@ -11,24 +13,32 @@ import { ThreadingPage } from '@/pages/ThreadingPage'
 import { ToolsPage } from '@/pages/ToolsPage'
 import { TurningPage } from '@/pages/TurningPage'
 import { UsagePage } from '@/pages/UsagePage'
+import type { ReactNode } from 'react'
+
+function spaRoutes(path: string, element: ReactNode) {
+  return routePathVariants(path).map((variant) => <Route key={variant} path={variant} element={element} />)
+}
 
 export default function App() {
   return (
-    <Routes>
-      <Route element={<AppLayout />}>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/milling" element={<MillingPage />} />
-        <Route path="/turning" element={<TurningPage />} />
-        <Route path="/threading" element={<ThreadingPage />} />
-        <Route path="/laser" element={<LaserPage />} />
-        <Route path="/materials" element={<MaterialsPage />} />
-        <Route path="/tools" element={<ToolsPage />} />
-        <Route path="/history" element={<HistoryPage />} />
-        <Route path="/favorites" element={<FavoritesPage />} />
-        <Route path="/pro" element={<ProPage />} />
-        <Route path="/usage" element={<UsagePage />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Route>
-    </Routes>
+    <>
+      <PageMeta />
+      <Routes>
+        <Route element={<AppLayout />}>
+          {spaRoutes('/', <HomePage />)}
+          {spaRoutes('/milling', <MillingPage />)}
+          {spaRoutes('/turning', <TurningPage />)}
+          {spaRoutes('/threading', <ThreadingPage />)}
+          {spaRoutes('/laser', <LaserPage />)}
+          {spaRoutes('/materials', <MaterialsPage />)}
+          {spaRoutes('/tools', <ToolsPage />)}
+          {spaRoutes('/history', <HistoryPage />)}
+          {spaRoutes('/favorites', <FavoritesPage />)}
+          {spaRoutes('/pro', <ProPage />)}
+          {spaRoutes('/usage', <UsagePage />)}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Route>
+      </Routes>
+    </>
   )
 }
