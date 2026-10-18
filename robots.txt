@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://syncore54.ru/sitemap.xml
