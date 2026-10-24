@@ -25,7 +25,7 @@
       href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&family=Unbounded:wght@500;600&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=65" />
+    <link rel="stylesheet" href="styles.css?v=66" />
   </head>
   <body>
     <div class="glow" aria-hidden="true"></div>
@@ -56,7 +56,6 @@
         </p>
         <div class="film-frame">
           <video
-            src="video/syncore-system.mp4"
             width="1080"
             height="1920"
             muted
@@ -65,8 +64,12 @@
             controls
             preload="metadata"
           >
-            <a href="video/syncore-system.mp4">Открыть ролик</a>
+            <source src="video/syncore-system.mp4" type="video/mp4" />
           </video>
+          <p class="film-fallback" hidden>
+            Ролик не загрузился.
+            <a href="video/syncore-system.mp4">Открыть файл</a>
+          </p>
         </div>
       </section>
       <section class="then-now" id="then-now" aria-label="До и после SYNCORE">

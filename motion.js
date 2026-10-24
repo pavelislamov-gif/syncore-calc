@@ -42,11 +42,18 @@
   nodes.forEach((el) => io.observe(el));
 
   const film = document.querySelector(".film-frame video");
+  const filmFail = document.querySelector(".film-fallback");
   if (film) {
     const play = () => {
       const pending = film.play();
       if (pending) pending.catch(() => {});
     };
+    film.addEventListener("error", () => {
+      if (filmFail) filmFail.hidden = false;
+    });
+    film.addEventListener("loadeddata", () => {
+      if (filmFail) filmFail.hidden = true;
+    });
     const vo = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {

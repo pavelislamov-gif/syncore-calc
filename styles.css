@@ -147,6 +147,17 @@ body {
   background: #0a0a0a;
 }
 
+.film-fallback {
+  margin: 0;
+  padding: 1.1rem 1.2rem 1.2rem;
+  color: var(--muted);
+  text-align: center;
+}
+
+.film-fallback a {
+  color: var(--orange);
+}
+
 .hero h1 span,
 .compare h2 span,
 .offer h2 span,
