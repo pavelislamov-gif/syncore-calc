@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SYNCORE — схема системы</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Unbounded:wght@700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        background: #0a0a0a;
+      }
+      body {
+        display: grid;
+        place-items: center;
+      }
+      canvas {
+        height: 100vh;
+        width: auto;
+        max-width: 100vw;
+        background: #0a0a0a;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="c" width="1080" height="1920"></canvas>
+    <script>
+      const W = 1080;
+      const H = 1920;
+      const BG = "#0A0A0A";
+      const PANEL = "#141414";
+      const ORANGE = "#FF8A00";
+      const GREEN = "#3DDC97";
+      const DURATION = 37.5;
+      const LIGHT = "#F2F2F2";
+      const MUTED = "#A3A3A3";
+
+      const MAIN = { x: 540, y: 1160, w: 400, h: 292 };
+      const ST = { w: 200, h: 148 };
+      const stations = [
+        { kind: "laser", x: 540, y: 470, fill: 1, report: true },
+        { kind: "bend", x: 158, y: 830, fill: 1, report: true },
+        { kind: "weld", x: 922, y: 830, fill: 1, report: true },
+        { kind: "powder", x: 158, y: 1560, fill: 1, report: true },
+        { kind: "assembly", x: 922, y: 1560, fill: 1, report: true },
+      ];
+
+      const canvas = document.getElementById("c");
+      const ctx = canvas.getContext("2d");
+
+      function clamp01(v) {
+        return v < 0 ? 0 : v > 1 ? 1 : v;
+      }
+      function seg(t, a, b) {
+        return clamp01((t - a) / (b - a));
+      }
+      function lerp(a, b, t) {
+        return a + (b - a) * t;
+      }
+      function easeOut(t) {
+        t = clamp01(t);
+        return 1 - (1 - t) * (1 - t);
+      }
+      function easeInOut(t) {
+        t = clamp01(t);
+        return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+      }
+      function fade(t, a, b) {
+        return easeOut(seg(t, a, b));
+      }
+
+      function roundRect(x, y, w, h, r) {
+        const radius = Math.max(0, Math.min(r, w / 2, h / 2));
+        ctx.beginPath();
+        ctx.moveTo(x + radius, y);
+        ctx.arcTo(x + w, y, x + w, y + h, radius);
+        ctx.arcTo(x + w, y + h, x, y + h, radius);
+        ctx.arcTo(x, y + h, x, y, radius);
+        ctx.arcTo(x, y, x + w, y, radius);
+        ctx.closePath();
+      }
+
+      function edgePoint(cx, cy, w, h, tx, ty, gap) {
+        const dx = tx - cx;
+        const dy = ty - cy;
+        const ax = Math.abs(dx);
+        const ay = Math.abs(dy);
+        const hw = w / 2;
+        const hh = h / 2;
+        const scale = ax < 0.001 && ay < 0.001 ? 0 : Math.min(hw / (ax || 1e-6), hh / (ay || 1e-6));
+        const len = Math.hypot(dx, dy) || 1;
+        return {
+          x: cx + dx * scale + (dx / len) * gap,
+          y: cy + dy * scale + (dy / len) * gap,
+        };
+      }
+
+      function pointAlong(points, t) {
+        const lengths = [];
+        let total = 0;
+        for (let i = 1; i < points.length; i++) {
+          const d = Math.hypot(points[i].x - points[i - 1].x, points[i].y - points[i - 1].y);
+          lengths.push(d);
+          total += d;
+        }
+        let remain = clamp01(t) * total;
+        for (let i = 1; i < points.length; i++) {
+          const span = lengths[i - 1];
+          if (remain <= span || i === points.length - 1) {
+            const k = span === 0 ? 0 : Math.min(1, remain / span);
+            return {
+              x: lerp(points[i - 1].x, points[i].x, k),
+              y: lerp(points[i - 1].y, points[i].y, k),
+            };
+          }
+          remain -= span;
+        }
+        return points[points.length - 1];
+      }
+
+      function routeOf(station) {
+        const dx = station.x - MAIN.x;
+        if (Math.abs(dx) < 80) {
+          return [
+            edgePoint(MAIN.x, MAIN.y, MAIN.w, MAIN.h, station.x, station.y, 0),
+            edgePoint(station.x, station.y, ST.w, ST.h, MAIN.x, MAIN.y, 0),
+          ];
+        }
+        const side = dx < 0 ? -1 : 1;
+        const above = station.y < MAIN.y;
+        const from = {
+          x: MAIN.x + side * (MAIN.w / 2),
+          y: MAIN.y + (above ? -48 : 48),
+        };
+        const to = {
+          x: station.x,
+          y: station.y + (above ? ST.h / 2 : -ST.h / 2),
+        };
+        return [from, { x: to.x, y: from.y }, to];
+      }
+
+      function strokeRoute(points, t) {
+        const lengths = [];
+        let total = 0;
+        for (let i = 1; i < points.length; i++) {
+          const d = Math.hypot(points[i].x - points[i - 1].x, points[i].y - points[i - 1].y);
+          lengths.push(d);
+          total += d;
+        }
+        let remain = clamp01(t) * total;
+        ctx.beginPath();
+        ctx.moveTo(points[0].x, points[0].y);
+        for (let i = 1; i < points.length; i++) {
+          const span = lengths[i - 1];
+          if (remain >= span - 0.01 && i < points.length - 1) {
+            ctx.lineTo(points[i].x, points[i].y);
+            remain -= span;
+            continue;
+          }
+          const k = span === 0 ? 0 : Math.min(1, remain / span);
+          ctx.lineTo(
+            lerp(points[i - 1].x, points[i].x, k),
+            lerp(points[i - 1].y, points[i].y, k)
+          );
+          break;
+        }
+        ctx.stroke();
+      }
+
+      function appearAt(index) {
+        return 7.35 + index * 0.26;
+      }
+
+      function lineStart(index) {
+        return appearAt(index) + 0.2;
+      }
+
+      function lineEnd(index) {
+        return lineStart(index) + 0.95;
+      }
+
+      function docFade(index) {
+        return 2.6 + index * 0.18;
+      }
+
+      function docMove(index) {
+        return 4.15 + index * 0.36;
+      }
+
+      function docArrive(index) {
+        return docMove(index) + 1.15;
+      }
+
+      function cardDepart(index) {
+        return 9.75 + index * 0.36;
+      }
+
+      function cardArrive(index) {
+        return cardDepart(index) + 1.7;
+      }
+
+      function fillStart(index) {
+        return cardArrive(index) + 0.2;
+      }
+
+      function reportStart(index) {
+        return 27.35 + index * 0.26;
+      }
+
+      function reportEnd(index) {
+        return reportStart(index) + 1.2;
+      }
+
+      function hoverPos(index) {
+        return {
+          x: MAIN.x + (index - 2) * 76,
+          y: MAIN.y - MAIN.h / 2 - 46,
+        };
+      }
+
+      function localProgress(station, index, t) {
+        if (t < cardArrive(index)) return 0;
+        return station.fill * easeInOut(seg(t, fillStart(index), fillStart(index) + 1.85));
+      }
+
+      function hubProgress(station, index, t) {
+        return station.fill * easeInOut(seg(t, reportEnd(index) - 0.12, reportEnd(index) + 0.35));
+      }
+
+      function drawIcon(kind, x, y, size, alpha, accent) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.scale(size / 64, size / 64);
+        ctx.globalAlpha *= alpha;
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
+        ctx.lineWidth = 5.2;
+        const metal = LIGHT;
+        const quiet = MUTED;
+        const hot = accent ? ORANGE : LIGHT;
+        ctx.strokeStyle = metal;
+        ctx.fillStyle = metal;
+
+        if (kind === 'laser') {
+          ctx.strokeStyle = quiet;
+          ctx.lineWidth = 4.8;
+          ctx.beginPath();
+          ctx.moveTo(-30, -28);
+          ctx.lineTo(30, -28);
+          ctx.stroke();
+          ctx.fillStyle = quiet;
+          roundRect(-9, -30, 18, 10, 2);
+          ctx.fill();
+          ctx.strokeStyle = hot;
+          ctx.lineWidth = 6;
+          ctx.beginPath();
+          ctx.moveTo(0, -20);
+          ctx.lineTo(0, 8);
+          ctx.stroke();
+          ctx.strokeStyle = metal;
+          ctx.lineWidth = 5;
+          ctx.strokeRect(-28, 8, 56, 16);
+          ctx.strokeStyle = BG;
+          ctx.lineWidth = 4.6;
+          ctx.beginPath();
+          ctx.moveTo(0, 8);
+          ctx.lineTo(0, 24);
+          ctx.stroke();
+          ctx.fillStyle = hot;
+          ctx.beginPath();
+          ctx.arc(0, 8, 3.3, 0, Math.PI * 2);
+          ctx.fill();
+        } else if (kind === 'bend') {
+          ctx.strokeStyle = metal;
+          ctx.lineWidth = 7;
+          ctx.beginPath();
+          ctx.moveTo(-24, -20);
+          ctx.lineTo(-24, 8);
+          ctx.lineTo(28, 8);
+          ctx.stroke();
+          ctx.fillStyle = hot;
+          ctx.beginPath();
+          ctx.moveTo(-34, -6);
+          ctx.lineTo(-16, -6);
+          ctx.lineTo(-24, 8);
+          ctx.closePath();
+          ctx.fill();
+        } else if (kind === 'weld') {
+          ctx.strokeRect(-32, -2, 30, 24);
+          ctx.strokeRect(2, -28, 24, 30);
+          ctx.fillStyle = hot;
+          ctx.beginPath();
+          ctx.arc(1, -2, 5.2, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.strokeStyle = hot;
+          ctx.lineWidth = 4.2;
+          ctx.beginPath();
+          ctx.moveTo(12, -16);
+          ctx.lineTo(21, -24);
+          ctx.moveTo(16, -2);
+          ctx.lineTo(27, -6);
+          ctx.moveTo(8, 8);
+          ctx.lineTo(16, 16);
+          ctx.stroke();
+        } else if (kind === 'powder') {
+          ctx.strokeRect(10, -30, 20, 58);
+          ctx.strokeRect(-32, -8, 18, 14);
+          ctx.beginPath();
+          ctx.moveTo(-14, -8);
+          ctx.lineTo(-5, -1);
+          ctx.lineTo(-14, 6);
+          ctx.stroke();
+          ctx.fillStyle = hot;
+          [
+            [-1, -16, 3.5],
+            [4, -2, 3.6],
+            [0, 12, 3.3],
+            [5, 24, 2.8],
+          ].forEach(([dx, dy, r]) => {
+            ctx.beginPath();
+            ctx.arc(dx, dy, r, 0, Math.PI * 2);
+            ctx.fill();
+          });
+        } else {
+          ctx.strokeRect(-30, 8, 56, 18);
+          ctx.strokeRect(-14, -26, 36, 22);
+          ctx.strokeStyle = quiet;
+          ctx.strokeRect(-32, -14, 14, 14);
+          ctx.fillStyle = hot;
+          ctx.beginPath();
+          ctx.arc(2, 4, 5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+
+      function drawBadge(kind, x, y, alpha, accent) {
+        ctx.save();
+        ctx.globalAlpha *= alpha;
+        ctx.fillStyle = PANEL;
+        ctx.strokeStyle = accent ? ORANGE : 'rgba(163,163,163,0.75)';
+        ctx.lineWidth = 2.8;
+        roundRect(x - 26, y - 26, 52, 52, 7);
+        ctx.fill();
+        ctx.stroke();
+        drawIcon(kind, x, y, 36, 1, accent);
+        ctx.restore();
+      }
+
+      function drawBar(x, y, w, h, p) {
+        ctx.fillStyle = "rgba(163,163,163,0.72)";
+        roundRect(x, y, w, h, h / 2);
+        ctx.fill();
+        if (p > 0.012) {
+          ctx.fillStyle = ORANGE;
+          roundRect(x, y, Math.max(h, w * Math.min(1, p)), h, h / 2);
+          ctx.fill();
+        }
+      }
+
+      function drawCheck(x, y, s, alpha) {
+        if (alpha <= 0.01) return;
+        ctx.save();
+        ctx.globalAlpha *= alpha;
+        ctx.strokeStyle = ORANGE;
+        ctx.lineWidth = Math.max(2.6, s * 0.2);
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        ctx.beginPath();
+        ctx.arc(x, y, s * 0.5, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x - s * 0.22, y + s * 0.02);
+        ctx.lineTo(x - s * 0.05, y + s * 0.18);
+        ctx.lineTo(x + s * 0.24, y - s * 0.16);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      function drawStand(cx, bottom, framed) {
+        ctx.fillStyle = PANEL;
+        ctx.strokeStyle = "rgba(163,163,163,0.85)";
+        ctx.lineWidth = 2.6;
+        roundRect(cx - 8, bottom, 16, 16, 2);
+        ctx.fill();
+        if (framed) ctx.stroke();
+        roundRect(cx - 36, bottom + 14, 72, 8, 2);
+        ctx.fill();
+        if (framed) ctx.stroke();
+      }
+
+      function drawShell(x, y, w, h, alpha, hub) {
+        ctx.save();
+        ctx.globalAlpha *= alpha;
+        const left = x - w / 2;
+        const top = y - h / 2;
+        const pad = hub ? 14 : 10;
+        ctx.fillStyle = PANEL;
+        ctx.strokeStyle = ORANGE;
+        ctx.lineWidth = hub ? 6 : 5;
+        roundRect(left, top, w, h, hub ? 12 : 8);
+        ctx.fill();
+        ctx.stroke();
+        ctx.fillStyle = BG;
+        ctx.strokeStyle = "rgba(242,242,242,0.14)";
+        ctx.lineWidth = 2.6;
+        roundRect(left + pad, top + pad, w - pad * 2, h - pad * 2, 4);
+        ctx.fill();
+        ctx.stroke();
+        drawStand(x, top + h, true);
+        ctx.restore();
+        return { x: left + pad, y: top + pad, w: w - pad * 2, h: h - pad * 2 };
+      }
+
+      function drawHubWidgets(screen, t) {
+        const a = fade(t, 5.6, 6.7);
+        if (a <= 0) return;
+        ctx.save();
+        ctx.globalAlpha *= a;
+        const chartX = screen.x + 168;
+        const base = screen.y + screen.h - 28;
+        const heights = [46, 78, 58, 96, 70];
+        heights.forEach((h, i) => {
+          const grow = fade(t, 5.6 + i * 0.1, 6.55 + i * 0.1);
+          ctx.fillStyle = i % 2 === 0 ? ORANGE : "rgba(242,242,242,0.85)";
+          roundRect(chartX + i * 28, base - h * grow, 16, Math.max(2, h * grow), 2);
+          ctx.fill();
+        });
+        const blocks = [
+          { w: 70, y: 8 },
+          { w: 46, y: 8 },
+          { w: 92, y: 40 },
+        ];
+        blocks.forEach((b, i) => {
+          ctx.globalAlpha = a * fade(t, 5.6 + i * 0.12, 6.45 + i * 0.12);
+          ctx.fillStyle = i === 2 ? "rgba(255,138,0,0.85)" : "rgba(242,242,242,0.16)";
+          roundRect(chartX, screen.y + b.y, b.w * fade(t, 5.6 + i * 0.12, 6.5 + i * 0.12), 18, 3);
+          ctx.fill();
+        });
+        ctx.restore();
+      }
+
+      function slotGeom(screen, index) {
+        const rowH = 46;
+        return {
+          x: screen.x + 8,
+          y: screen.y + 8 + index * (rowH + 6),
+          w: 142,
+          h: rowH,
+        };
+      }
+
+      function drawHubTasks(screen, t) {
+        stations.forEach((s, i) => {
+          const shown = fade(t, docArrive(i) + 0.04, docArrive(i) + 0.45);
+          if (shown <= 0) return;
+          const slot = slotGeom(screen, i);
+          const p = hubProgress(s, i, t);
+          const depart = cardDepart(i);
+          const sent = fade(t, depart, depart + 0.25) * (1 - fade(t, depart + 0.25, depart + 0.7));
+          const got =
+            fade(t, reportEnd(i) - 0.12, reportEnd(i) + 0.12) *
+            (1 - fade(t, reportEnd(i) + 0.2, reportEnd(i) + 0.7));
+          ctx.save();
+          ctx.globalAlpha *= shown;
+          ctx.fillStyle = "rgba(242,242,242,0.045)";
+          roundRect(slot.x, slot.y, slot.w, slot.h, 4);
+          ctx.fill();
+          drawIcon(s.kind, slot.x + 18, slot.y + slot.h / 2, 26, 1, p > 0.05);
+          drawBar(slot.x + 36, slot.y + slot.h / 2 - 4, 66, 8, p);
+          if (p > 0.82) drawCheck(slot.x + slot.w - 16, slot.y + slot.h / 2, 15, clamp01((p - 0.82) / 0.18));
+          const doneEdge = clamp01((p - 0.86) / 0.14);
+          if (doneEdge > 0.02) {
+            ctx.save();
+            ctx.globalAlpha *= doneEdge;
+            ctx.strokeStyle = GREEN;
+            ctx.lineWidth = 3.2;
+            roundRect(slot.x, slot.y, slot.w, slot.h, 4);
+            ctx.stroke();
+            ctx.restore();
+          }
+          const ring = Math.max(sent, got);
+          if (ring > 0.02) {
+            ctx.globalAlpha *= ring;
+            ctx.strokeStyle = ORANGE;
+            ctx.lineWidth = 3;
+            roundRect(slot.x, slot.y, slot.w, slot.h, 4);
+            ctx.stroke();
+          }
+          ctx.restore();
+        });
+      }
+
+      function retractAt(index) {
+        return 29.8 + index * 0.08;
+      }
+
+      function lineAmount(index, t) {
+        const grown = easeOut(seg(t, lineStart(index), lineEnd(index)));
+        const retractStart = retractAt(index);
+        const back = easeInOut(seg(t, retractStart, retractStart + 0.95));
+        return grown * (1 - back);
+      }
+
+      function drawLine(station, t, index) {
+        const a = lineAmount(index, t);
+        if (a <= 0.01) return;
+        const points = routeOf(station);
+        ctx.save();
+        ctx.strokeStyle = ORANGE;
+        ctx.globalAlpha = 0.95;
+        ctx.lineWidth = 6.5;
+        ctx.lineCap = "square";
+        ctx.lineJoin = "miter";
+        strokeRoute(points, a);
+        const tip = pointAlong(points, a);
+        ctx.fillStyle = ORANGE;
+        ctx.beginPath();
+        ctx.arc(tip.x, tip.y, 5.2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      function drawPulse(from, to, u, radius, alpha) {
+        if (alpha <= 0.01 || u <= 0 || u >= 1) return;
+        const x = lerp(from.x, to.x, u);
+        const y = lerp(from.y, to.y, u);
+        for (let i = 4; i >= 1; i--) {
+          const k = i / 4;
+          const px = lerp(from.x, to.x, Math.max(0, u - k * 0.07));
+          const py = lerp(from.y, to.y, Math.max(0, u - k * 0.07));
+          ctx.fillStyle = ORANGE;
+          ctx.globalAlpha = alpha * (0.18 * (1 - k));
+          ctx.beginPath();
+          ctx.arc(px, py, radius * (1.15 - k * 0.2), 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = ORANGE;
+        ctx.beginPath();
+        ctx.arc(x, y, radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = LIGHT;
+        ctx.beginPath();
+        ctx.arc(x, y, radius * 0.38, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 1;
+      }
+
+      function drawConnectPulse(station, t, index) {
+        const start = appearAt(index) + 0.3;
+        const end = start + 0.2;
+        const u = easeInOut(seg(t, start, end));
+        if (u <= 0 || u >= 1) return;
+        const { from, to } = routeOf(station);
+        const alpha = u < 0.9 ? 1 : 1 - (u - 0.9) / 0.1;
+        drawPulse(from, to, u, 5, alpha);
+      }
+
+      function drawReturnPulse(t) {
+        const u = easeInOut(seg(t, 6.82, 7.52));
+        if (u <= 0 || u >= 1) return;
+        const { from, to } = routeOf(stations[2]);
+        const alpha = u < 0.9 ? 1 : 1 - (u - 0.9) / 0.1;
+        drawPulse(to, from, u, 5.5, alpha);
+      }
+
+      function drawTraffic(t) {
+        const trips = [
+          { index: 0, a: 8.12, b: 8.78, back: false },
+          { index: 1, a: 8.36, b: 9.02, back: true },
+          { index: 4, a: 8.6, b: 9.28, back: false },
+        ];
+        trips.forEach((trip) => {
+          const u = easeInOut(seg(t, trip.a, trip.b));
+          if (u <= 0 || u >= 1) return;
+          const { from, to } = routeOf(stations[trip.index]);
+          const alpha = u < 0.88 ? 1 : 1 - (u - 0.88) / 0.12;
+          if (trip.back) drawPulse(to, from, u, 4.2, alpha);
+          else drawPulse(from, to, u, 4.2, alpha);
+        });
+      }
+
+      function screenOf(station) {
+        const pad = 10;
+        return {
+          x: station.x - ST.w / 2 + pad,
+          y: station.y - ST.h / 2 + pad,
+          w: ST.w - pad * 2,
+          h: ST.h - pad * 2,
+        };
+      }
+
+      function drawSheet(x, y, kind, scale, alpha, variant, progress) {
+        if (alpha <= 0.01 || scale <= 0.02) return;
+        const w = 74 * scale;
+        const h = 92 * scale;
+        const fold = 16 * scale;
+        ctx.save();
+        ctx.globalAlpha *= alpha;
+        ctx.translate(x, y);
+        ctx.fillStyle = PANEL;
+        const done = clamp01((progress - 0.72) / 0.28);
+        ctx.lineWidth = (done > 0.02 ? 4.6 : 3.6) * Math.max(0.9, scale);
+        const strokeOutline = () => {
+          ctx.beginPath();
+          ctx.moveTo(-w / 2, -h / 2);
+          ctx.lineTo(w / 2 - fold, -h / 2);
+          ctx.lineTo(w / 2, -h / 2 + fold);
+          ctx.lineTo(w / 2, h / 2);
+          ctx.lineTo(-w / 2, h / 2);
+          ctx.closePath();
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(w / 2 - fold, -h / 2);
+          ctx.lineTo(w / 2 - fold, -h / 2 + fold);
+          ctx.lineTo(w / 2, -h / 2 + fold);
+          ctx.stroke();
+        };
+        ctx.beginPath();
+        ctx.moveTo(-w / 2, -h / 2);
+        ctx.lineTo(w / 2 - fold, -h / 2);
+        ctx.lineTo(w / 2, -h / 2 + fold);
+        ctx.lineTo(w / 2, h / 2);
+        ctx.lineTo(-w / 2, h / 2);
+        ctx.closePath();
+        ctx.fill();
+        ctx.strokeStyle = "rgba(242,242,242,0.9)";
+        strokeOutline();
+        if (done > 0.02) {
+          ctx.save();
+          ctx.globalAlpha *= done;
+          ctx.strokeStyle = GREEN;
+          strokeOutline();
+          ctx.restore();
+        }
+        if (variant === "change") {
+          ctx.save();
+          ctx.strokeStyle = ORANGE;
+          ctx.lineWidth = Math.max(4.2, 5 * scale);
+          strokeOutline();
+          ctx.restore();
+        } else if (variant === "report") {
+          drawIcon(kind, 0, -16 * scale, 28 * scale, 1, true);
+          drawCheck(0, 18 * scale, 16 * scale, 1);
+        } else if (variant === "doc") {
+          drawIcon(kind, 0, 2 * scale, 34 * scale, 1, true);
+        } else {
+          drawIcon(kind, 0, -14 * scale, 30 * scale, 1, true);
+          drawBar(-28 * scale, 16 * scale, 56 * scale, 12 * scale, progress);
+          if (progress > 0.82) drawCheck(0, 34 * scale, 12 * scale, clamp01((progress - 0.82) / 0.18));
+        }
+        ctx.restore();
+      }
+
+      function drawIntake(t, screen) {
+        stations.forEach((s, i) => {
+          const shown = fade(t, docFade(i), docFade(i) + 0.75);
+          if (shown <= 0 || t >= docArrive(i)) return;
+          const hover = hoverPos(i);
+          const slot = slotGeom(screen, i);
+          const end = { x: slot.x + 24, y: slot.y + slot.h / 2 };
+          let pos = hover;
+          let scale = 0.86;
+          let alpha = shown;
+          if (t >= docMove(i)) {
+            const u = easeInOut(seg(t, docMove(i), docArrive(i)));
+            const door = edgePoint(MAIN.x, MAIN.y, MAIN.w, MAIN.h, hover.x, hover.y, 0);
+            pos = pointAlong([hover, door, end], u);
+            if (u > 0.72) scale = lerp(0.86, 0.4, (u - 0.72) / 0.28);
+            if (u > 0.84) alpha = shown * (1 - (u - 0.84) / 0.16);
+          }
+          drawSheet(pos.x, pos.y, s.kind, scale, alpha, "doc", 0);
+        });
+      }
+
+      function drawOutbound(t, screen) {
+        stations.forEach((s, i) => {
+          const depart = cardDepart(i);
+          const arrive = cardArrive(i);
+          if (t < depart || t >= reportStart(i)) return;
+          const travel = t >= arrive ? 1 : easeInOut(seg(t, depart, arrive));
+          const slot = slotGeom(screen, i);
+          const start = { x: slot.x + slot.w / 2, y: slot.y + slot.h / 2 };
+          const land = screenOf(s);
+          const end = { x: land.x + land.w / 2, y: land.y + land.h / 2 + 4 };
+          const pos = pointAlong([start, ...routeOf(s), end], travel);
+          const scale = travel < 0.16 ? lerp(0.5, 1, travel / 0.16) : travel < 0.78 ? 1 : lerp(1, 0.92, (travel - 0.78) / 0.22);
+          drawSheet(pos.x, pos.y, s.kind, scale, 1, "task", localProgress(s, i, t));
+          if (travel > 0.74 && travel < 1) {
+            ctx.save();
+            ctx.globalAlpha = 1 - (travel - 0.74) / 0.26;
+            ctx.strokeStyle = ORANGE;
+            ctx.lineWidth = 4;
+            roundRect(land.x + 3, land.y + 3, land.w - 6, land.h - 6, 3);
+            ctx.stroke();
+            ctx.restore();
+          }
+        });
+      }
+
+      function drawReports(t, screen) {
+        stations.forEach((s, i) => {
+          const a = reportStart(i);
+          const b = reportEnd(i);
+          if (t < a || t > b) return;
+          const u = easeInOut(seg(t, a, b));
+          const land = screenOf(s);
+          const start = { x: land.x + land.w / 2, y: land.y + land.h / 2 };
+          const slot = slotGeom(screen, i);
+          const end = { x: slot.x + slot.w / 2, y: slot.y + slot.h / 2 };
+          const pos = pointAlong([start, ...routeOf(s).slice().reverse(), end], u);
+          let scale = 1;
+          if (u < 0.16) scale = lerp(0.72, 1, u / 0.16);
+          else if (u > 0.8) scale = lerp(1, 0.42, (u - 0.8) / 0.2);
+          const alpha = u < 0.06 ? u / 0.06 : u > 0.9 ? 1 - (u - 0.9) / 0.1 : 1;
+          drawSheet(pos.x, pos.y, s.kind, scale, alpha, "task", s.fill);
+        });
+      }
+
+      const DOC_WORDS = [
+        { text: "Изделия", color: LIGHT },
+        { text: "Детали", color: LIGHT },
+        { text: "Чертежи", color: LIGHT },
+        { text: "= Задачи", color: ORANGE },
+      ];
+
+      function drawDocWords(t) {
+        const start = 4.15;
+        const slot = 0.7;
+        const last = DOC_WORDS.length - 1;
+        const index = Math.floor((t - start) / slot);
+        let wordIndex = index;
+        let alpha = 1;
+        if (index < 0) return;
+        if (index < last) {
+          const local = t - start - index * slot;
+          if (local < 0.18) alpha = easeOut(local / 0.18);
+          else if (local > 0.46) alpha = 1 - easeOut((local - 0.46) / 0.22);
+        } else {
+          const shownAt = start + last * slot;
+          const fadeOutAt = lineStart(0) - 0.08;
+          wordIndex = last;
+          if (t < shownAt + 0.18) alpha = easeOut((t - shownAt) / 0.18);
+          else if (t > fadeOutAt) alpha = 1 - easeOut(Math.min(1, (t - fadeOutAt) / 0.32));
+        }
+        if (alpha <= 0.01) return;
+        const word = DOC_WORDS[wordIndex];
+        const textY = 860;
+        const size = 136;
+        const iconY = textY - 36 - 28 - size / 2;
+        drawPng(DOC_ICONS[wordIndex], W / 2, iconY, size, alpha, 0);
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = word.color;
+        ctx.font = "700 72px Unbounded, sans-serif";
+        ctx.letterSpacing = "0px";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(word.text, W / 2, textY);
+        ctx.restore();
+      }
+
+      const FINISH_WORDS = [
+        { text: "Задачи выполнены", color: GREEN },
+        { text: "Фиксация расхода", color: LIGHT },
+        { text: "Печать документа", color: ORANGE },
+      ];
+
+      function drawFinishWords(t) {
+        const start = 31.15;
+        const slot = 1.05;
+        const index = Math.floor((t - start) / slot);
+        if (index < 0 || index >= FINISH_WORDS.length) return;
+        const local = t - start - index * slot;
+        let alpha = 1;
+        if (local < 0.24) alpha = easeOut(local / 0.24);
+        else if (local > 0.68) alpha = 1 - easeOut((local - 0.68) / 0.32);
+        const word = FINISH_WORDS[index];
+        const textY = 860;
+        const size = 136;
+        const iconY = textY - 36 - 28 - size / 2;
+        drawPng(FINISH_ICONS[index], W / 2, iconY, size, alpha, 0);
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = word.color;
+        ctx.font = "700 72px Unbounded, sans-serif";
+        ctx.letterSpacing = "0px";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(word.text, W / 2, textY);
+        ctx.restore();
+      }
+
+      const CHANGES = [0, 1, 2];
+
+      function changeMove(index) {
+        return 15.05 + index * 0.16;
+      }
+
+      function changeArrive(index) {
+        return changeMove(index) + 0.72;
+      }
+
+      function changeDepart(index) {
+        return 17.95 + index * 0.24;
+      }
+
+      function changeLand(index) {
+        return changeDepart(index) + 1.15;
+      }
+
+      function changeHome(index) {
+        return {
+          x: MAIN.x + (index - 1) * 96,
+          y: MAIN.y + MAIN.h / 2 + 108,
+        };
+      }
+
+      function drawPng(img, x, y, size, alpha, rotation) {
+        if (!img.complete || !img.naturalWidth || alpha <= 0.02) return;
+        ctx.save();
+        ctx.translate(x, y);
+        if (rotation) ctx.rotate(rotation);
+        ctx.globalAlpha *= alpha;
+        ctx.drawImage(img, -size / 2, -size / 2, size, size);
+        ctx.restore();
+      }
+
+      function bellAt(index) {
+        return changeDepart(0) + index * 0.62;
+      }
+
+      function drawMessages(t) {
+        const trips = [
+          { index: 0, back: false, a: 21.25 },
+          { index: 2, back: true, a: 22.2 },
+          { index: 1, back: false, a: 23.15 },
+          { index: 4, back: true, a: 24.1 },
+          { index: 3, back: false, a: 25.05 },
+        ];
+        const dur = 1.75;
+        trips.forEach((trip) => {
+          const u = easeInOut(seg(t, trip.a, trip.a + dur));
+          if (u <= 0 || u >= 1) return;
+          const station = stations[trip.index];
+          const route = routeOf(station);
+          const hub = { x: MAIN.x, y: MAIN.y };
+          const screen = screenOf(station);
+          const end = { x: screen.x + screen.w / 2, y: screen.y + screen.h / 2 };
+          const path = trip.back ? [end, ...route.slice().reverse(), hub] : [hub, ...route, end];
+          const pos = pointAlong(path, u);
+          const alpha = u < 0.08 ? u / 0.08 : u > 0.9 ? 1 - (u - 0.9) / 0.1 : 1;
+          drawPng(messageIcon, pos.x, pos.y, 86, alpha, 0);
+        });
+      }
+
+      function avatarAt(index) {
+        const trips = [21.25, 23.15, 22.2, 25.05, 24.1];
+        return trips[index];
+      }
+
+      function drawAvatars(t) {
+        const gone = fade(t, 26.95, 27.35);
+        stations.forEach((s, i) => {
+          const born = avatarAt(i);
+          const alpha = fade(t, born, born + 0.28) * (1 - gone);
+          if (alpha <= 0.02) return;
+          const inner = s.x > MAIN.x + 40 ? -1 : 1;
+          drawPng(AVATARS[i], s.x + inner * (ST.w / 2 + 64), s.y - 4, 92, alpha, 0);
+        });
+      }
+
+      function drawChanges(t, screen) {
+        CHANGES.forEach((stationIndex, i) => {
+          const shown = fade(t, 14.5 + i * 0.1, 14.9 + i * 0.1);
+          const home = changeHome(i);
+          const arrive = changeArrive(i);
+          const depart = changeDepart(i);
+          const land = changeLand(i);
+          if (t < depart) {
+            if (shown <= 0 || t >= arrive) return;
+            const slot = slotGeom(screen, stationIndex);
+            const end = { x: slot.x + slot.w - 16, y: slot.y + slot.h / 2 };
+            let pos = home;
+            let scale = 0.78;
+            let alpha = shown;
+            if (t >= changeMove(i)) {
+              const u = easeInOut(seg(t, changeMove(i), arrive));
+              const door = edgePoint(MAIN.x, MAIN.y, MAIN.w, MAIN.h, home.x, home.y, 0);
+              pos = pointAlong([home, door, end], u);
+              if (u > 0.7) scale = lerp(0.78, 0.36, (u - 0.7) / 0.3);
+              if (u > 0.82) alpha = shown * (1 - (u - 0.82) / 0.18);
+            }
+            drawSheet(pos.x, pos.y, stations[stationIndex].kind, scale, alpha, "change", 0);
+            drawPng(refreshIcon, pos.x, pos.y, 46 * scale, alpha, t * 2.6);
+            return;
+          }
+          if (t > land + 0.42) return;
+          const u = easeInOut(seg(t, depart, land));
+          const slot = slotGeom(screen, stationIndex);
+          const start = { x: slot.x + slot.w / 2, y: slot.y + slot.h / 2 };
+          const target = screenOf(stations[stationIndex]);
+          const end = { x: target.x + target.w / 2, y: target.y + target.h / 2 };
+          const pos = pointAlong([start, ...routeOf(stations[stationIndex]), end], u);
+          const alpha = u > 0.86 ? 1 - (u - 0.86) / 0.14 : 1;
+          const scale = u < 0.14 ? lerp(0.42, 0.86, u / 0.14) : u > 0.82 ? lerp(0.86, 0.55, (u - 0.82) / 0.18) : 0.86;
+          drawSheet(pos.x, pos.y, stations[stationIndex].kind, scale, alpha, "change", 0);
+          drawPng(refreshIcon, pos.x, pos.y, 46 * scale, alpha, t * 2.6);
+        });
+      }
+
+      function drawRefreshHub(t) {
+        const alpha = fade(t, 16.15, 16.4) * (1 - fade(t, 17.75, 18.05));
+        if (alpha <= 0.02) return;
+        drawPng(refreshIcon, MAIN.x, MAIN.y + MAIN.h / 2 + 78, 72, alpha, t * 2.6);
+      }
+
+      const CHANGE_WORDS = [
+        { text: "Изменения", color: ORANGE },
+        { text: "Корректировки", color: LIGHT },
+      ];
+
+      function drawChangeWords(t) {
+        const start = 16.25;
+        const slot = 0.85;
+        const index = Math.floor((t - start) / slot);
+        if (index < 0 || index >= CHANGE_WORDS.length) return;
+        const local = t - start - index * slot;
+        let alpha = 1;
+        if (local < 0.2) alpha = easeOut(local / 0.2);
+        else if (local > 0.55) alpha = 1 - easeOut((local - 0.55) / 0.28);
+        const word = CHANGE_WORDS[index];
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = word.color;
+        ctx.font = "700 60px Unbounded, sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(word.text, W / 2, MAIN.y + MAIN.h / 2 + 210);
+        ctx.restore();
+      }
+
+      function drawChatLabel(t) {
+        const start = 21.2;
+        const end = 26.85;
+        const alpha = fade(t, start, start + 0.25) * (1 - fade(t, end - 0.4, end));
+        if (alpha <= 0.02) return;
+        const y = MAIN.y + MAIN.h / 2 + 168;
+        const text = "Чат";
+        const gap = 16;
+        const pulse = 0.5 + 0.5 * Math.sin((t - start) * Math.PI * 2.6);
+        const size = 54 + pulse * 26;
+        ctx.save();
+        ctx.font = "700 60px Unbounded, sans-serif";
+        const width = ctx.measureText(text).width;
+        const left = W / 2 - (size + gap + width) / 2;
+        drawPng(messageIcon, left + size / 2, y, size, alpha, 0);
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = LIGHT;
+        ctx.textAlign = "left";
+        ctx.textBaseline = "middle";
+        ctx.fillText(text, left + size + gap, y);
+        ctx.restore();
+      }
+
+      function drawNoticeLabel(t) {
+        const start = bellAt(2);
+        const end = 21.15;
+        const alpha = fade(t, start, start + 0.18) * (1 - fade(t, end - 0.28, end));
+        if (alpha <= 0.02) return;
+        const y = MAIN.y + MAIN.h / 2 + 118;
+        const text = "Уведомления";
+        const gap = 16;
+        const size = 72;
+        const wobble = Math.sin((t - start) * 38) * 0.2;
+        ctx.save();
+        ctx.font = "700 60px Unbounded, sans-serif";
+        const width = ctx.measureText(text).width;
+        const left = W / 2 - (size + gap + width) / 2;
+        drawPng(bellIcon, left + size / 2, y, size, alpha, wobble);
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = LIGHT;
+        ctx.textAlign = "left";
+        ctx.textBaseline = "middle";
+        ctx.fillText(text, left + size + gap, y);
+        ctx.restore();
+        const pulse = 0.5 + 0.5 * Math.sin((t - start) * Math.PI * 2.4);
+        const speaker = 96 + pulse * 40;
+        const speakerY = 118;
+        const down = Math.PI / 2;
+        const half = (15 * Math.PI) / 180;
+        drawPng(speakerIcon, 108, speakerY, speaker, alpha, down - half);
+        drawPng(speakerIcon, W - 108, speakerY, speaker, alpha, down + half);
+      }
+
+      function drawLed(x, y, on) {
+        ctx.fillStyle = on ? ORANGE : "#2A2A2A";
+        ctx.beginPath();
+        ctx.arc(x, y, 5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      function render(t) {
+        ctx.clearRect(0, 0, W, H);
+        ctx.fillStyle = BG;
+        ctx.fillRect(0, 0, W, H);
+        const hubA = fade(t, 0.2, 2.4);
+        stations.forEach((s, i) => drawLine(s, t, i));
+
+        const hubScreen = drawShell(MAIN.x, MAIN.y, MAIN.w, MAIN.h, hubA, true);
+        if (hubA > 0) {
+          ctx.save();
+          ctx.globalAlpha *= hubA;
+          drawLed(MAIN.x + MAIN.w / 2 - 16, MAIN.y - MAIN.h / 2 + 16, true);
+          drawHubWidgets(hubScreen, t);
+          drawHubTasks(hubScreen, t);
+          ctx.restore();
+        }
+
+        stations.forEach((s, i) => {
+          const shown = fade(t, cardDepart(i) - 0.1, cardDepart(i) + 1.05);
+          const retractStart = retractAt(i);
+          const a = shown * (1 - fade(t, retractStart, retractStart + 0.95));
+          if (a <= 0) return;
+          const lit = a;
+          drawShell(s.x, s.y, ST.w, ST.h, a, false);
+          ctx.save();
+          ctx.globalAlpha *= a;
+          drawLed(s.x + ST.w / 2 - 14, s.y - ST.h / 2 + 14, lit > 0.4);
+          const above = s.y < MAIN.y;
+          const badgeY = above ? s.y - ST.h / 2 - 36 : s.y + ST.h / 2 + 58;
+          drawBadge(s.kind, s.x, badgeY, lerp(0.45, 1, lit), lit > 0.85);
+          ctx.fillStyle = LIGHT;
+          ctx.font = "700 26px Unbounded, sans-serif";
+          ctx.letterSpacing = "0px";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText("Участок " + (i + 1), s.x, above ? badgeY - 52 : badgeY + 48);
+          const born = bellAt(i);
+          const age = t - born;
+          const cycle = 0.62;
+          if (age >= 0 && age <= cycle) {
+            const fadeIn = easeOut(Math.min(1, age / 0.08));
+            const fadeOut = age > cycle - 0.2 ? 1 - easeOut((age - (cycle - 0.2)) / 0.2) : 1;
+            const bellA = fadeIn * fadeOut;
+            const wobble = Math.sin(age * 38) * 0.16 * fadeOut;
+            const inner = s.x > MAIN.x + 40 ? -1 : 1;
+            drawPng(bellIcon, s.x + inner * (ST.w / 2 + 42), s.y - 4, 58, bellA, wobble);
+          }
+          const cover = fade(t, cardArrive(i) - 0.45, cardArrive(i));
+          if (lit > 0 && cover < 0.98) {
+            ctx.globalAlpha = a * lit * (1 - cover);
+            drawIcon(s.kind, s.x, s.y - 6, 44, 1, false);
+          }
+          ctx.restore();
+        });
+
+        if (hubA > 0) {
+          drawIntake(t, hubScreen);
+          drawOutbound(t, hubScreen);
+          drawReports(t, hubScreen);
+          drawChanges(t, hubScreen);
+          drawMessages(t);
+          drawAvatars(t);
+        }
+        drawDocWords(t);
+        drawChangeWords(t);
+        drawRefreshHub(t);
+        drawNoticeLabel(t);
+        drawChatLabel(t);
+        drawFinishWords(t);
+
+        const cover = fade(t, 34.2, 35.3);
+        if (cover > 0) {
+          ctx.save();
+          ctx.globalAlpha = cover;
+          ctx.fillStyle = BG;
+          ctx.fillRect(0, 0, W, H);
+          ctx.restore();
+        }
+        const logoA = fade(t, 35.05, 36.2);
+        if (logoA > 0 && logo.complete && logo.naturalWidth) {
+          const lw = 780;
+          const lh = lw * (logo.naturalHeight / logo.naturalWidth);
+          ctx.save();
+          ctx.globalAlpha = logoA;
+          ctx.drawImage(logo, (W - lw) / 2, (H - lh) / 2, lw, lh);
+          ctx.restore();
+        }
+      }
+
+      const logo = new Image();
+      logo.src = "../logo.png";
+      const bellIcon = new Image();
+      bellIcon.src = "bell.png";
+      const speakerIcon = new Image();
+      speakerIcon.src = "speaker.png";
+      const messageIcon = new Image();
+      messageIcon.src = "message.png";
+      const refreshIcon = new Image();
+      refreshIcon.src = "refresh.png";
+      const iconIzdeliya = new Image();
+      iconIzdeliya.src = "icon-izdeliya.png";
+      const iconDetali = new Image();
+      iconDetali.src = "icon-detali.png";
+      const iconChertezh = new Image();
+      iconChertezh.src = "icon-chertezh.png";
+      const iconZadachi = new Image();
+      iconZadachi.src = "icon-zadachi.png";
+      const DOC_ICONS = [iconIzdeliya, iconDetali, iconChertezh, iconZadachi];
+      const iconDone = new Image();
+      iconDone.src = "icon-done.png";
+      const iconCost = new Image();
+      iconCost.src = "icon-cost.png";
+      const iconPrint = new Image();
+      iconPrint.src = "icon-print.png";
+      const FINISH_ICONS = [iconDone, iconCost, iconPrint];
+      const AVATARS = [1, 2, 3, 4, 5].map((n) => {
+        const img = new Image();
+        img.src = "avatar-" + n + ".png";
+        return img;
+      });
+      function whenImage(img) {
+        return new Promise((resolve) => {
+          if (img.complete && img.naturalWidth) resolve(true);
+          img.onload = () => resolve(true);
+          img.onerror = () => resolve(false);
+        });
+      }
+      window.__logoReady = Promise.all([
+        whenImage(logo),
+        whenImage(bellIcon),
+        whenImage(speakerIcon),
+        whenImage(messageIcon),
+        whenImage(refreshIcon),
+        whenImage(iconIzdeliya),
+        whenImage(iconDetali),
+        whenImage(iconChertezh),
+        whenImage(iconZadachi),
+        whenImage(iconDone),
+        whenImage(iconCost),
+        whenImage(iconPrint),
+        ...AVATARS.map(whenImage),
+      ]);
+
+      window.renderAt = render;
+      window.__duration = DURATION;
+
+      const params = new URLSearchParams(location.search);
+      const freeze = params.get("t");
+      if (freeze !== null) {
+        render(Math.max(0, Math.min(DURATION, Number(freeze))));
+      } else if (params.get("record") === "1") {
+        render(0);
+        window.__ready = true;
+      } else {
+        let start = performance.now();
+        let alive = true;
+        const tick = (now) => {
+          const time = Math.min(DURATION, (now - start) / 1000);
+          render(time);
+          if (time < DURATION && alive) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+        canvas.addEventListener("click", () => {
+          start = performance.now();
+          alive = true;
+          requestAnimationFrame(tick);
+        });
+      }
+    </script>
+  </body>
+</html>
