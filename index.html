@@ -25,7 +25,7 @@
       href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&family=Unbounded:wght@500;600&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=64" />
+    <link rel="stylesheet" href="styles.css?v=65" />
   </head>
   <body>
     <div class="glow" aria-hidden="true"></div>
@@ -43,10 +43,32 @@
         Сильное производство строится не на памяти людей, а на ясности
         процессов.
       </p>
-      <a class="hero-cta" href="#tour">Посмотреть, как работать</a>
+      <a class="hero-cta" href="#film">Посмотреть, как работать</a>
     </header>
 
     <main>
+      <section class="film" id="film" aria-labelledby="film-title">
+        <p class="kicker">Как работает</p>
+        <h2 id="film-title">Система управления производством</h2>
+        <p class="film-lead">
+          Документы становятся задачами, уходят на участки и возвращаются
+          закрытыми.
+        </p>
+        <div class="film-frame">
+          <video
+            src="video/syncore-system.mp4"
+            width="1080"
+            height="1920"
+            muted
+            loop
+            playsinline
+            controls
+            preload="metadata"
+          >
+            <a href="video/syncore-system.mp4">Открыть ролик</a>
+          </video>
+        </div>
+      </section>
       <section class="then-now" id="then-now" aria-label="До и после SYNCORE">
         <article class="then-card">
           <p class="kicker">До</p>
@@ -573,6 +595,6 @@
       <img class="foot-logo" src="logo.png?v=4" alt="" width="220" height="67" />
       <p>Новосибирск</p>
     </footer>
-    <script src="motion.js?v=1" defer></script>
+    <script src="motion.js?v=2" defer></script>
   </body>
 </html>

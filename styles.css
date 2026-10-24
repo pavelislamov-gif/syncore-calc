@@ -107,6 +107,46 @@ body {
   outline-offset: 3px;
 }
 
+.film {
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  width: min(1100px, calc(100% - 1.4rem));
+  margin: 0 auto 3.2rem;
+  padding: 0 var(--pad);
+}
+
+.film h2 {
+  font-family: Unbounded, Manrope, sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  font-size: clamp(1.5rem, 3vw, 2.1rem);
+  margin-top: 0.55rem;
+}
+
+.film-lead {
+  max-width: 34rem;
+  margin-top: 0.75rem;
+  color: var(--muted);
+}
+
+.film-frame {
+  width: min(390px, 100%);
+  margin-top: 1.5rem;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  background: #050505;
+}
+
+.film-frame video {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: #0a0a0a;
+}
+
 .hero h1 span,
 .compare h2 span,
 .offer h2 span,
@@ -1911,6 +1951,9 @@ h3 {
 
 .has-motion .reveal,
 .has-motion .then-card,
+.has-motion .film > h2,
+.has-motion .film-lead,
+.has-motion .film-frame,
 .has-motion .walk > h2,
 .has-motion .walk-lead,
 .has-motion .work-grid article,
@@ -1928,6 +1971,9 @@ h3 {
 }
 
 .has-motion .then-card.is-in,
+.has-motion .film > h2.is-in,
+.has-motion .film-lead.is-in,
+.has-motion .film-frame.is-in,
 .has-motion .walk > h2.is-in,
 .has-motion .walk-lead.is-in,
 .has-motion .work-grid article.is-in,
