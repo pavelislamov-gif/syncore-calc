@@ -779,7 +779,7 @@
         const start = 31.15;
         const slot = 1.05;
         const index = Math.floor((t - start) / slot);
-        if (index < 0 || index >= FINISH_WORDS.length) return;
+        if (index <= 0 || index >= FINISH_WORDS.length) return;
         const local = t - start - index * slot;
         let alpha = 1;
         if (local < 0.24) alpha = easeOut(local / 0.24);
@@ -1002,6 +1002,48 @@
         drawPng(speakerIcon, W - 108, speakerY, speaker, alpha, down + half);
       }
 
+      function drawDoneMark(screen, t) {
+        const alpha = fade(t, 30.4, 31.15);
+        if (alpha <= 0.01) return;
+        const grow = lerp(0.9, 1, easeOut(seg(t, 30.4, 31.15)));
+        const s = 92 * grow;
+        const x = screen.x + screen.w / 2;
+        const text = "Задачи выполнены";
+        ctx.save();
+        ctx.globalAlpha *= alpha;
+        roundRect(screen.x, screen.y, screen.w, screen.h, 4);
+        ctx.clip();
+        ctx.strokeStyle = GREEN;
+        ctx.fillStyle = GREEN;
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        ctx.letterSpacing = "0px";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        let size = 28;
+        ctx.font = "700 " + size + "px Unbounded, sans-serif";
+        while (size > 16 && ctx.measureText(text).width > screen.w - 28) {
+          size -= 1;
+          ctx.font = "700 " + size + "px Unbounded, sans-serif";
+        }
+        const gap = 16;
+        const block = s + gap + size;
+        const top = screen.y + (screen.h - block) / 2;
+        const cy = top + s / 2;
+        ctx.lineWidth = 8;
+        ctx.beginPath();
+        ctx.arc(x, cy, s * 0.5, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.lineWidth = 10;
+        ctx.beginPath();
+        ctx.moveTo(x - s * 0.22, cy + s * 0.02);
+        ctx.lineTo(x - s * 0.05, cy + s * 0.18);
+        ctx.lineTo(x + s * 0.24, cy - s * 0.18);
+        ctx.stroke();
+        ctx.fillText(text, x, top + s + gap + size / 2);
+        ctx.restore();
+      }
+
       function drawLed(x, y, on) {
         ctx.fillStyle = on ? ORANGE : "#2A2A2A";
         ctx.beginPath();
@@ -1021,8 +1063,15 @@
           ctx.save();
           ctx.globalAlpha *= hubA;
           drawLed(MAIN.x + MAIN.w / 2 - 16, MAIN.y - MAIN.h / 2 + 16, true);
-          drawHubWidgets(hubScreen, t);
-          drawHubTasks(hubScreen, t);
+          const tasksA = 1 - fade(t, 30.4, 31.15);
+          if (tasksA > 0.01) {
+            ctx.save();
+            ctx.globalAlpha *= tasksA;
+            drawHubWidgets(hubScreen, t);
+            drawHubTasks(hubScreen, t);
+            ctx.restore();
+          }
+          drawDoneMark(hubScreen, t);
           ctx.restore();
         }
 

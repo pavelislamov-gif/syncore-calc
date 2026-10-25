@@ -25,7 +25,7 @@
       href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&family=Unbounded:wght@500;600&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=66" />
+    <link rel="stylesheet" href="styles.css?v=67" />
   </head>
   <body>
     <div class="glow" aria-hidden="true"></div>
@@ -64,13 +64,16 @@
             controls
             preload="metadata"
           >
-            <source src="video/syncore-system.mp4" type="video/mp4" />
+            <source src="video/syncore-system.mp4?v=sfx11" type="video/mp4" />
           </video>
           <p class="film-fallback" hidden>
             Ролик не загрузился.
-            <a href="video/syncore-system.mp4">Открыть файл</a>
+            <a href="video/syncore-system.mp4?v=sfx11">Открыть файл</a>
           </p>
         </div>
+        <button class="film-sound" type="button" aria-pressed="false">
+          Включить звук
+        </button>
       </section>
       <section class="then-now" id="then-now" aria-label="До и после SYNCORE">
         <article class="then-card">
@@ -598,6 +601,6 @@
       <img class="foot-logo" src="logo.png?v=4" alt="" width="220" height="67" />
       <p>Новосибирск</p>
     </footer>
-    <script src="motion.js?v=2" defer></script>
+    <script src="motion.js?v=3" defer></script>
   </body>
 </html>
